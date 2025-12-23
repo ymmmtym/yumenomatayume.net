@@ -1,11 +1,13 @@
 import { createRoute } from 'honox/factory'
+import { calculateReadingTime } from '../../utils/readingTime'
 
 const modules = import.meta.glob('../../content/blog/*.md', { eager: true })
 
 export default createRoute(async (c) => {
   const posts = Object.entries(modules).map(([path, module]: [string, any]) => {
     const slug = path.split('/').pop()?.replace('.md', '')
-    return { slug, ...module.frontmatter }
+    const readingTime = calculateReadingTime(typeof module.default === 'string' ? module.default : '')
+    return { slug, readingTime, ...module.frontmatter }
   }).sort((a, b) => 
     new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
   )
@@ -42,7 +44,12 @@ export default createRoute(async (c) => {
               <div class="p-6">
                 <h2 class="text-xl font-bold mb-2 text-gray-900 dark:text-gray-100">{post.title}</h2>
                 <p class="text-gray-600 dark:text-gray-400 mb-3 text-sm line-clamp-3">{post.description}</p>
-                <time class="text-xs text-gray-500 dark:text-gray-500">{post.pubDate}</time>
+                <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-500">
+                  <time>{post.pubDate}</time>
+                  <span class="flex items-center gap-1">
+                    📖 {post.readingTime}で読めます
+                  </span>
+                </div>
                 {post.tags && (
                   <div class="flex gap-1 flex-wrap mt-3">
                     {post.tags.slice(0, 3).map((tag: string) => (
