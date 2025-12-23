@@ -78,6 +78,103 @@ details[open] summary::before {
   overflow: hidden;
 }
 
+/* Heading anchor links */
+.prose h2,
+.prose h3 {
+  position: relative;
+  padding-left: 2rem; /* #分のスペースを確保 */
+  padding-right: 0.5rem; /* 右側にも少し余白 */
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-radius: 0.375rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  margin-left: -0.5rem;
+  display: block; /* 改行を正しく処理 */
+  width: fit-content; /* 内容に合わせた幅 */
+}
+
+.prose h2:hover,
+.prose h3:hover {
+  background-color: rgba(209, 213, 219, 0.6); /* より濃いライトテーマ */
+}
+
+.dark .prose h2:hover,
+.dark .prose h3:hover {
+  background-color: rgba(55, 65, 81, 0.3);
+}
+
+.anchor-link {
+  position: absolute;
+  left: 0.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 1; /* 常に表示 */
+  color: #6b7280;
+  text-decoration: none;
+  font-weight: normal;
+  font-size: 1.125rem; /* より大きく */
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.25rem;
+  transition: color 0.2s ease;
+}
+
+/* h3の###アイコンを小さく */
+.prose h3 .anchor-link {
+  font-size: 0.875rem;
+}
+
+.anchor-link:hover {
+  color: #4f46e5;
+}
+
+.dark .anchor-link {
+  color: #9ca3af;
+}
+
+.dark .anchor-link:hover {
+  color: #818cf8;
+}
+
+/* Copy tooltip */
+.copy-tooltip {
+  position: fixed;
+  background: #10b981;
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  z-index: 1000;
+  pointer-events: none;
+  animation: fadeInOut 2s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(10px); }
+  20% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+/* モバイル対応 */
+@media (max-width: 768px) {
+  .prose h2,
+  .prose h3 {
+    padding-left: 1.5rem;
+  }
+  
+  .anchor-link {
+    left: 0.125rem;
+    font-size: 1rem;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
 /* Line clamp utility */
 .line-clamp-2 {
   display: -webkit-box;
