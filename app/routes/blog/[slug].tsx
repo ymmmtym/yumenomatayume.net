@@ -110,19 +110,20 @@ export default createRoute(async (c) => {
               navigator.clipboard.writeText(url.toString()).then(() => {
                 // コピー完了の視覚的フィードバック
                 const tooltip = document.createElement('div');
-                tooltip.textContent = 'リンクをコピーしました！';
-                tooltip.className = 'copy-tooltip';
-                document.body.appendChild(tooltip);
+                tooltip.textContent = 'Copied!';
+                tooltip.style.cssText = 'position:absolute;top:50%;left:100%;transform:translateY(-50%);margin-left:12px;background:rgba(16,185,129,0.9);color:white;padding:6px 12px;border-radius:6px;font-size:14px;white-space:nowrap;backdrop-filter:blur(4px);opacity:0;transition:opacity 0.3s ease-in-out;z-index:1000;';
+                heading.appendChild(tooltip);
                 
-                // ツールチップの位置を設定
-                const rect = heading.getBoundingClientRect();
-                tooltip.style.left = rect.left + 'px';
-                tooltip.style.top = (rect.top - 40) + 'px';
-                
-                // 2秒後にツールチップを削除
+                // アニメーション開始
                 setTimeout(() => {
-                  tooltip.remove();
-                }, 2000);
+                  tooltip.style.opacity = '1';
+                }, 10);
+                
+                // 1秒後にツールチップを削除
+                setTimeout(() => {
+                  tooltip.style.opacity = '0';
+                  setTimeout(() => tooltip.remove(), 300);
+                }, 1000);
               }).catch(() => {
                 console.log('クリップボードへのコピーに失敗しました');
               });
@@ -153,7 +154,7 @@ export default createRoute(async (c) => {
         });
       `}} />
       <div class="fixed top-20 right-2 md:top-24 md:right-4 z-50 flex flex-col gap-2">
-        <button onclick={`navigator.clipboard.writeText('https://yumenomatayume.net/blog/${slug}'); const t=document.createElement('div'); t.textContent='Copied!'; t.style.cssText='position:absolute;top:-35px;right:0;background:#10b981;color:white;padding:6px 12px;border-radius:6px;font-size:14px;white-space:nowrap;'; this.appendChild(t); setTimeout(() => t.remove(), 2000)`} class="flex items-center justify-center w-9 h-9 md:w-12 md:h-12 bg-white dark:bg-purple-900/40 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all cursor-pointer relative" title="URLをコピー">
+        <button onclick={`navigator.clipboard.writeText('https://yumenomatayume.net/blog/${slug}'); const t=document.createElement('div'); t.textContent='Copied!'; t.style.cssText='position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:8px;background:#10b981;color:white;padding:6px 12px;border-radius:6px;font-size:14px;white-space:nowrap;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);z-index:1000;opacity:0;animation:fadeIn 0.3s ease-in-out forwards;'; t.style.animation='fadeIn 0.3s ease-in-out forwards'; const style=document.createElement('style'); style.textContent='@keyframes fadeIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}'; document.head.appendChild(style); this.appendChild(t); setTimeout(() => t.remove(), 1000)`} class="flex items-center justify-center w-9 h-9 md:w-12 md:h-12 bg-white dark:bg-purple-900/40 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all cursor-pointer relative" title="URLをコピー">
           <span class="text-base md:text-xl">🔗</span>
         </button>
         <a href={`https://twitter.com/intent/tweet?url=https://yumenomatayume.net/blog/${slug}&text=${encodeURIComponent(tweetText)}`} target="_blank" rel="noopener noreferrer" class="flex items-center justify-center w-9 h-9 md:w-12 md:h-12 bg-white dark:bg-purple-900/40 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all" title="Xでシェア">

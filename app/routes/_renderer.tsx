@@ -150,9 +150,13 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
                   navigator.clipboard.writeText(code);
                   const tooltip = document.createElement('div');
                   tooltip.textContent = 'Copied!';
-                  tooltip.style.cssText = 'position:absolute;bottom:100%;right:0;margin-bottom:8px;background:#10b981;color:white;padding:4px 8px;border-radius:4px;font-size:12px;white-space:nowrap;z-index:20';
+                  tooltip.style.cssText = 'position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:8px;background:#10b981;color:white;padding:6px 12px;border-radius:6px;font-size:14px;white-space:nowrap;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);z-index:1000;opacity:0;transition:opacity 0.3s ease-in-out;';
                   button.appendChild(tooltip);
-                  setTimeout(function() { tooltip.remove(); }, 2000);
+                  setTimeout(function() { tooltip.style.opacity = '1'; }, 10);
+                  setTimeout(function() { 
+                    tooltip.style.opacity = '0';
+                    setTimeout(function() { tooltip.remove(); }, 300);
+                  }, 1000);
                 };
                 pre.style.position = 'relative';
                 pre.style.overflow = 'visible';
