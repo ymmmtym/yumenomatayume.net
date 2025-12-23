@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "linear": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://mcp.linear.app/mcp"
+      ]
+    }
+  },
+  "workflows": {
+    "blog_creation": {
+      "blog_directory": "app/content/blog",
+      "image_directory": "public/images",
+      "default_tags": ["tech", "troubleshooting"],
+      "image_formats": ["png", "jpg", "jpeg", "webp"]
+    }
+  }
+}

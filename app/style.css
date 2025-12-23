@@ -1,0 +1,150 @@
+@import 'prismjs/themes/prism.css';
+@import 'prismjs/themes/prism-tomorrow.css' layer(dark);
+@import 'tailwindcss' source('../app');
+@plugin '@tailwindcss/typography';
+
+@theme {
+  --color-*: initial;
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+  --color-purple-50: #faf5ff;
+  --color-purple-100: #f3e8ff;
+  --color-purple-200: #e9d5ff;
+  --color-purple-300: #d8b4fe;
+  --color-purple-600: #9333ea;
+  --color-purple-700: #7e22ce;
+  --color-purple-800: #6b21a8;
+  --color-purple-900: #581c87;
+  --color-purple-950: #3b0764;
+  --color-indigo-900: #312e81;
+  --color-pink-50: #fdf2f8;
+}
+
+@variant dark (&:where(.dark, .dark *));
+
+/* Collapsible tag list styles */
+details summary {
+  list-style: none;
+  user-select: none;
+}
+
+details summary::-webkit-details-marker {
+  display: none;
+}
+
+details summary::before {
+  content: "▶";
+  display: inline-block;
+  margin-right: 0.5rem;
+  transition: transform 0.2s ease;
+}
+
+details[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark h5,
+.dark h6 {
+  color: #f9fafb;
+}
+
+.dark pre[class*="language-"],
+.dark code[class*="language-"] {
+  background: #2d2d2d;
+  color: #ccc;
+}
+
+/* Inline code styling */
+.prose code:not([class*="language-"]) {
+  background-color: #f6f8fa;
+  color: #24292f;
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 85%;
+  font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+}
+
+.dark .prose code:not([class*="language-"]) {
+  background-color: rgba(110, 118, 129, 0.4);
+  color: #e6edf3;
+}
+
+/* Remove excessive shadows from code blocks */
+.prose pre[class*="language-"],
+.prose code[class*="language-"] {
+  text-shadow: none;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.prose .token {
+  text-shadow: none;
+  background: none !important;
+}
+
+.prose .token.operator,
+.prose .token.punctuation {
+  background: none !important;
+}
+
+/* Table styling */
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+  table-layout: auto;
+}
+
+.prose th,
+.prose td {
+  border: 1px solid #d1d5db;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.prose th:first-child,
+.prose td:first-child {
+  width: 120px;
+}
+
+.prose th:last-child,
+.prose td:last-child {
+  white-space: normal;
+  width: auto;
+}
+
+.prose th {
+  background-color: #f9fafb;
+  font-weight: 600;
+}
+
+.prose tbody tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+.dark .prose th,
+.dark .prose td {
+  border-color: rgba(88, 28, 135, 0.3);
+}
+
+.dark .prose th {
+  background-color: rgba(88, 28, 135, 0.3);
+  color: #f9fafb;
+}
+
+.dark .prose tbody tr:nth-child(even) {
+  background-color: rgba(88, 28, 135, 0.15);
+}
