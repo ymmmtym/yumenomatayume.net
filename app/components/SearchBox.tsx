@@ -1,9 +1,12 @@
+import { calculateReadingTime } from '../utils/readingTime'
+
 interface SearchResult {
   slug: string
   title: string
   description: string
   tags: string[]
   pubDate: string
+  content: string
 }
 
 interface SearchBoxProps {
@@ -30,6 +33,53 @@ export function SearchBox({ posts }: SearchBoxProps) {
       <script dangerouslySetInnerHTML={{
         __html: `
           (function() {
+            // Reading time calculation function
+            window.calculateReadingTime = function(content) {
+              if (typeof content !== 'string') {
+                return '1分未満';
+              }
+              
+              const codeBlockRegex = /\`\`\`[\\s\\S]*?\`\`\`/g;
+              const inlineCodeRegex = /\`[^\`]+\`/g;
+              
+              const codeBlocks = content.match(codeBlockRegex) || [];
+              const inlineCodes = content.match(inlineCodeRegex) || [];
+              
+              const codeCharCount = [...codeBlocks, ...inlineCodes]
+                .join('')
+                .replace(/\`\`\`|\`/g, '')
+                .length;
+              
+              const textContent = content
+                .replace(codeBlockRegex, '')
+                .replace(inlineCodeRegex, '')
+                .replace(/---[\\s\\S]*?---/, '')
+                .replace(/#+\\s/g, '')
+                .replace(/\\*\\*|__|\\*|_/g, '')
+                .replace(/\\[([^\\]]+)\\]\\([^)]+\\)/g, '$1')
+                .replace(/!\\[[^\\]]*\\]\\([^)]+\\)/g, '')
+                .trim();
+              
+              const japaneseChars = (textContent.match(/[\\u3040-\\u309F\\u30A0-\\u30FF\\u4E00-\\u9FAF]/g) || []).length;
+              const englishWords = textContent
+                .replace(/[\\u3040-\\u309F\\u30A0-\\u30FF\\u4E00-\\u9FAF]/g, ' ')
+                .split(/\\s+/)
+                .filter(word => word.length > 0).length;
+              
+              const japaneseReadingTime = japaneseChars / 450;
+              const englishReadingTime = englishWords / 225;
+              const codeReadingTime = (codeCharCount / 450) * 2;
+              
+              const totalMinutes = japaneseReadingTime + englishReadingTime + codeReadingTime;
+              
+              if (totalMinutes < 1) {
+                return '1分未満';
+              }
+              
+              const roundedMinutes = Math.round(totalMinutes);
+              return '約' + roundedMinutes + '分';
+            };
+            
             const posts = ${JSON.stringify(posts)};
             const searchInput = document.getElementById('search-input');
             const searchResults = document.getElementById('search-results');
@@ -56,8 +106,11 @@ export function SearchBox({ posts }: SearchBoxProps) {
                 '<a href="/blog/' + result.slug + '" class="block m-1 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700 last:border-b-0 bg-white dark:bg-gray-800 rounded focus-visible:outline-2 focus-visible:outline-blue-500 dark:focus-visible:outline-cyan-400 focus-visible:outline-offset-2">' +
                   '<div class="font-medium text-gray-800 dark:text-gray-100 mb-1">' + result.title + '</div>' +
                   '<div class="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">' + result.description + '</div>' +
-                  '<div class="flex items-center gap-2">' +
+                  '<div class="flex items-center justify-between">' +
                     '<time class="text-xs text-gray-500 dark:text-gray-500">' + result.pubDate + '</time>' +
+                    '<span class="text-xs text-gray-500 dark:text-gray-500">📖 ' + (function() { try { return window.calculateReadingTime(result.content) + 'で読めます'; } catch(e) { return ''; } })() + '</span>' +
+                  '</div>' +
+                  '<div class="flex items-center gap-2 mt-2">' +
                     result.tags.slice(0, 3).map(tag => 
                       '<span class="px-2 py-1 bg-gray-300 dark:bg-gray-700 rounded text-xs text-gray-700 dark:text-gray-300">' + tag + '</span>'
                     ).join('') +
