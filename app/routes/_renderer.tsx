@@ -5,7 +5,7 @@ import Header from '../components/Header'
 // 記事データを取得する関数
 const getBlogPosts = () => {
   try {
-    const modules = import.meta.glob('../content/blog/*.md', { eager: true })
+    const modules = import.meta.glob('../content/blog/*.{md,mdx}', { eager: true })
     return Object.entries(modules).map(([path, module]: [string, any]) => {
       const slug = path.split('/').pop()?.replace('.md', '')
       return { 

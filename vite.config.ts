@@ -5,7 +5,6 @@ import mdx from '@mdx-js/rollup'
 import honox from 'honox/vite'
 import remarkFrontmatter from 'remark-frontmatter'
 import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
-import remarkGfm from 'remark-gfm'
 import rehypePrism from 'rehype-prism-plus'
 import { remarkLinkCard } from './app/utils/remarkLinkCard'
 import { defineConfig } from 'vite'
@@ -19,7 +18,7 @@ export default defineConfig({
     tailwindcss(),
     mdx({
       jsxImportSource: 'hono/jsx',
-      remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter, remarkGfm, remarkLinkCard],
+      remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter, remarkLinkCard],
       rehypePlugins: [rehypePrism]
     }),
     build()

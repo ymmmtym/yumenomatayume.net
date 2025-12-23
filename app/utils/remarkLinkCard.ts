@@ -2,7 +2,7 @@ import { visit } from 'unist-util-visit'
 import type { Plugin } from 'unified'
 import type { Root } from 'mdast'
 
-// MDXでリンクカードを自動変換するプラグイン
+// MDXでリンクカードを自動変換するプラグイン（remarkGfmより前に実行）
 export const remarkLinkCard: Plugin<[], Root> = () => {
   return (tree) => {
     visit(tree, 'paragraph', (node, index, parent) => {
@@ -16,8 +16,16 @@ export const remarkLinkCard: Plugin<[], Root> = () => {
         if (urlRegex.test(text)) {
           // LinkCardコンポーネントに置換
           const linkCardNode = {
-            type: 'jsx',
-            value: `<LinkCard url="${text}" />`
+            type: 'mdxJsxFlowElement',
+            name: 'LinkCard',
+            attributes: [
+              {
+                type: 'mdxJsxAttribute',
+                name: 'url',
+                value: text
+              }
+            ],
+            children: []
           }
           
           parent.children[index] = linkCardNode
