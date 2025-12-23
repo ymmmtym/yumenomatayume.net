@@ -1,73 +1,8 @@
 import { createRoute } from 'honox/factory'
-
-const RSS_FEEDS = [
-  { name: '個人ブログ', url: 'https://yumenomatayume.net/feed', icon: '📋' },
-  { name: 'Zenn', url: 'https://zenn.dev/ymmmtym/feed', icon: '📝' },
-  { name: 'Qiita', url: 'https://qiita.com/yumenomatayume/feed', icon: '📚' },
-  { name: 'はてな', url: 'https://ymmmtym.hateblo.jp/feed', icon: '📖' },
-]
-
-async function parseRSS(xml: string) {
-  const items: any[] = []
-  
-  // Try <item> tags (RSS 2.0)
-  let itemRegex = /<item>([\s\S]*?)<\/item>/g
-  let match
-  
-  while ((match = itemRegex.exec(xml)) !== null) {
-    const item = match[1]
-    const title = item.match(/<title>(.*?)<\/title>/)?.[1] || ''
-    const link = item.match(/<link>(.*?)<\/link>/)?.[1] || ''
-    const pubDate = item.match(/<pubDate>(.*?)<\/pubDate>/)?.[1] || item.match(/<dc:date>(.*?)<\/dc:date>/)?.[1] || ''
-    
-    items.push({ title, link, pubDate })
-  }
-  
-  // Try <entry> tags (Atom)
-  if (items.length === 0) {
-    itemRegex = /<entry>([\s\S]*?)<\/entry>/g
-    while ((match = itemRegex.exec(xml)) !== null) {
-      const item = match[1]
-      const title = item.match(/<title>(.*?)<\/title>/)?.[1] || ''
-      const link = item.match(/<link[^>]*href="([^"]*)"[^>]*>/)?.[1] || item.match(/<link>(.*?)<\/link>/)?.[1] || ''
-      const pubDate = item.match(/<published>(.*?)<\/published>/)?.[1] || item.match(/<updated>(.*?)<\/updated>/)?.[1] || ''
-      
-      items.push({ title, link, pubDate })
-    }
-  }
-  
-  return items
-}
-
-async function fetchExternalPosts() {
-  const allPosts: any[] = []
-
-  for (const feed of RSS_FEEDS) {
-    try {
-      const response = await fetch(feed.url)
-      const xml = await response.text()
-      const items = await parseRSS(xml)
-      
-      const posts = items.map(item => ({
-        title: item.title.replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1'),
-        link: item.link,
-        pubDate: item.pubDate,
-        source: feed.name,
-        icon: feed.icon,
-      }))
-      allPosts.push(...posts)
-    } catch (error) {
-      console.error(`Failed to fetch ${feed.name}:`, error)
-    }
-  }
-
-  return allPosts
-    .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
-    .slice(0, 10)
-}
+import { fetchExternalPosts } from '../components/ExternalPosts'
 
 export default createRoute(async (c) => {
-  const externalPosts = await fetchExternalPosts()
+  const externalPosts = await fetchExternalPosts(10)
   
   return c.render(
     <main class="max-w-3xl mx-auto py-8 px-4">
