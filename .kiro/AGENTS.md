@@ -96,6 +96,30 @@ heroImage: "https://cloudinary-url" # optional
 - 記事カードでは最初の3つのタグのみ表示
 - タグページでの記事フィルタリング対応
 
+## Development Workflow
+
+### Branch Naming Convention
+- Feature branches: `issue/{issue-number}`
+- Example: `issue/1`, `issue/2`, `issue/3`
+
+### Git Workflow
+1. Create branch: `git checkout -b issue/1`
+2. Commit with reference: `git commit -m "feat: 機能名 (#1)"`
+3. Push and create PR: `gh pr create --title "機能名" --body "Closes #1"`
+4. PR merge automatically closes the issue
+
+### Commit Message Format
+- `feat: 新機能 (#issue-number)`
+- `fix: バグ修正 (#issue-number)`
+- `docs: ドキュメント更新 (#issue-number)`
+- `style: スタイル調整 (#issue-number)`
+
+### Commit Best Practices
+- **機能ごとに細かくコミット** - 1つのコミットは1つの機能や修正に集中
+- 複数の変更がある場合は `git reset` で分割してコミット
+- 例: SearchBox作成、Header統合、CSS追加を別々のコミットに分ける
+- コミットメッセージは変更内容を具体的に記述
+
 ## Deployment & Hosting
 
 **Platform:** Cloudflare Workers
