@@ -54,6 +54,103 @@ export default createRoute(async (c) => {
             }
           }
         });
+        
+        // 見出しアンカーリンク機能を初期化
+        document.addEventListener('DOMContentLoaded', () => {
+          // h2, h3見出しを取得
+          const headings = document.querySelectorAll('.prose h2, .prose h3');
+          const usedIds = new Set();
+          
+          headings.forEach((heading) => {
+            const text = heading.textContent || '';
+            let id = text
+              .toLowerCase()
+              .replace(/[^\\w\\u3040-\\u309F\\u30A0-\\u30FF\\u4E00-\\u9FAF\\s-]/g, '')
+              .replace(/\\s+/g, '-')
+              .replace(/-+/g, '-')
+              .replace(/^-|-$/g, '');
+            
+            // 重複IDの場合は連番を付与
+            let counter = 1;
+            let uniqueId = id;
+            while (usedIds.has(uniqueId)) {
+              uniqueId = id + '-' + counter;
+              counter++;
+            }
+            usedIds.add(uniqueId);
+            
+            // IDを設定
+            heading.id = uniqueId;
+            
+            // アンカーリンクボタンを追加
+            const anchorLink = document.createElement('a');
+            anchorLink.href = '#' + uniqueId;
+            anchorLink.className = 'anchor-link';
+            
+            // 見出しレベルに応じて#の数を変更
+            const level = parseInt(heading.tagName.charAt(1));
+            anchorLink.innerHTML = '#'.repeat(level);
+            
+            anchorLink.setAttribute('aria-label', text + 'へのリンク');
+            
+            // コピー機能
+            function copyAnchorLink(e) {
+              e.preventDefault();
+              e.stopPropagation();
+              
+              // URLを更新
+              const url = new URL(window.location.href);
+              url.hash = uniqueId;
+              window.history.pushState({}, '', url.toString());
+              
+              // スムーススクロール
+              heading.scrollIntoView({ behavior: 'smooth' });
+              
+              // URLをクリップボードにコピー
+              navigator.clipboard.writeText(url.toString()).then(() => {
+                // コピー完了の視覚的フィードバック
+                const tooltip = document.createElement('div');
+                tooltip.textContent = 'リンクをコピーしました！';
+                tooltip.className = 'copy-tooltip';
+                document.body.appendChild(tooltip);
+                
+                // ツールチップの位置を設定
+                const rect = heading.getBoundingClientRect();
+                tooltip.style.left = rect.left + 'px';
+                tooltip.style.top = (rect.top - 40) + 'px';
+                
+                // 2秒後にツールチップを削除
+                setTimeout(() => {
+                  tooltip.remove();
+                }, 2000);
+              }).catch(() => {
+                console.log('クリップボードへのコピーに失敗しました');
+              });
+            }
+            
+            // #アイコンクリック時の処理
+            anchorLink.addEventListener('click', copyAnchorLink);
+            
+            // 見出し全体クリック時の処理
+            heading.addEventListener('click', copyAnchorLink);
+            heading.style.cursor = 'pointer';
+            
+            // 見出しにアンカーリンクを追加
+            heading.style.position = 'relative';
+            heading.appendChild(anchorLink);
+          });
+          
+          // ページ読み込み時にアンカーがある場合はスクロール
+          if (window.location.hash) {
+            const targetId = window.location.hash.slice(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+              setTimeout(() => {
+                targetElement.scrollIntoView({ behavior: 'smooth' });
+              }, 100);
+            }
+          }
+        });
       `}} />
       <div class="fixed top-20 right-2 md:top-24 md:right-4 z-50 flex flex-col gap-2">
         <button onclick={`navigator.clipboard.writeText('https://yumenomatayume.net/blog/${slug}'); const t=document.createElement('div'); t.textContent='Copied!'; t.style.cssText='position:absolute;top:-35px;right:0;background:#10b981;color:white;padding:6px 12px;border-radius:6px;font-size:14px;white-space:nowrap;'; this.appendChild(t); setTimeout(() => t.remove(), 2000)`} class="flex items-center justify-center w-9 h-9 md:w-12 md:h-12 bg-white dark:bg-purple-900/40 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all cursor-pointer relative" title="URLをコピー">
