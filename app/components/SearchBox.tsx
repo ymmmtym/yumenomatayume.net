@@ -66,9 +66,9 @@ export function SearchBox({ posts }: SearchBoxProps) {
                 .split(/\\s+/)
                 .filter(word => word.length > 0).length;
               
-              const japaneseReadingTime = japaneseChars / 450;
-              const englishReadingTime = englishWords / 225;
-              const codeReadingTime = (codeCharCount / 450) * 2;
+              const japaneseReadingTime = japaneseChars / 300;
+              const englishReadingTime = englishWords / 200;
+              const codeReadingTime = (codeCharCount / 300) * 3.33;
               
               const totalMinutes = japaneseReadingTime + englishReadingTime + codeReadingTime;
               

@@ -41,10 +41,10 @@ export function calculateReadingTime(content: string): string {
     .filter(word => word.length > 0).length
   
   // 読了時間計算
-  // 日本語: 450文字/分, 英語: 225単語/分, コード: 通常の50%
-  const japaneseReadingTime = japaneseChars / 450
-  const englishReadingTime = englishWords / 225
-  const codeReadingTime = (codeCharCount / 450) * 2 // 50%の速度なので2倍の時間
+  // 日本語: 300文字/分, 英語: 200単語/分, コード: 通常の30%の速度
+  const japaneseReadingTime = japaneseChars / 300
+  const englishReadingTime = englishWords / 200
+  const codeReadingTime = (codeCharCount / 300) * 3.33 // 30%の速度なので3.33倍の時間
   
   const totalMinutes = japaneseReadingTime + englishReadingTime + codeReadingTime
   
