@@ -9,65 +9,76 @@ export function TableOfContents() {
           const tocContainer = document.getElementById('toc-container');
           
           function updateToc() {
-            const headings = document.querySelectorAll('h2, h3, h4, h5, h6');
-            if (headings.length === 0) {
-              tocContainer.style.display = 'none';
-              return;
-            }
-            
-            tocList.innerHTML = '';
-            let activeId = '';
-            
-            headings.forEach((heading, index) => {
-              if (!heading.id) {
-                const text = heading.textContent || '';
-                const id = text.toLowerCase()
-                  .replace(/[^a-z0-9\\u3040-\\u309f\\u30a0-\\u30ff\\u4e00-\\u9faf]/g, '-')
-                  .replace(/-+/g, '-')
-                  .replace(/^-|-$/g, '') || \`heading-\${index}\`;
-                heading.id = id;
+            // 見出しアンカーリンク機能で既にIDが設定されるまで少し待つ
+            setTimeout(() => {
+              const headings = document.querySelectorAll('.prose h2, .prose h3, .prose h4, .prose h5, .prose h6');
+              if (headings.length === 0) {
+                tocContainer.style.display = 'none';
+                return;
               }
               
-              const li = document.createElement('li');
-              const a = document.createElement('a');
-              const level = parseInt(heading.tagName.charAt(1));
+              tocList.innerHTML = '';
               
-              a.href = '#' + heading.id;
-              a.textContent = heading.textContent;
-              a.className = 'block text-sm py-1 px-2 rounded transition-colors text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100';
-              a.style.paddingLeft = (level - 1) * 12 + 8 + 'px';
-              a.dataset.headingId = heading.id;
-              
-              li.appendChild(a);
-              tocList.appendChild(li);
-            });
-            
-            // スクロール位置ベースのアクティブセクション検出
-            function updateActiveSection() {
-              const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
-              let activeHeading = null;
-              
-              headings.forEach(heading => {
-                const rect = heading.getBoundingClientRect();
-                if (rect.top <= 100) {
-                  activeHeading = heading;
-                }
-              });
-              
-              document.querySelectorAll('#toc-list a').forEach(a => {
+              headings.forEach((heading) => {
+                // 見出しアンカーリンク機能で既にIDが設定されているはず
+                if (!heading.id) return;
+                
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                const level = parseInt(heading.tagName.charAt(1));
+                
+                a.href = '#' + heading.id;
+                a.textContent = heading.textContent.replace(/#+$/, ''); // 末尾の#を全て除去
                 a.className = 'block text-sm py-1 px-2 rounded transition-colors text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100';
+                a.style.paddingLeft = (level - 1) * 12 + 8 + 'px';
+                a.dataset.headingId = heading.id;
+                
+                // クリック時のスムーススクロール
+                a.addEventListener('click', (e) => {
+                  e.preventDefault();
+                  const targetElement = document.getElementById(heading.id);
+                  if (targetElement) {
+                    // URLを更新
+                    const url = new URL(window.location.href);
+                    url.hash = heading.id;
+                    window.history.pushState({}, '', url.toString());
+                    
+                    // スムーススクロール
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                  }
+                });
+                
+                li.appendChild(a);
+                tocList.appendChild(li);
               });
               
-              if (activeHeading) {
-                const link = document.querySelector(\`a[data-heading-id="\${activeHeading.id}"]\`);
-                if (link) {
-                  link.className = 'block text-sm py-1 px-2 rounded transition-colors bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200';
+              // スクロール位置ベースのアクティブセクション検出
+              function updateActiveSection() {
+                const headings = document.querySelectorAll('.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6');
+                let activeHeading = null;
+                
+                headings.forEach(heading => {
+                  const rect = heading.getBoundingClientRect();
+                  if (rect.top <= 100) {
+                    activeHeading = heading;
+                  }
+                });
+                
+                document.querySelectorAll('#toc-list a').forEach(a => {
+                  a.className = 'block text-sm py-1 px-2 rounded transition-colors text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100';
+                });
+                
+                if (activeHeading) {
+                  const link = document.querySelector(\`a[data-heading-id="\${activeHeading.id}"]\`);
+                  if (link) {
+                    link.className = 'block text-sm py-1 px-2 rounded transition-colors bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200';
+                  }
                 }
               }
-            }
-            
-            window.addEventListener('scroll', updateActiveSection);
-            updateActiveSection();
+              
+              window.addEventListener('scroll', updateActiveSection);
+              updateActiveSection();
+            }, 200); // 見出しアンカーリンク機能の初期化を待つ
           }
           
           updateToc();
