@@ -1,5 +1,6 @@
 import { createRoute } from 'honox/factory'
 import { TableOfContents } from '../../components/TableOfContents'
+import { LinkCard } from '../../components/LinkCard'
 
 const modules = import.meta.glob('../../content/blog/*.md', { eager: true })
 
@@ -193,7 +194,7 @@ export default createRoute(async (c) => {
           )}
         </header>
         <div class="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200">
-          <Content />
+          <Content components={{ LinkCard }} />
         </div>
       </article>
 
