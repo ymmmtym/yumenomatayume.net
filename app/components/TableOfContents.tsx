@@ -23,6 +23,9 @@ export function TableOfContents() {
                 // 見出しアンカーリンク機能で既にIDが設定されているはず
                 if (!heading.id) return;
                 
+                // リンクカード内の見出しは除外
+                if (heading.closest('a[target="_blank"]')) return;
+                
                 const li = document.createElement('li');
                 const a = document.createElement('a');
                 const level = parseInt(heading.tagName.charAt(1));
@@ -58,6 +61,9 @@ export function TableOfContents() {
                 let activeHeading = null;
                 
                 headings.forEach(heading => {
+                  // リンクカード内の見出しは除外
+                  if (heading.closest('a[target="_blank"]')) return;
+                  
                   const rect = heading.getBoundingClientRect();
                   if (rect.top <= 100) {
                     activeHeading = heading;
