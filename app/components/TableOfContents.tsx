@@ -107,6 +107,6 @@ export function TableOfContents() {
           updateToc();
         });
       `}} />
-    </div>
+    </>
   )
 }
