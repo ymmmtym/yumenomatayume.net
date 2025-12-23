@@ -8,12 +8,12 @@ export function TableOfContents() {
       </div>
       
       {/* モバイル・タブレット用折りたたみ目次 */}
-      <div id="toc-container-mobile" class="xl:hidden mb-8 bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+      <div id="toc-container-mobile" class="xl:hidden mb-8 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 -mx-4">
         <details class="group">
-          <summary class="font-bold text-sm mb-3 text-gray-900 dark:text-gray-100 cursor-pointer hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
-            目次 <span class="group-open:rotate-90 transition-transform inline-block">▶</span>
+          <summary class="font-bold text-sm p-4 text-gray-900 dark:text-gray-100 cursor-pointer hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+            ▶ 目次
           </summary>
-          <ul id="toc-list-mobile" class="space-y-1 mt-3"></ul>
+          <ul id="toc-list-mobile" class="space-y-1 px-4 pb-4"></ul>
         </details>
       </div>
       <script dangerouslySetInnerHTML={{__html: `
@@ -22,6 +22,19 @@ export function TableOfContents() {
           const tocListMobile = document.getElementById('toc-list-mobile');
           const tocContainerDesktop = document.getElementById('toc-container-desktop');
           const tocContainerMobile = document.getElementById('toc-container-mobile');
+          
+          // モバイル目次の矢印回転アニメーション
+          const mobileDetails = tocContainerMobile.querySelector('details');
+          const mobileSummary = mobileDetails.querySelector('summary');
+          
+          mobileDetails.addEventListener('toggle', () => {
+            const arrow = mobileSummary.textContent.charAt(0);
+            if (mobileDetails.open) {
+              mobileSummary.innerHTML = '▼ 目次';
+            } else {
+              mobileSummary.innerHTML = '▶ 目次';
+            }
+          });
           
           function updateToc() {
             // 見出しアンカーリンク機能で既にIDが設定されるまで少し待つ
