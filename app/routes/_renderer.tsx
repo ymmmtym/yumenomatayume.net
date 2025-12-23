@@ -2,6 +2,25 @@ import { jsxRenderer, useRequestContext } from 'hono/jsx-renderer'
 import { Link, Script } from 'honox/server'
 import Header from '../components/Header'
 
+// 記事データを取得する関数
+const getBlogPosts = () => {
+  try {
+    const modules = import.meta.glob('../content/blog/*.md', { eager: true })
+    return Object.entries(modules).map(([path, module]: [string, any]) => {
+      const slug = path.split('/').pop()?.replace('.md', '')
+      return { 
+        slug, 
+        title: module.frontmatter?.title || '',
+        description: module.frontmatter?.description || '',
+        tags: module.frontmatter?.tags || [],
+        pubDate: module.frontmatter?.pubDate || ''
+      }
+    })
+  } catch (error) {
+    return []
+  }
+}
+
 export default jsxRenderer(({ children, title, description, heroImage }) => {
   const c = useRequestContext()
   const pageTitle = title ? `${title} | yumenomatayume` : 'yumenomatayume'
@@ -9,6 +28,9 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
   const baseUrl = 'https://yumenomatayume.net'
   const currentUrl = `${baseUrl}${c.req.path}`
   const ogImage = heroImage || 'https://img.yumenomatayume.net/og-image.png'
+  
+  // ブログページの場合のみ記事データを取得
+  const posts = c.req.path.startsWith('/blog') ? getBlogPosts() : []
   
   return (
     <html lang="ja">
@@ -42,9 +64,20 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
                 toggle.checked = isDark;
               }
               
-              // Keyboard shortcuts for scrolling
+              // Keyboard shortcuts for scrolling and search
               document.addEventListener('keydown', function(e) {
                 if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+                
+                // Search shortcut (Ctrl+K or Cmd+K)
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                  e.preventDefault();
+                  const searchInput = document.getElementById('search-input');
+                  if (searchInput) {
+                    searchInput.focus();
+                  }
+                  return;
+                }
+                
                 if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
                 if (e.key === 'j') {
                   window.scrollBy({ top: 100, behavior: 'smooth' });
@@ -72,6 +105,7 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
                 content.innerHTML = \`
                   <h3 style="margin:0 0 1rem 0;font-size:1.25rem;font-weight:bold;">⌨️ ショートカットキー</h3>
                   <div style="margin-bottom:1rem;">
+                    \${window.location.pathname.startsWith('/blog') ? '<div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">⌘K / Ctrl+K</kbd> - 記事を検索</div>' : ''}
                     <div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">j</kbd> - 下にスクロール</div>
                     <div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">k</kbd> - 上にスクロール</div>
                     \${window.location.pathname.includes('/blog/') ? '<div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">h</kbd> - 前の記事</div><div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">l</kbd> - 次の記事</div>' : ''}
@@ -132,7 +166,7 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
         <Script src="/app/client.ts" async />
       </head>
       <body class="bg-white dark:bg-gray-900/95 dark:bg-gradient-to-br dark:from-gray-900 dark:to-purple-950">
-        <Header pathname={c.req.path} />
+        <Header pathname={c.req.path} posts={posts} />
         {children}
       </body>
       <footer class="py-4 px-4 text-center bg-gradient-to-r from-purple-900 to-indigo-900 dark:from-purple-50 dark:to-pink-50 border-t border-purple-700 dark:border-purple-200 text-gray-200 dark:text-gray-600">
