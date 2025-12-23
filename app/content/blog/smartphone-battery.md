@@ -9,11 +9,13 @@ tags: ["life", "smartphone", "tips", "battery"]
 
 新しく選んだのは **OPPO Reno7A** です。カメラ性能とコスパの良さが決め手でした！
 
-[OPPO Reno7 A](https://www.oppo.com/jp/smartphones/series-reno/reno7-a/)
+https://www.oppo.com/jp/smartphones/series-reno/reno7-a/
 
 ## 📉 前のスマホで起きた悲劇
 
-実は前に使っていた [OPPO Find X](https://www.oppo.com/jp/smartphones/series-find/find-x/) を約3年間愛用していたのですが、最後の方はバッテリーの消耗が激しくて大変でした... 😭
+実は前に使っていた **OPPO Find X** を約3年間愛用していたのですが、最後の方はバッテリーの消耗が激しくて大変でした... 😭
+
+https://www.oppo.com/jp/smartphones/series-find/find-x/
 
 具体的には：
 - 朝100%で出かけても、昼には50%を切る
@@ -51,7 +53,7 @@ tags: ["life", "smartphone", "tips", "battery"]
 
 ちなみに、macOS Big Sur以降では「**バッテリー充電の最適化**」という素晴らしい機能が追加されています。これは機械学習を使って、ユーザーの使用パターンを学習し、フル充電の時間を最小限に抑えてくれる機能です 🤖
 
-[Macのバッテリーの寿命を延ばす - Apple公式](https://support.apple.com/ja-jp/HT211832)
+https://support.apple.com/ja-jp/HT211832
 
 iPhoneにも同様の機能があるので、Apple製品を使っている方は設定を確認してみてください！
 
