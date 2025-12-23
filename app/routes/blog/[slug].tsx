@@ -1,5 +1,6 @@
 import { createRoute } from 'honox/factory'
 import { TableOfContents } from '../../components/TableOfContents'
+import { calculateReadingTime } from '../../utils/readingTime'
 
 const modules = import.meta.glob('../../content/blog/*.md', { eager: true })
 
@@ -11,6 +12,7 @@ export default createRoute(async (c) => {
   if (!module) return c.notFound()
   
   const { frontmatter, default: Content } = module
+  const readingTime = calculateReadingTime(typeof module.default === 'string' ? module.default : '')
   
   const allPosts = Object.entries(modules)
     .map(([path, mod]: [string, any]) => {
@@ -85,9 +87,14 @@ export default createRoute(async (c) => {
         )}
         <header class="mb-8">
           <h1 class="text-4xl font-bold mb-4">{frontmatter.title}</h1>
-          <time class="text-sm text-gray-600 dark:text-gray-400">{frontmatter.pubDate}</time>
+          <div class="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <time>{frontmatter.pubDate}</time>
+            <span class="flex items-center gap-1">
+              📖 {readingTime}で読めます
+            </span>
+          </div>
           {frontmatter.tags && (
-            <div class="flex gap-2 flex-wrap mt-4">
+            <div class="flex gap-2 flex-wrap">
               {frontmatter.tags.map((tag: string) => (
                 <a href={`/blog/tag/${tag}`} class="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-full text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">{tag}</a>
               ))}
