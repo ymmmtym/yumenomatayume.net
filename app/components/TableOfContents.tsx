@@ -2,18 +2,18 @@ export function TableOfContents() {
   return (
     <>
       {/* デスクトップ用固定目次 */}
-      <div id="toc-container-desktop" class="hidden xl:block fixed left-4 top-32 w-64 max-h-96 overflow-y-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-200 dark:border-gray-700" style="margin-left: max(1rem, calc((100vw - 768px) / 2 - 280px));">
+      <div id="toc-container-desktop" class="hidden xl:block fixed top-32 w-64 max-h-96 overflow-y-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-200 dark:border-gray-700" style="left: max(1rem, calc((100vw - 768px) / 2 - 280px));">
         <text class="font-bold text-sm mb-3 text-gray-900 dark:text-gray-100">目次</text>
-        <ul id="toc-list-desktop" class="space-y-1"></ul>
+        <ul id="toc-list-desktop" class="space-y-1 text-left"></ul>
       </div>
       
       {/* モバイル・タブレット用折りたたみ目次 */}
-      <div id="toc-container-mobile" class="xl:hidden mb-8 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-        <details class="group">
-          <summary class="font-bold text-sm p-4 text-gray-900 dark:text-gray-100 cursor-pointer hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+      <div id="toc-container-mobile" class="xl:hidden mb-8">
+        <details class="group bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+          <summary class="font-bold text-sm p-4 text-gray-900 dark:text-gray-100 cursor-pointer hover:text-gray-700 dark:hover:text-gray-300 transition-colors bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 group-open:border-b-0 group-open:rounded-b-none">
             目次
           </summary>
-          <ul id="toc-list-mobile" class="space-y-1 px-4 pb-4"></ul>
+          <ul id="toc-list-mobile" class="space-y-1 px-4 pb-4 text-left bg-gray-50 dark:bg-gray-800 rounded-b-lg"></ul>
         </details>
       </div>
       <script dangerouslySetInnerHTML={{__html: `
