@@ -166,7 +166,7 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
         <Script src="/app/client.ts" async />
       </head>
       <body class="bg-gradient-to-br from-purple-200 to-indigo-200 dark:from-purple-800/30 dark:to-indigo-800/30 min-h-screen">
-        <div class="bg-white dark:bg-gray-900/95 dark:bg-gradient-to-br dark:from-gray-900 dark:to-purple-950 min-h-screen">
+        <div class="max-w-6xl mx-auto bg-white dark:bg-gray-900/95 dark:bg-gradient-to-br dark:from-gray-900 dark:to-purple-950 min-h-screen shadow-lg">
         <Header pathname={c.req.path} posts={posts} />
         {children}
         </div>
