@@ -15,7 +15,7 @@ async function fetchLinkMetadata(url: string): Promise<LinkMetadata> {
   try {
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; LinkCard/1.0)'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
       }
     })
     
@@ -39,7 +39,6 @@ async function fetchLinkMetadata(url: string): Promise<LinkMetadata> {
       domain
     }
   } catch (error) {
-    console.warn(`Failed to fetch metadata for ${url}:`, error)
     return {
       url,
       title: domain,
