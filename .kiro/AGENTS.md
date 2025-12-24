@@ -124,6 +124,7 @@ heroImage: "https://cloudinary-url" # optional
 ## Deployment & Hosting
 
 **Platform:** Cloudflare Workers
+**Install Command:** `bun install -D ${PACKAGE_NAME}`
 **Build Command:** `bun build`
 **Output Directory:** `dist/`
 **Environment:** Node.js
