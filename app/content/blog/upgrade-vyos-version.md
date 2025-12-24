@@ -12,7 +12,7 @@ heroImage: "https://res.cloudinary.com/yumenomatayume/image/upload/f_auto,q_auto
 
 VyOS は version 1.3 以降から rolling release で提供されており、最新版が日々アップデートされています 🔄 以下のサイトから最新版をダウンロードできます：
 
-[rolling/current/amd64 • downloads.vyos.io](https://downloads.vyos.io/?dir=rolling/current/amd64)
+https://downloads.vyos.io/?dir=rolling/current/amd64
 
 ## アップグレード手順
 

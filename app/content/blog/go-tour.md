@@ -28,7 +28,7 @@ Go Tourでは以下の内容を学びました：
 
 Go Tourで実行されるコードは、実際にはGo Playgroundで実行されています 🎮
 
-[The Go Playground](https://go.dev/play/)
+https://go.dev/play/
 
 Go Playgroundでは、最新の安定バージョンを使用することができます。
 

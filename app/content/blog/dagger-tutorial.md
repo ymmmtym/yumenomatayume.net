@@ -128,7 +128,7 @@ Global Flags:
 ```
 
 ### Integrate with your CI environment
-[Dagger CI Integration](https://www.notion.so/f9b9ee83c2c648f282805cc1591abe9d#d7791a461bda467f838ac7491cc9412d)
+
 Dagger は主要な CI/CD サービスに対応しています。公式サイトに各 CI/CD サービスのサンプルが記載されています。
 ローカル環境で実行したコマンドをそのまま CI に入れたり、プロダクション用に CD を実行したりと、Dagger の設定ファイルのみに柔軟にカスタマイズできるのが魅力です。
 
@@ -226,9 +226,9 @@ build:
 実際に CI/CD サービスと連携したチュートリアルは実施しませんが、ローカル環境で試したパイプラインを CI/CD サービスに適用することが容易であることはお分かりいただけたと思います。
 
 ## 終わりに
+
 これまでは、ローカル環境でもテストを実行したい場合は `Makefile` で処理をまとめていたのですが、Dagger を導入すれば解決できそうです。
 Dagger の動作や設定などについては、自身の Scrapbox にメモしていきます。
-[Dagger Scrapbox](https://www.notion.so/f9b9ee83c2c648f282805cc1591abe9d#d436bde2e64848f48afdcc525602afee)
+
 新しく CI/CD を作成する際は、試しに Dagger で作ってみようかなと思いました。
 何か作ったら記事を書こうとおもいます。
-

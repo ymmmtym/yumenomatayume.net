@@ -10,7 +10,7 @@ Mackupのバージョン0.8.Xから0.9.Xへのアップデートに伴い、バ�
 
 README にも注意点として記載されています 📝
 
-[GitHub - lra/mackup](https://github.com/lra/mackup?tab=readme-ov-file)
+https://github.com/lra/mackup?tab=readme-ov-file
 
 ## 従来の挙動と問題点
 

@@ -67,4 +67,4 @@ Mac で tailscale を起動してみます。疎通確認をしてみます。
 
 ## Reference（参考）
 
-[Kubernetes Tutorial: Deploy Tailscale to Kubernetes via Helm or Porter to securely access k8s services by cluster IP. Tailscale is a VPN that creates a secure mesh network between your devices, including your Kubernetes cluster.](https://tailscale.com/blog/kubernetes/)
+https://tailscale.com/blog/kubernetes/

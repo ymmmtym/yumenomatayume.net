@@ -7,7 +7,7 @@ tags: ["terraform","github"]
 
 個人環境で、OCI(Oracle Cloud Infrastructure) の無料枠を terraform でデプロイしています。
 
-[GitHub - ymmmtym/terraform-cloud-oci: https://console.ap-tokyo-1.oraclecloud.com/](https://github.com/ymmmtym/terraform-cloud-oci)
+https://github.com/ymmmtym/terraform-cloud-oci
 
 Terraform Cloud では tfstate とクレデンシャル情報を管理しており、GitHub に PR(merge) すると GitHub Acitons より terraform plan(terraform apply) が実行されます。
 
@@ -15,7 +15,7 @@ Terraform Cloud では tfstate とクレデンシャル情報を管理してお�
 
 以下の記事に詳しく記載されています。
 
-[GitHub Actions × Terraform Cloud | 株式会社AI Shift](https://www.ai-shift.co.jp/techblog/1924)
+https://www.ai-shift.co.jp/techblog/1924
 
 GitHub と連携しているため、terraform コマンドを実行するためには GitHub に操作を加える必要があります。 [^1]
 

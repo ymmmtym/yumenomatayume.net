@@ -29,7 +29,7 @@ docker-compose version 1.26.0, build d4451659
 
 Docker Volume の使用方法については、以下のドキュメントにまとまっています 📚
 
-[ボリュームの利用 | Docker ドキュメント](https://matsuand.github.io/docs.docker.jp.onthefly/storage/volumes/)
+https://matsuand.github.io/docs.docker.jp.onthefly/storage/volumes/
 
 ヘルプコマンドで確認できるオプション：
 

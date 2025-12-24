@@ -11,7 +11,7 @@ tags: ["mise", "asdf"]
 
 公式サイトに asdf からの移行ガイドが記載されています 📖
 
-[FAQs | mise-en-place](https://mise.jdx.dev/faq.html#how-do-i-migrate-from-asdf)
+https://mise.jdx.dev/faq.html#how-do-i-migrate-from-asdf
 
 徐々に利用頻度が高いものを mise に移行していたのですが、移行したものも増えてきたのでこの際全てのプラグインを mise に移行しようと思います 💪
 
