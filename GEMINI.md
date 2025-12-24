@@ -145,6 +145,7 @@ heroImage: "https://cloudinary-url" # optional
 - `style: スタイル調整 (#issue-number)`
 
 ### Commit Best Practices
+- メッセージは英語で記述
 - **機能ごとに細かくコミット** - 1つのコミットは1つの機能や修正に集中
 - 複数の変更がある場合は `git reset` で分割してコミット
 - 例: SearchBox作成、Header統合、CSS追加を別々のコミットに分ける
@@ -153,6 +154,7 @@ heroImage: "https://cloudinary-url" # optional
 ## Deployment & Hosting
 
 **Platform:** Cloudflare Workers
+**Install Command:** `bun install -D ${PACKAGE_NAME}`
 **Build Command:** `bun build`
 **Output Directory:** `dist/`
 **Environment:** Node.js
