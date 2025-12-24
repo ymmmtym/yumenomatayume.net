@@ -12,7 +12,7 @@ GitHub Actions のイベントトリガーには、`workflow_dispatch` という
 
 ## workflow_dispatch とは
 
-[GitHub Docs: Events that trigger workflows](https://docs.github.com/ja/actions/reference/events-that-trigger-workflows)
+https://docs.github.com/ja/actions/reference/events-that-trigger-workflows
 
 `workflow_dispatch` は、GitHub Actions を手動で実行するためのイベントトリガーです。以下の特徴があります：
 

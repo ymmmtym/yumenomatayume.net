@@ -9,7 +9,7 @@ tags: ["k3s","kubernetes"]
 
 ## k3s とは
 
-[K3s: Lightweight Kubernetes](https://k3s.io/)
+https://k3s.io/
 
 k3s とは、簡単に言うと**軽量の Kubernetes** です ⚡ 通常の Kubernetes と比べて以下の特徴があります：
 

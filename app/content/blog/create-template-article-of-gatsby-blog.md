@@ -5,16 +5,16 @@ pubDate: "2021-09-07"
 tags: ["go","gatsby","blog"]
 ---
 
-[yumenomatayume's Blog](https://blog.yumenomatayume.net/)
+https://blog.yumenomatayume.net/
 
-[ymmmtym/blog: yumenomatayume's personal blog](https://github.com/ymmmtym/blog)
+https://github.com/ymmmtym/blog
 
 Gatsby で個人ブログを運営しております。
 ブログ記事は markdown ファイルで管理していますが、記事を新規作成するとき、「前回の記事のファイルをコピーして書き換える」ということを行っており、少し手間だと感じたので CLI で作成できるようにしました。
 
 たとえば、zenn だと `npx zenn new:article` コマンドで新規記事を作成できます。
 
-[zenn-dev/zenn-editor: Convert markdown to html in Zenn format](https://github.com/zenn-dev/zenn-editor)
+https://github.com/zenn-dev/zenn-editor
 
 
 ## 記事ファイルの構成について
@@ -38,7 +38,7 @@ tags: # タグをリストで記載
 ---
 ```
 
-[このサイトについて | yumenomatayume's Blog](https://blog.yumenomatayume.net/about#%E3%83%A1%E3%82%BF%E3%83%87%E3%83%BC%E3%82%BF%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)
+https://blog.yumenomatayume.net/about#%E3%83%A1%E3%82%BF%E3%83%87%E3%83%BC%E3%82%BF%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6
 
 これを毎回手入力で作成するのは手間なので、テンプレートを用意して効率的に作成する準備をします。
 

@@ -9,7 +9,7 @@ tags: ["apogee", "music", "troubleshooting", "audio"]
 
 自宅のオーディオインターフェースに **Apogee Symphony Desktop** という、なかなかお値段のする機材を使っているのですが、最近謎の不具合に悩まされています... 🤔
 
-[Apogee Symphony Desktop - USB Audio Interface](https://apogeedigital.com/products/symphony-desktop)
+https://apogeedigital.com/products/symphony-desktop
 
 ## 🎯 Symphony Desktop とは
 
@@ -38,7 +38,7 @@ tags: ["apogee", "music", "troubleshooting", "audio"]
 ### 公式サポートを頼る
 まずは公式のナレッジベースを漁ってみました。さすがApogee、トラブルシューティング記事が充実しています 👍
 
-[Symphony Desktop Troubleshooting | Apogee Knowledge Base](https://apogeedigital.com/knowledgebase/symphony-desktop-troubleshooting/)
+https://apogeedigital.com/knowledgebase/symphony-desktop-troubleshooting/
 
 ### 試した基本的な対処法
 公式の推奨に従って、以下を実施：

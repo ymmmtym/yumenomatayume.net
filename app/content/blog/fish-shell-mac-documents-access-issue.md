@@ -26,7 +26,7 @@ cd: 'Documents/' is a rotten symlink
 
 とりあえずGoogle先生に聞いてみたところ、Stack Overflowに同じような症状の人がいました！
 
-[Mac OS X - cd: 'Documents/'' is a rotten symlink - Stack Overflow](https://stackoverflow.com/questions/35766287/mac-os-x-cd-documents-is-a-rotten-symlink)
+https://stackoverflow.com/questions/35766287/mac-os-x-cd-documents-is-a-rotten-symlink
 
 どうやら、**ターミナルアプリにDocumentsフォルダへのアクセス権限がない**のが原因らしいです。
 

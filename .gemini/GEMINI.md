@@ -1,3 +1,33 @@
+# 💎 GEMINI パーソナル設定ファイル
+
+---
+
+## 👤 私の役割 (My Persona)
+
+私は、主に**インフラ領域**に携わる**ソフトウェアエンジニア**です。いわゆる SRE です。
+
+* **得意な言語/分野**: Terraform, マイクロサービス, システム設計。
+* **経験レベル**: 業界経験9年。基礎的な説明は不要です。
+* **現在の学習トピック**: Rustの非同期プログラミング、eBPF。
+
+---
+
+## 🗣️ 応答スタイル (Response Style)
+
+1.  **簡潔性**: 応答は常に簡潔かつ要点を突いたものとし、過度な感情表現や冗長な挨拶は避けてください。
+2.  **専門用語**: 技術的な質問に対しては、専門用語を積極的に使用し、説明は最小限に留めてください。
+3.  **フォーマット**: 可能であれば、回答は**Markdown**の**コードブロック**や**箇条書き**を使用して構造化してください。
+4.  **日本語**: 回答は日本語で回答してください。
+
+---
+
+## ⚙️ 技術的な制約と好み
+
+* **コード例**: Goのコードを提供する際は、可能な限り標準ライブラリの使用を優先してください。
+* **アーキテクチャ**: 分散システムに関する議論では、**可用性**と**スケーラビリティ**のトレードオフについて言及してください。
+* **日付と時刻**: 特定のタイムゾーンの指定がない限り、すべて**JST (UTC+9)**で扱ってください。
+
+---
 # yumenomatayume.net Blog Management Agents
 
 ## Project Overview
@@ -155,3 +185,24 @@ heroImage: "https://cloudinary-url" # optional
 - Email: yumenomatayume@yumenomatayume.net
 - GitHub: @ymmmtym
 - Blog: https://yumenomatayume.net
+
+---
+## MCP (Model Context Protocol) Configuration
+
+This project utilizes a system referred to as MCP (Model Context Protocol) to connect to external services and tools. The configuration for these services is defined in JSON files.
+
+### Linear Integration
+
+A specific MCP server is configured for integration with Linear.
+
+-   **Name:** `linear`
+-   **Configuration File:** `.kiro/settings/mcp.json`
+-   **Execution Command:** The server is invoked via `npx` with the following command:
+    ```sh
+    npx -y mcp-remote https://mcp.linear.app/mcp
+    ```
+-   **Purpose:** This is used in workflows, such as creating blog posts from Linear issues, as detailed in the "Content Management Agents" section.
+
+### General MCP Setup ("Archon" service)
+
+The provided code snippets indicate a more general MCP setup, likely for an internal service named "Archon", with configurations tailored for different IDEs (Windsurf, Cursor, Cline, Claude Code). These configurations are generated and displayed via a Streamlit interface. This suggests that MCP is a core part of the development workflow for connecting to AI services.

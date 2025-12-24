@@ -18,7 +18,7 @@ Error: EACCES: permission denied, open '/home/node/.n8n/crash.journal'
 
 公式ドキュメントの hosting n8n にある Docker の手順を元に実施しました 📖
 
-[Docker | n8n Docs](https://docs.n8n.io/hosting/installation/docker/)
+https://docs.n8n.io/hosting/installation/docker/
 
 ドキュメントには以下の手順が記載されています：
 

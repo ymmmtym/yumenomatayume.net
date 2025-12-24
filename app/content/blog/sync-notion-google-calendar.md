@@ -17,7 +17,7 @@ Notionでタスク管理をしているんですが、カレンダー機能も�
 
 Notionの公式ヘルプを見てみました：
 
-[カレンダー同期について – Notion ヘルプセンター](https://www.notion.so/ja-jp/help/calendar-syncing)
+https://www.notion.so/ja-jp/help/calendar-syncing
 
 > NotionカレンダーとGoogle/Apple/Microsoftカレンダーをインテグレーションするには、どうすればよいですか？
 > 弊社API（現在パブリックベータ）を使用して、Notionと外部プラットフォームをインテグレーションできます！
@@ -30,7 +30,7 @@ Notionの公式ヘルプを見てみました：
 
 調べていたら、まさに探していたツールを発見しました！
 
-[Notion Automations: Connect your calendar, contacts & tasks to Notion](https://www.notion.so/product/automations)
+https://www.notion.so/product/automations
 
 <video src="https://www.youtube.com/watch?v=YvcfiMY5EqM"></video>
 
@@ -55,7 +55,7 @@ Notionの公式ヘルプを見てみました：
 
 色々調べているうちに、**ClickUp**というツールに出会いました。
 
-[ClickUp™ | One app to replace them all.](https://clickup.com/)
+https://clickup.com/
 
 最初は「また新しいツール覚えるのか...」と思ったんですが、調べてみると：
 
@@ -65,12 +65,12 @@ Notionの公式ヘルプを見てみました：
 - **タスク管理機能がNotionより充実** ✅
 - **動作が軽快** ⚡
 
-[ClickUpとは？機能・料金・使い方をわかりやすく解説｜タスク管理ツール比較](https://boxil.jp/mag/a7505/)
+https://boxil.jp/mag/a7505/
 
 ### 🔄 実際に移行してみた感想
 
 この記事も参考になりました：
-[NotionからClickUpへ引っ越した話｜Yusuke.S｜note](https://note.com/yusuke_s/n/nc379895c52ae)
+https://note.com/yusuke_s/n/nc379895c52ae
 
 実際に使ってみると：
 

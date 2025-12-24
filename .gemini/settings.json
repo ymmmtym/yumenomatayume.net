@@ -1,0 +1,37 @@
+{
+  "mcp": {
+    "servers": {
+      "linear": {
+        "source": ".kiro/settings/mcp.json",
+        "command": "npx",
+        "args": [
+          "-y",
+          "mcp-remote",
+          "https://mcp.linear.app/mcp"
+        ]
+      },
+      "archon": {
+        "source": "Inferred from python scripts (e.g., generate_mcp_config)",
+        "description": "A general MCP server for IDE integration, typically run from a local python virtual environment.",
+        "example_command": "<path_to_venv>/bin/python mcp_server.py"
+      }
+    },
+    "workflows": {
+      "blog_creation": {
+        "source": ".kiro/settings/mcp.json",
+        "blog_directory": "app/content/blog",
+        "image_directory": "public/images",
+        "default_tags": [
+          "tech",
+          "troubleshooting"
+        ],
+        "image_formats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ]
+      }
+    }
+  }
+}

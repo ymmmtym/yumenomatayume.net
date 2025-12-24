@@ -10,13 +10,13 @@ GitHubでforkしたリポジトリがあるんですが、fork元リポジトリ
 
 ## そもそも fork とは？ 🤔
 
-[リポジトリをフォークする - GitHub Docs](https://docs.github.com/ja/get-started/quickstart/fork-a-repo)
+https://docs.github.com/ja/get-started/quickstart/fork-a-repo
 
 そもそもforkとは、**ユーザーが管理するリポジトリのコピー**を作成することです。
 
 OSSなど、ユーザー自身が管理していないリポジトリは直接変更することができません。そのため一度forkしてユーザー自身が管理するリポジトリを作成します。forkしたリポジトリに対してユーザー自身で変更を加え、fork元リポジトリに対してPRを作成してマージされることで、OSSにコントリビュートできます ✨
 
-[About forks - GitHub Docs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks)
+https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks
 
 ## なぜ fork 元からブランチを作成するのか？
 
