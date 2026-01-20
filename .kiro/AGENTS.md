@@ -120,6 +120,8 @@ heroImage: "https://cloudinary-url" # optional
 - 複数の変更がある場合は `git reset` で分割してコミット
 - 例: SearchBox作成、Header統合、CSS追加を別々のコミットに分ける
 - コミットメッセージは変更内容を具体的に記述
+- **記事追加時は簡潔な1行メッセージ** - プライベートツール（Linear等）の詳細情報は不要
+- 記事追加の場合は "Add [article-topic] article" 形式で十分（内容は記事を見れば分かるため）
 
 ## Deployment & Hosting
 
