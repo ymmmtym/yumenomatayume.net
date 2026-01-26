@@ -30,9 +30,10 @@ scripts/                # ユーティリティスクリプト
 **Workflow:**
 1. Linear issue の詳細を取得
 2. issue 内の画像を `public/images/` にダウンロード
-3. 既存記事の形式に合わせてブログ記事を作成
-4. 画像パスを記事内で適切に参照
-5. **記事作成完了後、必ずLinear issueにコメントで完了報告（slugを含む）**
+3. 既存記事の形式に合わせて `app/content/blog/` にブログ記事を作成
+4. 文章を校正
+5. 画像パスを記事内で適切に参照
+6. **記事作成完了後、必ずLinear issueにコメントで完了報告（slugを含む）**
 
 **Settings:**
 - Blog directory: `app/content/blog/`
