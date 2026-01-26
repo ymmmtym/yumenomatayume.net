@@ -33,7 +33,11 @@ scripts/                # ユーティリティスクリプト
 3. 既存記事の形式に合わせて `app/content/blog/` にブログ記事を作成
 4. 文章を校正
 5. 画像パスを記事内で適切に参照
-6. **記事作成完了後、必ずLinear issueにコメントで完了報告（slugを含む）**
+6. Linear の gitBranchName を使用してブランチを作成
+7. 記事ファイルをコミット（メッセージ: `feat: [記事タイトル]の記事を追加`）
+8. PR を作成（ユーザーが記事内容を確認後にマージ）
+9. マージは `gh pr merge -md --auto` コマンドを実行する
+10. **マージ完了後、Linear issue にコメントで公開報告（PR と記事 URL を含む）**
 
 **Settings:**
 - Blog directory: `app/content/blog/`
