@@ -1,25 +1,8 @@
 # yumenomatayume.net Blog Management Agents
 
-## Project Overview
+## Project Documentation
 
-**Tech Stack:**
-- HonoX (Hono-based meta-framework)
-- Cloudflare Pages (Hosting)
-- Tailwind CSS v4 (Styling)
-- MDX (Markdown + JSX)
-- Cloudinary (Image management)
-- Prism.js (Syntax highlighting)
-
-**Project Structure:**
-```
-app/
-├── routes/              # ルーティング
-├── content/blog/        # MDX 記事
-├── components/          # React コンポーネント
-└── style.css           # グローバルスタイル
-public/images/          # 画像ファイル
-scripts/                # ユーティリティスクリプト
-```
+For comprehensive details about the project's tech stack, structure, setup, development workflow, deployment, and scripts, please refer to README.md.
 
 ## Content Management Agents
 

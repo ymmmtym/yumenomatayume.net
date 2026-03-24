@@ -9,6 +9,7 @@ HonoX + Cloudflare Pages で構築されたブログサイト
 - [Tailwind CSS](https://tailwindcss.com/) - スタイリング
 - [MDX](https://mdxjs.com/) - Markdown + JSX
 - [Cloudinary](https://cloudinary.com/) - 画像管理
+- [Prism.js](https://prismjs.com/) - シンタックスハイライト
 
 ## Features
 
@@ -87,7 +88,7 @@ bun run upload
 .
 ├── app/
 │   ├── routes/          # ルーティング
-│   ├── content/         # MDX 記事
+│   ├── content/blog/         # MDX 記事
 │   ├── components/      # React コンポーネント
 │   ├── style.css        # グローバルスタイル
 │   ├── client.ts        # クライアントエントリー
