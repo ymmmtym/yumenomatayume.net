@@ -1,4 +1,5 @@
 import { parseRSS, type RSSItem } from './RSSParser'
+import { getLocalBlogPosts, type LocalBlogPost } from '../utils/localBlogPosts'
 
 export interface ExternalPost {
   title: string
@@ -15,26 +16,42 @@ export interface RSSFeed {
 }
 
 const RSS_FEEDS: RSSFeed[] = [
-  { name: '個人ブログ', url: 'https://yumenomatayume.net/feed', icon: '📋' },
   { name: 'Zenn', url: 'https://zenn.dev/ymmmtym/feed', icon: '📝' },
   { name: 'Qiita', url: 'https://qiita.com/yumenomatayume/feed', icon: '📚' },
   { name: 'はてな', url: 'https://ymmmtym.hateblo.jp/feed', icon: '📖' },
 ]
 
 /**
+ * ローカルブログ記事をExternalPost形式に変換
+ */
+function localBlogToExternalPost(post: LocalBlogPost): ExternalPost {
+  return {
+    title: post.title,
+    link: `https://yumenomatayume.net/blog/${post.slug}`,
+    pubDate: post.pubDate,
+    source: '個人ブログ',
+    icon: '📋',
+  }
+}
+
+/**
  * 外部RSSフィードから記事を取得する
- * 注意: Cloudflare Workers環境ではCORS制限により一部のRSSフィードが取得できない場合があります
+ * 個人ブログはローカルファイルから直接読み込むため、自己参照フェッチの問題を回避
  */
 export async function fetchExternalPosts(maxPosts: number = 10): Promise<ExternalPost[]> {
   const allPosts: ExternalPost[] = []
 
+  // 個人ブログはローカルファイルから直接読み込み（自己参照フェッチ回避）
+  const localPosts = getLocalBlogPosts()
+  allPosts.push(...localPosts.map(localBlogToExternalPost))
+
+  // 外部RSSフィードを取得
   for (const feed of RSS_FEEDS) {
     try {
       const response = await fetch(feed.url, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (compatible; yumenomatayume.net RSS Reader)',
           'Accept': 'application/rss+xml, application/xml, text/xml, */*',
-          'Cache-Control': 'no-cache',
         },
         signal: AbortSignal.timeout(8000),
       })
@@ -53,10 +70,6 @@ export async function fetchExternalPosts(maxPosts: number = 10): Promise<Externa
       
       const items = await parseRSS(xml)
       
-      if (items.length === 0) {
-        console.warn(`No items parsed from ${feed.name}`)
-      }
-      
       const posts = items.map(item => ({
         title: item.title.replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1').trim(),
         link: item.link,
@@ -68,10 +81,6 @@ export async function fetchExternalPosts(maxPosts: number = 10): Promise<Externa
       allPosts.push(...posts)
     } catch (error) {
       console.error(`Failed to fetch ${feed.name}:`, error)
-      // CORS エラーの場合は特別にログ出力
-      if (error instanceof TypeError && error.message.includes('fetch')) {
-        console.warn(`Possible CORS issue for ${feed.name} - this may be expected in Cloudflare Workers environment`)
-      }
     }
   }
   
