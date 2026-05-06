@@ -9,15 +9,54 @@ interface LinkMetadata {
   domain: string
 }
 
+// SSRF対策: プライベートIPアドレスや内部ホストをブロック
+function isPrivateUrl(url: URL): boolean {
+  const hostname = url.hostname
+  
+  // localhost のチェック
+  if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1') {
+    return true
+  }
+  
+  // プライベートIPアドレスのチェック (10.x.x.x, 172.16-31.x.x, 192.168.x.x)
+  if (/^(10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.)/.test(hostname)) {
+    return true
+  }
+  
+  // リンクローカルアドレス (169.254.x.x)
+  if (/^169\.254\./.test(hostname)) {
+    return true
+  }
+  
+  return false
+}
+
 async function fetchLinkMetadata(url: string): Promise<LinkMetadata> {
-  const domain = new URL(url).hostname
+  const parsedUrl = new URL(url)
+  const domain = parsedUrl.hostname
+  
+  // HTTPスキームを拒否（HTTPSのみ許可）
+  if (parsedUrl.protocol !== 'https:') {
+    throw new Error('HTTP scheme not allowed')
+  }
+  
+  // プライベートURLをブロック
+  if (isPrivateUrl(parsedUrl)) {
+    throw new Error('Private URL not allowed')
+  }
   
   try {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 10000) // 10秒タイムアウト
+    
     const response = await fetch(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
-      }
+      },
+      signal: controller.signal as any
     })
+    
+    clearTimeout(timeout)
     
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`)
@@ -96,16 +135,34 @@ export default createRoute(async (c) => {
   
   try {
     // URLの妥当性をチェック
-    new URL(url)
+    const parsedUrl = new URL(url)
+    
+    // セキュリティチェック（二重にチェック）
+    if (parsedUrl.protocol !== 'https:') {
+      return c.json({ error: 'HTTPS URLs only' }, 403)
+    }
+    
+    if (isPrivateUrl(parsedUrl)) {
+      return c.json({ error: 'Private URLs not allowed' }, 403)
+    }
     
     const metadata = await fetchLinkMetadata(url)
     return c.json(metadata)
   } catch (error) {
     console.error('Error fetching metadata:', error)
-    return c.json({ 
-      url,
-      title: new URL(url).hostname,
-      domain: new URL(url).hostname
-    })
+    try {
+      const hostname = new URL(url).hostname
+      return c.json({ 
+        url,
+        title: hostname,
+        domain: hostname
+      })
+    } catch {
+      return c.json({ 
+        url,
+        title: 'Invalid URL',
+        domain: 'Invalid URL'
+      }, 400)
+    }
   }
 })

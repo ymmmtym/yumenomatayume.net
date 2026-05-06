@@ -22,15 +22,24 @@ export function LinkCard({ url, title, description, image, favicon, domain }: Li
       >
         <div class="flex-1 p-2 min-w-0 flex flex-col justify-center overflow-hidden">
           <div class="metadata-loading">
-            <div class="animate-pulse">
-              <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded mb-1 w-4/5"></div>
-              <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded mb-1 w-3/5"></div>
-              <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded w-2/5"></div>
+            <div class="animate-pulse flex items-center gap-1.5">
+              <div class="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              <div class="flex-1">
+                <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded mb-1 w-4/5"></div>
+                <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded w-2/5"></div>
+              </div>
             </div>
           </div>
           <div class="metadata-content" style="display: none;">
-            <div class="font-medium text-gray-900 dark:text-gray-100 text-sm leading-tight mb-1 title-text truncate">
-              Loading...
+            <div class="flex items-center gap-1.5 mb-1">
+              <img 
+                alt="" 
+                class="favicon-img w-4 h-4 rounded"
+                style="display: none;"
+              />
+              <div class="font-medium text-gray-900 dark:text-gray-100 text-sm leading-tight title-text truncate flex-1">
+                Loading...
+              </div>
             </div>
             <div class="text-xs text-gray-600 dark:text-gray-400 leading-tight mb-1 description-text line-clamp-2">
               
@@ -53,7 +62,9 @@ export function LinkCard({ url, title, description, image, favicon, domain }: Li
           (function() {
             const card = document.getElementById('${cardId}');
             if (!card) return;
-            
+
+            const fallbackFavicon = 'https://www.google.com/s2/favicons?domain=${displayDomain}&sz=32';
+
             fetch('/api/metadata?url=' + encodeURIComponent('${url}'))
               .then(res => res.json())
               .then(data => {
@@ -63,15 +74,32 @@ export function LinkCard({ url, title, description, image, favicon, domain }: Li
                 const descEl = card.querySelector('.description-text');
                 const domainEl = card.querySelector('.domain-text');
                 const ogImage = card.querySelector('.og-image');
-                
+                const faviconEl = card.querySelector('.favicon-img');
+
                 if (loading) loading.style.display = 'none';
                 if (content) content.style.display = 'block';
-                
+
+                // ファビコン
+                if (faviconEl) {
+                  const faviconUrl = data.favicon || fallbackFavicon;
+                  faviconEl.src = faviconUrl;
+                  faviconEl.onload = () => {
+                    faviconEl.style.display = 'block';
+                  };
+                  faviconEl.onerror = () => {
+                    faviconEl.src = fallbackFavicon;
+                    faviconEl.onerror = null;
+                    faviconEl.onload = () => {
+                      faviconEl.style.display = 'block';
+                    };
+                  };
+                }
+
                 // タイトル
                 if (titleEl) {
                   titleEl.textContent = data.title || '${displayDomain}';
                 }
-                
+
                 // 説明文
                 if (descEl) {
                   if (data.description) {
@@ -81,13 +109,13 @@ export function LinkCard({ url, title, description, image, favicon, domain }: Li
                     descEl.style.display = 'none';
                   }
                 }
-                
+
                 // ドメイン
                 if (domainEl) {
                   domainEl.textContent = data.domain || '${displayDomain}';
                 }
-                
-                // 画像
+
+                // OG画像
                 if (data.image && ogImage) {
                   ogImage.src = data.image;
                   ogImage.onload = () => {
@@ -103,11 +131,18 @@ export function LinkCard({ url, title, description, image, favicon, domain }: Li
                 const content = card.querySelector('.metadata-content');
                 const titleEl = card.querySelector('.title-text');
                 const domainEl = card.querySelector('.domain-text');
-                
+                const faviconEl = card.querySelector('.favicon-img');
+
                 if (loading) loading.style.display = 'none';
                 if (content) content.style.display = 'block';
                 if (titleEl) titleEl.textContent = '${displayDomain}';
                 if (domainEl) domainEl.textContent = '${displayDomain}';
+                if (faviconEl) {
+                  faviconEl.src = fallbackFavicon;
+                  faviconEl.onload = () => {
+                    faviconEl.style.display = 'block';
+                  };
+                }
               });
           })();
         `
