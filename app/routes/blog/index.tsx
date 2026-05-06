@@ -44,7 +44,14 @@ export default createRoute(async (c) => {
               <p class="text-gray-600 dark:text-gray-400 mb-3 text-sm line-clamp-3">{post.description}</p>
             </div>
             <div class="px-6 pb-6">
-              <time class="text-xs text-gray-500 dark:text-gray-500">{post.pubDate}</time>
+              <div class="flex items-center gap-2">
+                <time class="text-xs text-gray-500 dark:text-gray-500">{post.pubDate}</time>
+                {post.readingTime && (
+                  <span class="text-xs text-gray-500 dark:text-gray-500">
+                    📖 {post.readingTime === 1 ? '1分未満' : `約${post.readingTime}分`}で読めます
+                  </span>
+                )}
+              </div>
               {post.tags && (
                 <div class="flex gap-1 flex-wrap mt-3">
                   {post.tags.slice(0, 3).map((tag: string) => (
