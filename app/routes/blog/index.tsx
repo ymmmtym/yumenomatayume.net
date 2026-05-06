@@ -43,9 +43,12 @@ export default createRoute(async (c) => {
               <h2 class="text-xl font-bold mb-2 text-gray-900 dark:text-gray-100">{post.title}</h2>
               <p class="text-gray-600 dark:text-gray-400 mb-3 text-sm line-clamp-3">{post.description}</p>
             </div>
-            <div class="px-6 pb-6">
-              <time class="text-xs text-gray-500 dark:text-gray-500">{post.pubDate}</time>
-              {post.tags && (
+             <div class="px-6 pb-6">
+               <time class="text-xs text-gray-500 dark:text-gray-500">{post.pubDate}</time>
+               {post.readingTime && (
+                 <span class="text-xs text-gray-500 dark:text-gray-500 ml-2">📖 約{post.readingTime}分で読めます</span>
+               )}
+               {post.tags && (
                 <div class="flex gap-1 flex-wrap mt-3">
                   {post.tags.slice(0, 3).map((tag: string) => (
                     <a href={`/blog/tag/${tag}`} class="relative z-10 px-2 py-1 bg-gray-100 dark:bg-purple-900/30 rounded text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-purple-900/40 transition-colors">{tag}</a>

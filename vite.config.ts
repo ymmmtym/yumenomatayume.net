@@ -8,6 +8,7 @@ import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
 import remarkGfm from 'remark-gfm'
 import rehypePrism from 'rehype-prism-plus'
 import { remarkLinkCard } from './app/utils/remarkLinkCard'
+import { remarkReadingTime } from './app/utils/remarkReadingTime'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
@@ -19,7 +20,7 @@ export default defineConfig({
     tailwindcss(),
     mdx({
       jsxImportSource: 'hono/jsx',
-      remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter, remarkLinkCard, remarkGfm],
+      remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter, remarkLinkCard, remarkGfm, remarkReadingTime],
       rehypePlugins: [rehypePrism]
     }),
     build()

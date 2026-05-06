@@ -188,10 +188,15 @@ export default createRoute(async (c) => {
             />
           </div>
         )}
-        <header class="mb-8">
-          <h1 class="text-4xl font-bold mb-4">{frontmatter.title}</h1>
-          <time class="text-sm text-gray-600 dark:text-gray-400">{frontmatter.pubDate}</time>
-          {frontmatter.tags && (
+         <header class="mb-8">
+           <h1 class="text-4xl font-bold mb-4">{frontmatter.title}</h1>
+           <div class="flex items-center gap-3">
+             <time class="text-sm text-gray-600 dark:text-gray-400">{frontmatter.pubDate}</time>
+             {frontmatter.readingTime && (
+               <span class="text-sm text-gray-600 dark:text-gray-400">📖 約{frontmatter.readingTime}分で読めます</span>
+             )}
+           </div>
+           {frontmatter.tags && (
             <div class="flex gap-2 flex-wrap mt-4">
               {frontmatter.tags.map((tag: string) => (
                 <a href={`/blog/tag/${tag}`} class="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-full text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">{tag}</a>
