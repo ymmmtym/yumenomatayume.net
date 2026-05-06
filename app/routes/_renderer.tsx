@@ -7,13 +7,18 @@ const getBlogPosts = () => {
   try {
     const modules = import.meta.glob('../content/blog/*.{md,mdx}', { eager: true })
     return Object.entries(modules).map(([path, module]: [string, any]) => {
-      const slug = path.split('/').pop()?.replace('.md', '')
+      const filename = path.split('/').pop() || ''
+      const slug = filename.replace(/\.(md|mdx)$/, '')
+      const body = module.default || module.compiledSource || ''
+      // 本文からHTMLタグを除去して検索用テキストを作成
+      const searchBody = typeof body === 'string' ? body.replace(/<[^>]*>/g, '').substring(0, 500) : ''
       return { 
         slug, 
         title: module.frontmatter?.title || '',
         description: module.frontmatter?.description || '',
         tags: module.frontmatter?.tags || [],
-        pubDate: module.frontmatter?.pubDate || ''
+        pubDate: module.frontmatter?.pubDate || '',
+        body: searchBody
       }
     })
   } catch (error) {
@@ -29,8 +34,8 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
   const currentUrl = `${baseUrl}${c.req.path}`
   const ogImage = heroImage || 'https://img.yumenomatayume.net/og-image.png'
   
-  // ブログページの場合のみ記事データを取得
-  const posts = c.req.path.startsWith('/blog') ? getBlogPosts() : []
+  // 全ページで記事データを取得（検索機能のため）
+  const posts = getBlogPosts()
   
   return (
     <html lang="ja">
@@ -102,19 +107,17 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
                 
                 const content = document.createElement('div');
                 content.style.cssText = 'background:white;dark:bg-gray-800;padding:2rem;border-radius:8px;max-width:400px;width:90%;';
-                content.innerHTML = \`
-                  <h3 style="margin:0 0 1rem 0;font-size:1.25rem;font-weight:bold;">⌨️ ショートカットキー</h3>
-                  <div style="margin-bottom:1rem;">
-                    \${window.location.pathname.startsWith('/blog') ? '<div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">⌘K / Ctrl+K</kbd> - 記事を検索</div>' : ''}
-                    <div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">j</kbd> - 下にスクロール</div>
-                    <div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">k</kbd> - 上にスクロール</div>
-                    \${window.location.pathname.includes('/blog/') ? '<div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">h</kbd> - 前の記事</div><div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">l</kbd> - 次の記事</div>' : ''}
-                    <div><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">/</kbd> - このヘルプを表示</div>
-                  </div>
-                  <div style="text-align:right;">
-                    <button onclick="document.getElementById('shortcut-help').remove()" style="background:#6366f1;color:white;border:none;padding:0.5rem 1rem;border-radius:4px;cursor:pointer;">閉じる</button>
-                  </div>
-                \`;
+        content.innerHTML = '<h3 style="margin:0 0 1rem 0;font-size:1.25rem;font-weight:bold;">⌨️ ショートカットキー</h3>' +
+                  '<div style="margin-bottom:1rem;">' +
+                    (window.location.pathname.startsWith('/blog') ? '<div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">⌘K / Ctrl+K</kbd> - 記事を検索</div>' : '') +
+                    '<div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">j</kbd> - 下にスクロール</div>' +
+                    '<div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">k</kbd> - 上にスクロール</div>' +
+                    (window.location.pathname.includes('/blog/') ? '<div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">h</kbd> - 前の記事</div><div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">l</kbd> - 次の記事</div>' : '') +
+                    '<div><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">/</kbd> - このヘルプを表示</div>' +
+                  '</div>' +
+                  '<div style="text-align:right;">' +
+                    '<button onclick="document.getElementById(\'shortcut-help\').remove()" style="background:#6366f1;color:white;border:none;padding:0.5rem 1rem;border-radius:4px;cursor:pointer;">閉じる</button>' +
+                  '</div>';
                 
                 modal.appendChild(content);
                 document.body.appendChild(modal);
