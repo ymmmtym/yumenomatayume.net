@@ -9,6 +9,18 @@ interface LinkMetadata {
   domain: string
 }
 
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+    .replace(/&#(\d+);/g, (_, dec) => String.fromCodePoint(parseInt(dec, 10)))
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
+}
+
 async function fetchLinkMetadata(url: string): Promise<LinkMetadata> {
   const domain = new URL(url).hostname
   
@@ -32,8 +44,8 @@ async function fetchLinkMetadata(url: string): Promise<LinkMetadata> {
     
     return {
       url,
-      title,
-      description,
+      title: decodeHtmlEntities(title),
+      description: description ? decodeHtmlEntities(description) : undefined,
       image: image ? resolveUrl(image, url) : undefined,
       favicon: favicon ? resolveUrl(favicon, url) : undefined,
       domain
