@@ -42,7 +42,7 @@ export default createRoute(async (c) => {
   
   return c.render(
     <>
-      <TableOfContents />
+
       <script dangerouslySetInnerHTML={{__html: `
         document.addEventListener('keydown', (e) => {
           if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
@@ -176,9 +176,13 @@ export default createRoute(async (c) => {
         <a href={`https://raindrop.io/add?link=https://yumenomatayume.net/blog/${slug}&title=${encodeURIComponent(frontmatter.title)}`} target="_blank" rel="noopener noreferrer" class="flex items-center justify-center w-9 h-9 md:w-12 md:h-12 bg-white dark:bg-purple-900/40 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all" title="Raindropに保存">
           <span class="text-base md:text-xl">☁️</span>
         </a>
-      </div>
-      <main class="max-w-3xl mx-auto py-8 px-4">
-      <article>
+       </div>
+       <div class="max-w-7xl mx-auto py-8 px-4 flex flex-col lg:flex-row gap-8">
+         <aside class="hidden lg:block w-64 flex-shrink-0">
+           <TableOfContents />
+         </aside>
+         <main class="flex-1 min-w-0 max-w-3xl mx-auto">
+       <article>
         {frontmatter.heroImage && (
           <div class="mb-8">
             <img 
