@@ -14,21 +14,38 @@ export interface RSSFeed {
   icon: string
 }
 
-const RSS_FEEDS: RSSFeed[] = [
-  { name: '個人ブログ', url: 'https://yumenomatayume.net/feed', icon: '📋' },
+const EXTERNAL_RSS_FEEDS: RSSFeed[] = [
   { name: 'Zenn', url: 'https://zenn.dev/ymmmtym/feed', icon: '📝' },
   { name: 'Qiita', url: 'https://qiita.com/yumenomatayume/feed', icon: '📚' },
   { name: 'はてな', url: 'https://ymmmtym.hateblo.jp/feed', icon: '📖' },
 ]
 
 /**
- * 外部RSSフィードから記事を取得する
- * 注意: Cloudflare Workers環境ではCORS制限により一部のRSSフィードが取得できない場合があります
+ * ローカルブログ記事を取得する（fetchを使わず直接読み込み）
  */
-export async function fetchExternalPosts(maxPosts: number = 10): Promise<ExternalPost[]> {
+function getLocalBlogPosts(): ExternalPost[] {
+  const modules = import.meta.glob('../content/blog/*.md', { eager: true })
+  
+  return Object.entries(modules).map(([path, module]: [string, any]) => {
+    const slug = path.split('/').pop()?.replace('.md', '')
+    const { title, pubDate, description } = module.frontmatter || {}
+    return {
+      title: title || slug || '',
+      link: `https://yumenomatayume.net/blog/${slug}`,
+      pubDate: pubDate || new Date().toISOString(),
+      source: '個人ブログ',
+      icon: '📋',
+    }
+  })
+}
+
+/**
+ * 外部RSSフィードから記事を取得する
+ */
+async function fetchExternalRSSPosts(): Promise<ExternalPost[]> {
   const allPosts: ExternalPost[] = []
 
-  for (const feed of RSS_FEEDS) {
+  for (const feed of EXTERNAL_RSS_FEEDS) {
     try {
       const response = await fetch(feed.url, {
         headers: {
@@ -68,14 +85,22 @@ export async function fetchExternalPosts(maxPosts: number = 10): Promise<Externa
       allPosts.push(...posts)
     } catch (error) {
       console.error(`Failed to fetch ${feed.name}:`, error)
-      // CORS エラーの場合は特別にログ出力
-      if (error instanceof TypeError && error.message.includes('fetch')) {
-        console.warn(`Possible CORS issue for ${feed.name} - this may be expected in Cloudflare Workers environment`)
-      }
     }
   }
-  
+
   return allPosts
+}
+
+/**
+ * 全ての記事（ローカル＋外部RSS）を取得する
+ * 個人ブログはfetchを使わずローカルファイルから直接読み込むため
+ * Cloudflare Workers環境でも安全に動作する
+ */
+export async function fetchExternalPosts(maxPosts: number = 10): Promise<ExternalPost[]> {
+  const localPosts = getLocalBlogPosts()
+  const externalPosts = await fetchExternalRSSPosts()
+  
+  return [...localPosts, ...externalPosts]
     .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
     .slice(0, maxPosts)
 }
