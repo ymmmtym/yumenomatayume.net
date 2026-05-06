@@ -29,8 +29,16 @@ export function LinkCard({ url, title, description, image, favicon, domain }: Li
             </div>
           </div>
           <div class="metadata-content" style="display: none;">
-            <div class="font-medium text-gray-900 dark:text-gray-100 text-sm leading-tight mb-1 title-text truncate">
-              Loading...
+            <div class="flex items-center gap-1 mb-1">
+              <img 
+                alt="" 
+                class="w-4 h-4 favicon hidden"
+                onerror="this.classList.add('hidden')"
+                onload="this.classList.remove('hidden')"
+              />
+              <div class="font-medium text-gray-900 dark:text-gray-100 text-sm leading-tight title-text truncate">
+                Loading...
+              </div>
             </div>
             <div class="text-xs text-gray-600 dark:text-gray-400 leading-tight mb-1 description-text line-clamp-2">
               
@@ -63,6 +71,7 @@ export function LinkCard({ url, title, description, image, favicon, domain }: Li
                 const descEl = card.querySelector('.description-text');
                 const domainEl = card.querySelector('.domain-text');
                 const ogImage = card.querySelector('.og-image');
+                const favicon = card.querySelector('.favicon');
                 
                 if (loading) loading.style.display = 'none';
                 if (content) content.style.display = 'block';
@@ -97,17 +106,24 @@ export function LinkCard({ url, title, description, image, favicon, domain }: Li
                     ogImage.style.display = 'none';
                   };
                 }
+                
+                // ファビコン
+                if (data.favicon && favicon) {
+                  favicon.src = data.favicon;
+                }
               })
               .catch(() => {
                 const loading = card.querySelector('.metadata-loading');
                 const content = card.querySelector('.metadata-content');
                 const titleEl = card.querySelector('.title-text');
                 const domainEl = card.querySelector('.domain-text');
+                const favicon = card.querySelector('.favicon');
                 
                 if (loading) loading.style.display = 'none';
                 if (content) content.style.display = 'block';
                 if (titleEl) titleEl.textContent = '${displayDomain}';
                 if (domainEl) domainEl.textContent = '${displayDomain}';
+                if (favicon) favicon.src = 'https://www.google.com/s2/favicons?domain=${displayDomain}&sz=32';
               });
           })();
         `
