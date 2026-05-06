@@ -1,5 +1,7 @@
 import { parseRSS, type RSSItem } from './RSSParser'
 
+const blogModules = import.meta.glob('../content/blog/*.md', { eager: true })
+
 export interface ExternalPost {
   title: string
   link: string
@@ -15,18 +17,34 @@ export interface RSSFeed {
 }
 
 const RSS_FEEDS: RSSFeed[] = [
-  { name: '個人ブログ', url: 'https://yumenomatayume.net/feed', icon: '📋' },
   { name: 'Zenn', url: 'https://zenn.dev/ymmmtym/feed', icon: '📝' },
   { name: 'Qiita', url: 'https://qiita.com/yumenomatayume/feed', icon: '📚' },
   { name: 'はてな', url: 'https://ymmmtym.hateblo.jp/feed', icon: '📖' },
 ]
 
+function getLocalBlogPosts(): ExternalPost[] {
+  const baseUrl = 'https://yumenomatayume.net'
+  
+  return Object.entries(blogModules).map(([path, module]: [string, any]) => {
+    const slug = path.split('/').pop()?.replace('.md', '')
+    const frontmatter = module.frontmatter
+    
+    return {
+      title: frontmatter.title || '',
+      link: `${baseUrl}/blog/${slug}`,
+      pubDate: frontmatter.pubDate || '',
+      source: '個人ブログ',
+      icon: '📋',
+    }
+  }).sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
+}
+
 /**
  * 外部RSSフィードから記事を取得する
- * 注意: Cloudflare Workers環境ではCORS制限により一部のRSSフィードが取得できない場合があります
+ * 個人ブログはローカルファイルから直接読み込み、他のフィードはHTTPフェッチを使用
  */
 export async function fetchExternalPosts(maxPosts: number = 10): Promise<ExternalPost[]> {
-  const allPosts: ExternalPost[] = []
+  const allPosts: ExternalPost[] = [...getLocalBlogPosts()]
 
   for (const feed of RSS_FEEDS) {
     try {
@@ -68,9 +86,8 @@ export async function fetchExternalPosts(maxPosts: number = 10): Promise<Externa
       allPosts.push(...posts)
     } catch (error) {
       console.error(`Failed to fetch ${feed.name}:`, error)
-      // CORS エラーの場合は特別にログ出力
       if (error instanceof TypeError && error.message.includes('fetch')) {
-        console.warn(`Possible CORS issue for ${feed.name} - this may be expected in Cloudflare Workers environment`)
+        console.warn(`Possible CORS issue for ${feed.name}`)
       }
     }
   }
