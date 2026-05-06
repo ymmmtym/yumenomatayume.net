@@ -5,15 +5,26 @@ import Header from '../components/Header'
 // 記事データを取得する関数
 const getBlogPosts = () => {
   try {
-    const modules = import.meta.glob('../content/blog/*.{md,mdx}', { eager: true })
-    return Object.entries(modules).map(([path, module]: [string, any]) => {
-      const slug = path.split('/').pop()?.replace('.md', '')
+    // frontmatter用と本文用で別々にインポート
+    const frontmatterModules = import.meta.glob('../content/blog/*.{md,mdx}', { eager: true })
+    const rawModules = import.meta.glob('../content/blog/*.{md,mdx}', { eager: true, query: '?raw' })
+    
+    return Object.entries(frontmatterModules).map(([path, module]: [string, any]) => {
+      const fileName = path.split('/').pop()
+      const slug = fileName?.replace(/\.(md|mdx)$/, '')
+      // 本文を取得（rawインポートから）
+      const rawModule = rawModules[path]
+      const rawContent = (rawModule as any)?.default || ''
+      // frontmatter部分を除去して本文のみ抽出
+      const body = rawContent.replace(/^---\n[\s\S]*?\n---\n?/, '').substring(0, 1000)
+      
       return { 
         slug, 
         title: module.frontmatter?.title || '',
         description: module.frontmatter?.description || '',
         tags: module.frontmatter?.tags || [],
-        pubDate: module.frontmatter?.pubDate || ''
+        pubDate: module.frontmatter?.pubDate || '',
+        body
       }
     })
   } catch (error) {
@@ -29,8 +40,8 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
   const currentUrl = `${baseUrl}${c.req.path}`
   const ogImage = heroImage || 'https://img.yumenomatayume.net/og-image.png'
   
-  // ブログページの場合のみ記事データを取得
-  const posts = c.req.path.startsWith('/blog') ? getBlogPosts() : []
+  // 全ページで検索可能にするため記事データを取得
+  const posts = getBlogPosts()
   
   return (
     <html lang="ja">
