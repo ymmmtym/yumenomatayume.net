@@ -188,9 +188,22 @@ export default createRoute(async (c) => {
             />
           </div>
         )}
-        <header class="mb-8">
+         <header class="mb-8">
           <h1 class="text-4xl font-bold mb-4">{frontmatter.title}</h1>
-          <time class="text-sm text-gray-600 dark:text-gray-400">{frontmatter.pubDate}</time>
+          <div class="flex items-center gap-2">
+            <time class="text-sm text-gray-600 dark:text-gray-400">
+              {frontmatter.updatedDate && new Date(frontmatter.updatedDate) > new Date(frontmatter.pubDate) ? (
+                <>{frontmatter.pubDate} (更新: {frontmatter.updatedDate})</>
+              ) : (
+                <>{frontmatter.pubDate}</>
+              )}
+            </time>
+            {frontmatter.updatedDate && new Date(frontmatter.updatedDate) > new Date(frontmatter.pubDate) && (Date.now() - new Date(frontmatter.updatedDate).getTime()) < 7 * 24 * 60 * 60 * 1000 && (
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                最近更新
+              </span>
+            )}
+          </div>
           {frontmatter.tags && (
             <div class="flex gap-2 flex-wrap mt-4">
               {frontmatter.tags.map((tag: string) => (
@@ -231,7 +244,13 @@ export default createRoute(async (c) => {
               <a href={`/blog/${post.slug}`} class="block p-4 bg-gray-50 dark:bg-purple-900/20 rounded-lg hover:bg-gray-100 dark:hover:bg-purple-900/30 transition-colors">
                 <p class="font-bold text-lg mb-2 text-gray-900 dark:text-gray-100">{post.title}</p>
                 <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{post.description}</p>
-                <time class="text-xs text-gray-500 dark:text-gray-500 mt-2 block">{post.pubDate}</time>
+                 <time class="text-xs text-gray-500 dark:text-gray-500 mt-2 block">
+                  {post.updatedDate && new Date(post.updatedDate) > new Date(post.pubDate) ? (
+                    <>{post.pubDate} (更新: {post.updatedDate})</>
+                  ) : (
+                    <>{post.pubDate}</>
+                  )}
+                </time>
               </a>
             ))}
           </div>

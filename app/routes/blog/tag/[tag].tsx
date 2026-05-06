@@ -38,7 +38,13 @@ export default createRoute(async (c) => {
               <div class="p-6">
                 <h2 class="text-xl font-bold mb-2 text-gray-900 dark:text-gray-100">{post.title}</h2>
                 <p class="text-gray-600 dark:text-gray-400 mb-3 text-sm line-clamp-3">{post.description}</p>
-                <time class="text-xs text-gray-500 dark:text-gray-500">{post.pubDate}</time>
+                 <time class="text-xs text-gray-500 dark:text-gray-500">
+                  {post.updatedDate && new Date(post.updatedDate) > new Date(post.pubDate) ? (
+                    <>{post.pubDate} (更新: {post.updatedDate})</>
+                  ) : (
+                    <>{post.pubDate}</>
+                  )}
+                </time>
                 {post.tags && (
                   <div class="flex gap-1 flex-wrap mt-3">
                     {post.tags.slice(0, 3).map((t: string) => (
