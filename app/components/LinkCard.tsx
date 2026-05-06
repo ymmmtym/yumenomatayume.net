@@ -54,6 +54,13 @@ export function LinkCard({ url, title, description, image, favicon, domain }: Li
             const card = document.getElementById('${cardId}');
             if (!card) return;
             
+            function decodeHtmlEntities(text) {
+              if (!text) return text;
+              const textarea = document.createElement('textarea');
+              textarea.innerHTML = text;
+              return textarea.value;
+            }
+            
             fetch('/api/metadata?url=' + encodeURIComponent('${url}'))
               .then(res => res.json())
               .then(data => {
@@ -69,13 +76,13 @@ export function LinkCard({ url, title, description, image, favicon, domain }: Li
                 
                 // タイトル
                 if (titleEl) {
-                  titleEl.textContent = data.title || '${displayDomain}';
+                  titleEl.textContent = decodeHtmlEntities(data.title || '${displayDomain}');
                 }
                 
                 // 説明文
                 if (descEl) {
                   if (data.description) {
-                    descEl.textContent = data.description;
+                    descEl.textContent = decodeHtmlEntities(data.description);
                     descEl.style.display = 'block';
                   } else {
                     descEl.style.display = 'none';
