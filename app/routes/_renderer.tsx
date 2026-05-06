@@ -6,14 +6,19 @@ import Header from '../components/Header'
 const getBlogPosts = () => {
   try {
     const modules = import.meta.glob('../content/blog/*.{md,mdx}', { eager: true })
+    const rawModules = import.meta.glob('../content/blog/*.{md,mdx}', { eager: true, query: '?raw', import: 'default' })
     return Object.entries(modules).map(([path, module]: [string, any]) => {
-      const slug = path.split('/').pop()?.replace('.md', '')
+      const slug = path.split('/').pop()?.replace('.md', '').replace('.mdx', '')
+      const rawContent = (rawModules as any)[path] || ''
+      // Remove frontmatter to get body text
+      const body = rawContent.replace(/^---[\s\S]*?---\n?/, '')
       return { 
         slug, 
         title: module.frontmatter?.title || '',
         description: module.frontmatter?.description || '',
         tags: module.frontmatter?.tags || [],
-        pubDate: module.frontmatter?.pubDate || ''
+        pubDate: module.frontmatter?.pubDate || '',
+        body
       }
     })
   } catch (error) {
@@ -29,8 +34,8 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
   const currentUrl = `${baseUrl}${c.req.path}`
   const ogImage = heroImage || 'https://img.yumenomatayume.net/og-image.png'
   
-  // ブログページの場合のみ記事データを取得
-  const posts = c.req.path.startsWith('/blog') ? getBlogPosts() : []
+  // 全ページで記事データを取得（検索用）
+  const posts = getBlogPosts()
   
   return (
     <html lang="ja">
@@ -74,6 +79,7 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
                   const searchInput = document.getElementById('search-input');
                   if (searchInput) {
                     searchInput.focus();
+                    searchInput.select();
                   }
                   return;
                 }
@@ -105,7 +111,7 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
                 content.innerHTML = \`
                   <h3 style="margin:0 0 1rem 0;font-size:1.25rem;font-weight:bold;">⌨️ ショートカットキー</h3>
                   <div style="margin-bottom:1rem;">
-                    \${window.location.pathname.startsWith('/blog') ? '<div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">⌘K / Ctrl+K</kbd> - 記事を検索</div>' : ''}
+                    <div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">⌘K / Ctrl+K</kbd> - 記事を検索</div>
                     <div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">j</kbd> - 下にスクロール</div>
                     <div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">k</kbd> - 上にスクロール</div>
                     \${window.location.pathname.includes('/blog/') ? '<div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">h</kbd> - 前の記事</div><div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">l</kbd> - 次の記事</div>' : ''}
