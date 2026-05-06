@@ -48,70 +48,76 @@ export function LinkCard({ url, title, description, image, favicon, domain }: Li
           />
         </div>
       </a>
-      <script dangerouslySetInnerHTML={{
-        __html: `
-          (function() {
-            const card = document.getElementById('${cardId}');
-            if (!card) return;
-            
-            fetch('/api/metadata?url=' + encodeURIComponent('${url}'))
-              .then(res => res.json())
-              .then(data => {
-                const loading = card.querySelector('.metadata-loading');
-                const content = card.querySelector('.metadata-content');
-                const titleEl = card.querySelector('.title-text');
-                const descEl = card.querySelector('.description-text');
-                const domainEl = card.querySelector('.domain-text');
-                const ogImage = card.querySelector('.og-image');
-                
-                if (loading) loading.style.display = 'none';
-                if (content) content.style.display = 'block';
-                
-                // タイトル
-                if (titleEl) {
-                  titleEl.textContent = data.title || '${displayDomain}';
-                }
-                
-                // 説明文
-                if (descEl) {
-                  if (data.description) {
-                    descEl.textContent = data.description;
-                    descEl.style.display = 'block';
-                  } else {
-                    descEl.style.display = 'none';
-                  }
-                }
-                
-                // ドメイン
-                if (domainEl) {
-                  domainEl.textContent = data.domain || '${displayDomain}';
-                }
-                
-                // 画像
-                if (data.image && ogImage) {
-                  ogImage.src = data.image;
-                  ogImage.onload = () => {
-                    ogImage.style.display = 'block';
-                  };
-                  ogImage.onerror = () => {
-                    ogImage.style.display = 'none';
-                  };
-                }
-              })
-              .catch(() => {
-                const loading = card.querySelector('.metadata-loading');
-                const content = card.querySelector('.metadata-content');
-                const titleEl = card.querySelector('.title-text');
-                const domainEl = card.querySelector('.domain-text');
-                
-                if (loading) loading.style.display = 'none';
-                if (content) content.style.display = 'block';
-                if (titleEl) titleEl.textContent = '${displayDomain}';
-                if (domainEl) domainEl.textContent = '${displayDomain}';
-              });
-          })();
-        `
-      }} />
+       <script dangerouslySetInnerHTML={{
+         __html: `
+           (function() {
+             function decodeHtmlEntities(text) {
+               const textarea = document.createElement('textarea');
+               textarea.innerHTML = text;
+               return textarea.value;
+             }
+
+             const card = document.getElementById('${cardId}');
+             if (!card) return;
+             
+             fetch('/api/metadata?url=' + encodeURIComponent('${url}'))
+               .then(res => res.json())
+               .then(data => {
+                 const loading = card.querySelector('.metadata-loading');
+                 const content = card.querySelector('.metadata-content');
+                 const titleEl = card.querySelector('.title-text');
+                 const descEl = card.querySelector('.description-text');
+                 const domainEl = card.querySelector('.domain-text');
+                 const ogImage = card.querySelector('.og-image');
+                 
+                 if (loading) loading.style.display = 'none';
+                 if (content) content.style.display = 'block';
+                 
+                 // タイトル
+                 if (titleEl) {
+                   titleEl.textContent = decodeHtmlEntities(data.title || '${displayDomain}');
+                 }
+                 
+                 // 説明文
+                 if (descEl) {
+                   if (data.description) {
+                     descEl.textContent = decodeHtmlEntities(data.description);
+                     descEl.style.display = 'block';
+                   } else {
+                     descEl.style.display = 'none';
+                   }
+                 }
+                 
+                 // ドメイン
+                 if (domainEl) {
+                   domainEl.textContent = decodeHtmlEntities(data.domain || '${displayDomain}');
+                 }
+                 
+                 // 画像
+                 if (data.image && ogImage) {
+                   ogImage.src = data.image;
+                   ogImage.onload = () => {
+                     ogImage.style.display = 'block';
+                   };
+                   ogImage.onerror = () => {
+                     ogImage.style.display = 'none';
+                   };
+                 }
+               })
+               .catch(() => {
+                 const loading = card.querySelector('.metadata-loading');
+                 const content = card.querySelector('.metadata-content');
+                 const titleEl = card.querySelector('.title-text');
+                 const domainEl = card.querySelector('.domain-text');
+                 
+                 if (loading) loading.style.display = 'none';
+                 if (content) content.style.display = 'block';
+                 if (titleEl) titleEl.textContent = '${displayDomain}';
+                 if (domainEl) domainEl.textContent = '${displayDomain}';
+               });
+           })();
+         `
+       }} />
     </>
   )
 }
