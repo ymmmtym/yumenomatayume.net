@@ -13,8 +13,9 @@ const getBlogPosts = () => {
         title: module.frontmatter?.title || '',
         description: module.frontmatter?.description || '',
         tags: module.frontmatter?.tags || [],
-        pubDate: module.frontmatter?.pubDate || ''
-      }
+        pubDate: module.frontmatter?.pubDate || '',
+        updatedDate: module.frontmatter?.updatedDate || undefined
+       }
     })
   } catch (error) {
     return []

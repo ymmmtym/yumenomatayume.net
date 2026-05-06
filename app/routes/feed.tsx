@@ -23,13 +23,14 @@ export default createRoute(async (c) => {
     <language>ja</language>
     <lastBuildDate>${lastBuildDate}</lastBuildDate>
     ${posts.map(post => `
-    <item>
-      <title><![CDATA[${post.title}]]></title>
-      <description><![CDATA[${post.description || ''}]]></description>
-      <link>${baseUrl}/blog/${post.slug}</link>
-      <guid>${baseUrl}/blog/${post.slug}</guid>
-      <pubDate>${new Date(post.pubDate).toUTCString()}</pubDate>
-    </item>`).join('')}
+     <item>
+       <title><![CDATA[${post.title}]]></title>
+       <description><![CDATA[${post.description || ''}]]></description>
+       <link>${baseUrl}/blog/${post.slug}</link>
+       <guid>${baseUrl}/blog/${post.slug}</guid>
+       <pubDate>${new Date(post.pubDate).toUTCString()}</pubDate>
+       ${post.updatedDate ? `<atom:updated>${new Date(post.updatedDate).toUTCString()}</atom:updated>` : ''}
+     </item>`).join('')}
   </channel>
 </rss>`
 

@@ -4,6 +4,7 @@ interface SearchResult {
   description: string
   tags: string[]
   pubDate: string
+  updatedDate?: string
 }
 
 interface SearchBoxProps {
@@ -56,8 +57,11 @@ export function SearchBox({ posts }: SearchBoxProps) {
                 '<a href="/blog/' + result.slug + '" class="block m-1 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700 last:border-b-0 bg-white dark:bg-gray-800 rounded focus-visible:outline-2 focus-visible:outline-blue-500 dark:focus-visible:outline-cyan-400 focus-visible:outline-offset-2">' +
                   '<div class="font-medium text-gray-800 dark:text-gray-100 mb-1">' + result.title + '</div>' +
                   '<div class="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">' + result.description + '</div>' +
-                  '<div class="flex items-center gap-2">' +
-                    '<time class="text-xs text-gray-500 dark:text-gray-500">' + result.pubDate + '</time>' +
+                   '<div class="flex items-center gap-2">' +
+                     '<time class="text-xs text-gray-500 dark:text-gray-500">' + 
+                     result.pubDate + 
+                     (result.updatedDate && new Date(result.updatedDate) > new Date(result.pubDate) ? ' (更新: ' + result.updatedDate + ')' : '') + 
+                     '</time>' +
                     result.tags.slice(0, 3).map(tag => 
                       '<span class="px-2 py-1 bg-gray-300 dark:bg-gray-700 rounded text-xs text-gray-700 dark:text-gray-300">' + tag + '</span>'
                     ).join('') +

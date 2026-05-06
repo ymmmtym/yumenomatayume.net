@@ -25,13 +25,13 @@ export default createRoute(async (c) => {
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-  ${posts.map(post => `
-  <url>
-    <loc>${baseUrl}/blog/${post.slug}</loc>
-    <lastmod>${post.pubDate}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>`).join('')}
+   ${posts.map(post => `
+   <url>
+     <loc>${baseUrl}/blog/${post.slug}</loc>
+     <lastmod>${post.updatedDate && new Date(post.updatedDate) > new Date(post.pubDate) ? post.updatedDate : post.pubDate}</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.6</priority>
+   </url>`).join('')}
 </urlset>`
 
   return c.text(sitemap, 200, {
