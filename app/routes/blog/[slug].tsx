@@ -1,6 +1,7 @@
 import { createRoute } from 'honox/factory'
 import { TableOfContents } from '../../components/TableOfContents'
 import { LinkCard } from '../../components/LinkCard'
+import { formatDate, getUpdateStatus } from '../../lib/dateUtils'
 
 const modules = import.meta.glob('../../content/blog/*.{md,mdx}', { eager: true })
 
@@ -190,7 +191,23 @@ export default createRoute(async (c) => {
         )}
         <header class="mb-8">
           <h1 class="text-4xl font-bold mb-4">{frontmatter.title}</h1>
-          <time class="text-sm text-gray-600 dark:text-gray-400">{frontmatter.pubDate}</time>
+          <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+            <time>{formatDate(frontmatter.pubDate)}</time>
+            {(() => {
+              const status = getUpdateStatus(frontmatter.pubDate, frontmatter.updatedDate)
+              if (!status.showUpdated) return null
+              return (
+                <>
+                  <span class="mx-2">(更新: <time>{formatDate(frontmatter.updatedDate)}</time>)</span>
+                  {status.isRecent && (
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                      最近更新
+                    </span>
+                  )}
+                </>
+              )
+            })()}
+          </div>
           {frontmatter.tags && (
             <div class="flex gap-2 flex-wrap mt-4">
               {frontmatter.tags.map((tag: string) => (
@@ -231,7 +248,9 @@ export default createRoute(async (c) => {
               <a href={`/blog/${post.slug}`} class="block p-4 bg-gray-50 dark:bg-purple-900/20 rounded-lg hover:bg-gray-100 dark:hover:bg-purple-900/30 transition-colors">
                 <p class="font-bold text-lg mb-2 text-gray-900 dark:text-gray-100">{post.title}</p>
                 <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{post.description}</p>
-                <time class="text-xs text-gray-500 dark:text-gray-500 mt-2 block">{post.pubDate}</time>
+                <time class="text-xs text-gray-500 dark:text-gray-500 mt-2 block">
+                  {post.updatedDate && new Date(post.updatedDate) > new Date(post.pubDate) ? formatDate(post.updatedDate) : formatDate(post.pubDate)}
+                </time>
               </a>
             ))}
           </div>
