@@ -1,10 +1,13 @@
 import { visit } from 'unist-util-visit'
 import type { Plugin } from 'unified'
 import type { Root } from 'mdast'
+import { fetchLinkMetadata } from './fetchMetadata'
 
 // MDXでリンクカードを自動変換するプラグイン（remarkGfmより前に実行）
 export const remarkLinkCard: Plugin<[], Root> = () => {
-  return (tree) => {
+  return async (tree) => {
+    const promises: Promise<void>[] = []
+
     visit(tree, 'paragraph', (node, index, parent) => {
       if (!parent || index === undefined) return
       
@@ -41,21 +44,80 @@ export const remarkLinkCard: Plugin<[], Root> = () => {
         }
         
         if (urlToConvert) {
-          const linkCardNode = {
-            type: 'mdxJsxFlowElement',
-            name: 'LinkCard',
-            attributes: [
+          const promise = fetchLinkMetadata(urlToConvert).then(metadata => {
+            const attributes = [
               {
-                type: 'mdxJsxAttribute',
+                type: 'mdxJsxAttribute' as const,
                 name: 'url',
                 value: urlToConvert
               }
-            ],
-            children: []
-          }
-          parent.children[index] = linkCardNode
+            ]
+
+            // メタデータをpropsとして追加
+            if (metadata.title) {
+              attributes.push({
+                type: 'mdxJsxAttribute' as const,
+                name: 'title',
+                value: metadata.title
+              })
+            }
+            if (metadata.description) {
+              attributes.push({
+                type: 'mdxJsxAttribute' as const,
+                name: 'description',
+                value: metadata.description
+              })
+            }
+            if (metadata.image) {
+              attributes.push({
+                type: 'mdxJsxAttribute' as const,
+                name: 'image',
+                value: metadata.image
+              })
+            }
+            if (metadata.favicon) {
+              attributes.push({
+                type: 'mdxJsxAttribute' as const,
+                name: 'favicon',
+                value: metadata.favicon
+              })
+            }
+            if (metadata.domain) {
+              attributes.push({
+                type: 'mdxJsxAttribute' as const,
+                name: 'domain',
+                value: metadata.domain
+              })
+            }
+
+            const linkCardNode = {
+              type: 'mdxJsxFlowElement',
+              name: 'LinkCard',
+              attributes,
+              children: []
+            }
+            parent.children[index] = linkCardNode
+          }).catch(() => {
+            // エラー時はURLのみでLinkCardを作成
+            const linkCardNode = {
+              type: 'mdxJsxFlowElement',
+              name: 'LinkCard',
+              attributes: [
+                {
+                  type: 'mdxJsxAttribute' as const,
+                  name: 'url',
+                  value: urlToConvert
+                }
+              ],
+              children: []
+            }
+            parent.children[index] = linkCardNode
+          })
+          promises.push(promise)
         }
       }
     })
+
+    await Promise.all(promises)
   }
 }
