@@ -45,6 +45,9 @@ export default createRoute(async (c) => {
             </div>
             <div class="px-6 pb-6">
               <time class="text-xs text-gray-500 dark:text-gray-500">{post.pubDate}</time>
+              {post.readingTime && (
+                <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">📖 {post.readingTime < 1 ? '1分未満' : `約${post.readingTime}分`}で読めます</p>
+              )}
               {post.tags && (
                 <div class="flex gap-1 flex-wrap mt-3">
                   {post.tags.slice(0, 3).map((tag: string) => (
