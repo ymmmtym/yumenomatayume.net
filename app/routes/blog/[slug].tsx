@@ -1,30 +1,24 @@
 import { createRoute } from 'honox/factory'
 import { TableOfContents } from '../../components/TableOfContents'
 import { LinkCard } from '../../components/LinkCard'
-
-const modules = import.meta.glob('../../content/blog/*.{md,mdx}', { eager: true })
+import { blogModules, getLocalPosts } from '../../lib/blog'
 
 export default createRoute(async (c) => {
   const slug = c.req.param('slug')
   const modulePath = `../../content/blog/${slug}.md`
-  let module = modules[modulePath] as any
+  let module = blogModules[modulePath] as any
   
   // .mdxファイルも試す
   if (!module) {
     const mdxPath = `../../content/blog/${slug}.mdx`
-    module = modules[mdxPath] as any
+    module = blogModules[mdxPath] as any
   }
   
   if (!module) return c.notFound()
   
   const { frontmatter, default: Content } = module
   
-  const allPosts = Object.entries(modules)
-    .map(([path, mod]: [string, any]) => {
-      const postSlug = path.split('/').pop()?.replace(/\.(md|mdx)$/, '')
-      return { slug: postSlug, ...mod.frontmatter }
-    })
-    .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
+  const allPosts = getLocalPosts()
   
   const currentIndex = allPosts.findIndex(post => post.slug === slug)
   const nextPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null
