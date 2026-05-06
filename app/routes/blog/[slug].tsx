@@ -191,6 +191,9 @@ export default createRoute(async (c) => {
         <header class="mb-8">
           <h1 class="text-4xl font-bold mb-4">{frontmatter.title}</h1>
           <time class="text-sm text-gray-600 dark:text-gray-400">{frontmatter.pubDate}</time>
+          {frontmatter.readingTime !== undefined && (
+            <span class="text-sm text-gray-600 dark:text-gray-400 ml-2">📖 {frontmatter.readingTime < 1 ? '1分未満で読めます' : `約${Math.ceil(frontmatter.readingTime)}分で読めます`}</span>
+          )}
           {frontmatter.tags && (
             <div class="flex gap-2 flex-wrap mt-4">
               {frontmatter.tags.map((tag: string) => (
