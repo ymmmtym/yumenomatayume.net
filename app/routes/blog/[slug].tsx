@@ -1,6 +1,7 @@
 import { createRoute } from 'honox/factory'
 import { TableOfContents } from '../../components/TableOfContents'
 import { LinkCard } from '../../components/LinkCard'
+import { formatDate, getUpdateStatus } from '../../lib/dateUtils'
 
 const modules = import.meta.glob('../../content/blog/*.{md,mdx}', { eager: true })
 
@@ -190,7 +191,23 @@ export default createRoute(async (c) => {
         )}
         <header class="mb-8">
           <h1 class="text-4xl font-bold mb-4">{frontmatter.title}</h1>
-          <time class="text-sm text-gray-600 dark:text-gray-400">{frontmatter.pubDate}</time>
+          <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+            <time>{formatDate(frontmatter.pubDate)}</time>
+            {(() => {
+              const { showUpdated, isRecent } = getUpdateStatus(frontmatter.pubDate, frontmatter.updatedDate)
+              if (!showUpdated) return null
+              return (
+                <>
+                  <span class="ml-2">(更新: <time>{formatDate(frontmatter.updatedDate)}</time>)</span>
+                  {isRecent && (
+                    <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                      最近更新
+                    </span>
+                  )}
+                </>
+              )
+            })()}
+          </div>
           {frontmatter.tags && (
             <div class="flex gap-2 flex-wrap mt-4">
               {frontmatter.tags.map((tag: string) => (
