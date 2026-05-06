@@ -25,8 +25,8 @@ async function fetchLinkMetadata(url: string): Promise<LinkMetadata> {
     
     const html = await response.text()
     
-    const title = extractMetaContent(html, ['og:title', 'twitter:title', 'title']) || domain
-    const description = extractMetaContent(html, ['og:description', 'twitter:description', 'description'])
+    const title = decodeHtmlEntities(extractMetaContent(html, ['og:title', 'twitter:title', 'title']) || domain)
+    const description = extractMetaContent(html, ['og:description', 'twitter:description', 'description']) ? decodeHtmlEntities(extractMetaContent(html, ['og:description', 'twitter:description', 'description'])) : undefined
     const image = extractMetaContent(html, ['og:image', 'twitter:image'])
     const favicon = extractFavicon(html, url)
     
@@ -45,6 +45,19 @@ async function fetchLinkMetadata(url: string): Promise<LinkMetadata> {
       domain
     }
   }
+}
+
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#x27;/g, "'")
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&#x2F;/g, '/')
+    .replace(/&#47;/g, '/')
 }
 
 function extractMetaContent(html: string, properties: string[]): string | undefined {
