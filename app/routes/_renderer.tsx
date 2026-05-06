@@ -8,13 +8,14 @@ const getBlogPosts = () => {
     const modules = import.meta.glob('../content/blog/*.{md,mdx}', { eager: true })
     return Object.entries(modules).map(([path, module]: [string, any]) => {
       const slug = path.split('/').pop()?.replace('.md', '')
-      return { 
-        slug, 
-        title: module.frontmatter?.title || '',
-        description: module.frontmatter?.description || '',
-        tags: module.frontmatter?.tags || [],
-        pubDate: module.frontmatter?.pubDate || ''
-      }
+        return { 
+          slug, 
+          title: module.frontmatter?.title || '',
+          description: module.frontmatter?.description || '',
+          tags: module.frontmatter?.tags || [],
+          pubDate: module.frontmatter?.pubDate || '',
+          updatedDate: module.frontmatter?.updatedDate || ''
+        }
     })
   } catch (error) {
     return []
