@@ -1,6 +1,6 @@
 export function TableOfContents() {
   return (
-    <div id="toc-container" class="hidden lg:block fixed left-4 top-32 w-64 max-h-96 overflow-y-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-200 dark:border-gray-700">
+    <div id="toc-container" class="sticky top-32 w-64 max-h-96 overflow-y-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-200 dark:border-gray-700">
       <text class="font-bold text-sm mb-3 text-gray-900 dark:text-gray-100">目次</text>
       <ul id="toc-list" class="space-y-1"></ul>
       <script dangerouslySetInnerHTML={{__html: `
