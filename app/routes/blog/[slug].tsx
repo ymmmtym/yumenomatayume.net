@@ -177,7 +177,11 @@ export default createRoute(async (c) => {
           <span class="text-base md:text-xl">☁️</span>
         </a>
       </div>
-      <main class="max-w-3xl mx-auto py-8 px-4">
+      <div class="max-w-7xl mx-auto py-8 px-4 flex flex-col lg:flex-row gap-8">
+        <aside class="hidden lg:block w-64 flex-shrink-0">
+          <TableOfContents />
+        </aside>
+        <main class="flex-1 min-w-0 max-w-3xl mx-auto">
       <article>
         {frontmatter.heroImage && (
           <div class="mb-8">
