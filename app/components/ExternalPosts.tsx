@@ -25,7 +25,20 @@ const RSS_FEEDS: RSSFeed[] = [
  * 外部RSSフィードから記事を取得する
  * 注意: Cloudflare Workers環境ではCORS制限により一部のRSSフィードが取得できない場合があります
  */
-export async function fetchExternalPosts(maxPosts: number = 10): Promise<ExternalPost[]> {
+const FALLBACK_POSTS: ExternalPost[] = RSS_FEEDS.map(feed => ({
+  title: `${feed.name} の記事一覧`,
+  link: feed.url.replace(/\/feed$/, '').replace(/\/feed\/$/, ''),
+  pubDate: new Date().toISOString(),
+  source: feed.name,
+  icon: feed.icon,
+}))
+
+export interface FetchResult {
+  posts: ExternalPost[]
+  isFallback: boolean
+}
+
+export async function fetchExternalPosts(maxPosts: number = 10): Promise<FetchResult> {
   const allPosts: ExternalPost[] = []
 
   for (const feed of RSS_FEEDS) {
@@ -68,14 +81,22 @@ export async function fetchExternalPosts(maxPosts: number = 10): Promise<Externa
       allPosts.push(...posts)
     } catch (error) {
       console.error(`Failed to fetch ${feed.name}:`, error)
-      // CORS エラーの場合は特別にログ出力
       if (error instanceof TypeError && error.message.includes('fetch')) {
         console.warn(`Possible CORS issue for ${feed.name} - this may be expected in Cloudflare Workers environment`)
       }
     }
   }
   
-  return allPosts
+  if (allPosts.length === 0) {
+    return {
+      posts: FALLBACK_POSTS.slice(0, maxPosts),
+      isFallback: true,
+    }
+  }
+  
+  const sortedPosts = allPosts
     .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
     .slice(0, maxPosts)
+  
+  return { posts: sortedPosts, isFallback: false }
 }

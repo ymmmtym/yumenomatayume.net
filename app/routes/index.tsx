@@ -2,7 +2,7 @@ import { createRoute } from 'honox/factory'
 import { fetchExternalPosts } from '../components/ExternalPosts'
 
 export default createRoute(async (c) => {
-  const externalPosts = await fetchExternalPosts(10)
+  const { posts: externalPosts, isFallback } = await fetchExternalPosts(10)
   
   return c.render(
     <main class="max-w-3xl mx-auto py-8 px-4">
@@ -87,7 +87,10 @@ export default createRoute(async (c) => {
         <h2 class="text-4xl font-bold border-b-2 border-gray-300 dark:border-gray-700 pb-2 mb-6">🧚 Activity</h2>
         
         <h3 class="text-2xl font-bold mb-4">Blog</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        {isFallback && (
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">外部記事を一時的に取得できません。各サイトへのリンクを表示しています。</p>
+        )}
+        <div class={`grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 ${isFallback ? 'opacity-60' : ''}`}>
           {externalPosts.map(post => (
             <a href={post.link} target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-purple-900/20 rounded-lg p-4 shadow hover:shadow-lg hover:-translate-y-1 transition-all block">
               <div class="flex items-start gap-2 mb-2">
