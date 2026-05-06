@@ -7,6 +7,7 @@ interface LinkMetadata {
   image?: string
   favicon?: string
   domain: string
+  isFallback?: boolean
 }
 
 async function fetchLinkMetadata(url: string): Promise<LinkMetadata> {
@@ -36,13 +37,15 @@ async function fetchLinkMetadata(url: string): Promise<LinkMetadata> {
       description,
       image: image ? resolveUrl(image, url) : undefined,
       favicon: favicon ? resolveUrl(favicon, url) : undefined,
-      domain
+      domain,
+      isFallback: false
     }
   } catch (error) {
     return {
       url,
       title: domain,
-      domain
+      domain,
+      isFallback: true
     }
   }
 }
@@ -105,7 +108,8 @@ export default createRoute(async (c) => {
     return c.json({ 
       url,
       title: new URL(url).hostname,
-      domain: new URL(url).hostname
+      domain: new URL(url).hostname,
+      isFallback: true
     })
   }
 })
