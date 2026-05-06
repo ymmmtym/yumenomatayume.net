@@ -51,6 +51,12 @@ export function LinkCard({ url, title, description, image, favicon, domain }: Li
       <script dangerouslySetInnerHTML={{
         __html: `
           (function() {
+            function decodeHtmlEntities(text) {
+              const textarea = document.createElement('textarea');
+              textarea.innerHTML = text;
+              return textarea.value;
+            }
+            
             const card = document.getElementById('${cardId}');
             if (!card) return;
             
@@ -69,13 +75,13 @@ export function LinkCard({ url, title, description, image, favicon, domain }: Li
                 
                 // タイトル
                 if (titleEl) {
-                  titleEl.textContent = data.title || '${displayDomain}';
+                  titleEl.textContent = decodeHtmlEntities(data.title || '${displayDomain}');
                 }
                 
                 // 説明文
                 if (descEl) {
                   if (data.description) {
-                    descEl.textContent = data.description;
+                    descEl.textContent = decodeHtmlEntities(data.description);
                     descEl.style.display = 'block';
                   } else {
                     descEl.style.display = 'none';
@@ -84,7 +90,7 @@ export function LinkCard({ url, title, description, image, favicon, domain }: Li
                 
                 // ドメイン
                 if (domainEl) {
-                  domainEl.textContent = data.domain || '${displayDomain}';
+                  domainEl.textContent = decodeHtmlEntities(data.domain || '${displayDomain}');
                 }
                 
                 // 画像
@@ -106,8 +112,8 @@ export function LinkCard({ url, title, description, image, favicon, domain }: Li
                 
                 if (loading) loading.style.display = 'none';
                 if (content) content.style.display = 'block';
-                if (titleEl) titleEl.textContent = '${displayDomain}';
-                if (domainEl) domainEl.textContent = '${displayDomain}';
+                if (titleEl) titleEl.textContent = decodeHtmlEntities('${displayDomain}');
+                if (domainEl) domainEl.textContent = decodeHtmlEntities('${displayDomain}');
               });
           })();
         `
