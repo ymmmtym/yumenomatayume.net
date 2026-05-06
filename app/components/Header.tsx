@@ -8,6 +8,7 @@ interface HeaderProps {
     description: string
     tags: string[]
     pubDate: string
+    body: string
   }>
 }
 
@@ -53,8 +54,8 @@ export default function Header({ pathname, posts = [] }: HeaderProps) {
           </div>
         </div>
         
-        {/* 検索ボックス - ブログページでのみ表示 */}
-        {isBlog && posts.length > 0 && (
+        {/* 検索ボックス */}
+        {posts.length > 0 && (
           <div class="max-w-md mx-auto">
             <SearchBox posts={posts} />
           </div>
