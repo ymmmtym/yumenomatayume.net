@@ -1,8 +1,22 @@
 import { createRoute } from 'honox/factory'
 import { fetchExternalPosts } from '../components/ExternalPosts'
+import { loadBlogPosts } from '../utils/blog'
 
 export default createRoute(async (c) => {
+  const blogPosts = loadBlogPosts(5)
   const externalPosts = await fetchExternalPosts(10)
+  
+  const blogPostItems = blogPosts.map(post => ({
+    title: post.title,
+    link: `https://yumenomatayume.net/blog/${post.slug}`,
+    pubDate: post.pubDate,
+    source: '個人ブログ',
+    icon: '📋',
+  }))
+  
+  const allPosts = [...blogPostItems, ...externalPosts]
+    .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
+    .slice(0, 10)
   
   return c.render(
     <main class="max-w-3xl mx-auto py-8 px-4">
@@ -88,7 +102,7 @@ export default createRoute(async (c) => {
         
         <h3 class="text-2xl font-bold mb-4">Blog</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          {externalPosts.map(post => (
+          {allPosts.map(post => (
             <a href={post.link} target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-purple-900/20 rounded-lg p-4 shadow hover:shadow-lg hover:-translate-y-1 transition-all block">
               <div class="flex items-start gap-2 mb-2">
                 <span class="text-xl">{post.icon}</span>

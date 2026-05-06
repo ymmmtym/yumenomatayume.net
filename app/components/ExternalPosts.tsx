@@ -14,8 +14,7 @@ export interface RSSFeed {
   icon: string
 }
 
-const RSS_FEEDS: RSSFeed[] = [
-  { name: '個人ブログ', url: 'https://yumenomatayume.net/feed', icon: '📋' },
+const EXTERNAL_RSS_FEEDS: RSSFeed[] = [
   { name: 'Zenn', url: 'https://zenn.dev/ymmmtym/feed', icon: '📝' },
   { name: 'Qiita', url: 'https://qiita.com/yumenomatayume/feed', icon: '📚' },
   { name: 'はてな', url: 'https://ymmmtym.hateblo.jp/feed', icon: '📖' },
@@ -28,7 +27,7 @@ const RSS_FEEDS: RSSFeed[] = [
 export async function fetchExternalPosts(maxPosts: number = 10): Promise<ExternalPost[]> {
   const allPosts: ExternalPost[] = []
 
-  for (const feed of RSS_FEEDS) {
+  for (const feed of EXTERNAL_RSS_FEEDS) {
     try {
       const response = await fetch(feed.url, {
         headers: {
