@@ -8,6 +8,7 @@ interface HeaderProps {
     description: string
     tags: string[]
     pubDate: string
+    updatedDate?: string
   }>
 }
 
