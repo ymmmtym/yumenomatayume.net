@@ -6,14 +6,17 @@ import Header from '../components/Header'
 const getBlogPosts = () => {
   try {
     const modules = import.meta.glob('../content/blog/*.{md,mdx}', { eager: true })
+    const rawModules = import.meta.glob('../content/blog/*.{md,mdx}', { eager: true, query: '?raw', import: 'default' })
     return Object.entries(modules).map(([path, module]: [string, any]) => {
-      const slug = path.split('/').pop()?.replace('.md', '')
+      const slug = path.split('/').pop()?.replace('.md', '').replace('.mdx', '')
+      const rawPath = path.replace(/^\.\/+/, '../content/blog/')
       return { 
         slug, 
         title: module.frontmatter?.title || '',
         description: module.frontmatter?.description || '',
         tags: module.frontmatter?.tags || [],
-        pubDate: module.frontmatter?.pubDate || ''
+        pubDate: module.frontmatter?.pubDate || '',
+        body: rawModules[path] || ''
       }
     })
   } catch (error) {
@@ -29,8 +32,8 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
   const currentUrl = `${baseUrl}${c.req.path}`
   const ogImage = heroImage || 'https://img.yumenomatayume.net/og-image.png'
   
-  // ブログページの場合のみ記事データを取得
-  const posts = c.req.path.startsWith('/blog') ? getBlogPosts() : []
+  // 全ページで記事データを取得（検索機能のため）
+  const posts = getBlogPosts()
   
   return (
     <html lang="ja">
