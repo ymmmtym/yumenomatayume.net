@@ -7,6 +7,7 @@ interface LinkMetadata {
   image?: string
   favicon?: string
   domain: string
+  isFallback?: boolean
 }
 
 async function fetchLinkMetadata(url: string): Promise<LinkMetadata> {
@@ -42,7 +43,8 @@ async function fetchLinkMetadata(url: string): Promise<LinkMetadata> {
     return {
       url,
       title: domain,
-      domain
+      domain,
+      isFallback: true,
     }
   }
 }
@@ -100,12 +102,13 @@ export default createRoute(async (c) => {
     
     const metadata = await fetchLinkMetadata(url)
     return c.json(metadata)
-  } catch (error) {
-    console.error('Error fetching metadata:', error)
-    return c.json({ 
-      url,
-      title: new URL(url).hostname,
-      domain: new URL(url).hostname
-    })
-  }
+   } catch (error) {
+     console.error('Error fetching metadata:', error)
+     return c.json({ 
+       url,
+       title: new URL(url).hostname,
+       domain: new URL(url).hostname,
+       isFallback: true,
+     })
+   }
 })
