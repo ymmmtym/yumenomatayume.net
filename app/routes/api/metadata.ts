@@ -47,18 +47,31 @@ async function fetchLinkMetadata(url: string): Promise<LinkMetadata> {
   }
 }
 
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&#(\d+);/g, (_match, dec) => String.fromCharCode(dec))
+    .replace(/&#x([0-9a-fA-F]+);/g, (_match, hex) => String.fromCharCode(parseInt(hex, 16)))
+}
+
 function extractMetaContent(html: string, properties: string[]): string | undefined {
   for (const prop of properties) {
     const metaRegex = new RegExp(`<meta[^>]*(?:property|name)=["']${prop}["'][^>]*content=["']([^"']*?)["']`, 'i')
     const match = html.match(metaRegex)
     if (match && match[1]) {
-      return match[1].trim()
+      return decodeHtmlEntities(match[1].trim())
     }
     
     if (prop === 'title') {
       const titleMatch = html.match(/<title[^>]*>([^<]*)<\/title>/i)
       if (titleMatch && titleMatch[1]) {
-        return titleMatch[1].trim()
+        return decodeHtmlEntities(titleMatch[1].trim())
       }
     }
   }
