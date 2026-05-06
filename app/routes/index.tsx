@@ -2,7 +2,7 @@ import { createRoute } from 'honox/factory'
 import { fetchExternalPosts } from '../components/ExternalPosts'
 
 export default createRoute(async (c) => {
-  const externalPosts = await fetchExternalPosts(10)
+  const { posts: externalPosts, isFallback } = await fetchExternalPosts(10)
   
   return c.render(
     <main class="max-w-3xl mx-auto py-8 px-4">
@@ -87,9 +87,16 @@ export default createRoute(async (c) => {
         <h2 class="text-4xl font-bold border-b-2 border-gray-300 dark:border-gray-700 pb-2 mb-6">🧚 Activity</h2>
         
         <h3 class="text-2xl font-bold mb-4">Blog</h3>
+        {isFallback && (
+          <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-4">
+            <p class="text-sm text-yellow-800 dark:text-yellow-200">
+              外部記事を一時的に取得できません。以下は各サイトへのリンクです。
+            </p>
+          </div>
+        )}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           {externalPosts.map(post => (
-            <a href={post.link} target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-purple-900/20 rounded-lg p-4 shadow hover:shadow-lg hover:-translate-y-1 transition-all block">
+            <a href={post.link} target="_blank" rel="noopener noreferrer" class={`bg-white dark:bg-purple-900/20 rounded-lg p-4 shadow hover:shadow-lg hover:-translate-y-1 transition-all block ${isFallback ? 'opacity-60' : ''}`}>
               <div class="flex items-start gap-2 mb-2">
                 <span class="text-xl">{post.icon}</span>
                 <span class="text-xs text-gray-600 dark:text-gray-400">{post.source}</span>
