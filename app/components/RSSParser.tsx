@@ -8,6 +8,12 @@ export interface RSSItem {
  * RSS/Atomフィードをパースしてアイテムのリストを返す
  */
 export async function parseRSS(xml: string): Promise<RSSItem[]> {
+  // XML簡易検証：<rss または <feed タグの存在チェック
+  const trimmed = xml.trim()
+  if (!trimmed.includes('<rss') && !trimmed.includes('<feed') && !trimmed.includes('<?xml')) {
+    throw new Error('Invalid XML format: missing <rss> or <feed> tag')
+  }
+
   const items: RSSItem[] = []
   
   // Try <item> tags (RSS 2.0)
