@@ -51,6 +51,12 @@ export function LinkCard({ url, title, description, image, favicon, domain }: Li
       <script dangerouslySetInnerHTML={{
         __html: `
           (function() {
+            function decodeHtmlEntities(text) {
+              const textarea = document.createElement('textarea');
+              textarea.innerHTML = text;
+              return textarea.value;
+            }
+
             const card = document.getElementById('${cardId}');
             if (!card) return;
             
@@ -69,13 +75,15 @@ export function LinkCard({ url, title, description, image, favicon, domain }: Li
                 
                 // タイトル
                 if (titleEl) {
-                  titleEl.textContent = data.title || '${displayDomain}';
+                  const decodedTitle = decodeHtmlEntities(data.title || '${displayDomain}');
+                  titleEl.textContent = decodedTitle;
                 }
                 
                 // 説明文
                 if (descEl) {
                   if (data.description) {
-                    descEl.textContent = data.description;
+                    const decodedDesc = decodeHtmlEntities(data.description);
+                    descEl.textContent = decodedDesc;
                     descEl.style.display = 'block';
                   } else {
                     descEl.style.display = 'none';
@@ -84,7 +92,8 @@ export function LinkCard({ url, title, description, image, favicon, domain }: Li
                 
                 // ドメイン
                 if (domainEl) {
-                  domainEl.textContent = data.domain || '${displayDomain}';
+                  const decodedDomain = decodeHtmlEntities(data.domain || '${displayDomain}');
+                  domainEl.textContent = decodedDomain;
                 }
                 
                 // 画像
