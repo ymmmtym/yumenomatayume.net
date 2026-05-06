@@ -42,7 +42,6 @@ export default createRoute(async (c) => {
   
   return c.render(
     <>
-      <TableOfContents />
       <script dangerouslySetInnerHTML={{__html: `
         document.addEventListener('keydown', (e) => {
           if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
