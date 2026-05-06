@@ -21,6 +21,7 @@
     "@mdx-js/rollup": "^3.1.1",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.0.9",
+    "@types/mdast": "^4.0.4",
     "cloudinary": "^2.8.0",
     "prismjs": "^1.30.0",
     "rehype-prism-plus": "^2.0.1",
