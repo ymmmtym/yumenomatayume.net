@@ -29,6 +29,7 @@ export default createRoute(async (c) => {
       <link>${baseUrl}/blog/${post.slug}</link>
       <guid>${baseUrl}/blog/${post.slug}</guid>
       <pubDate>${new Date(post.pubDate).toUTCString()}</pubDate>
+      ${post.updatedDate && new Date(post.updatedDate) > new Date(post.pubDate) ? `<atom:updated>${new Date(post.updatedDate).toUTCString()}</atom:updated>` : ''}
     </item>`).join('')}
   </channel>
 </rss>`
