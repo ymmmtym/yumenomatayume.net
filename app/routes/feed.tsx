@@ -1,14 +1,8 @@
 import { createRoute } from 'honox/factory'
-
-const modules = import.meta.glob('../content/blog/*.md', { eager: true })
+import { getLocalPosts } from '../utils/local-posts'
 
 export default createRoute(async (c) => {
-  const posts = Object.entries(modules).map(([path, module]: [string, any]) => {
-    const slug = path.split('/').pop()?.replace('.md', '')
-    return { slug, ...module.frontmatter }
-  }).sort((a, b) => 
-    new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
-  ).slice(0, 20)
+  const posts = getLocalPosts().slice(0, 20)
 
   const baseUrl = 'https://yumenomatayume.net'
   const lastBuildDate = new Date().toUTCString()

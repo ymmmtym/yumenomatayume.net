@@ -1,4 +1,5 @@
 import { parseRSS, type RSSItem } from './RSSParser'
+import { getLocalPostsAsExternalPosts } from '../utils/local-posts'
 
 export interface ExternalPost {
   title: string
@@ -15,7 +16,6 @@ export interface RSSFeed {
 }
 
 const RSS_FEEDS: RSSFeed[] = [
-  { name: '個人ブログ', url: 'https://yumenomatayume.net/feed', icon: '📋' },
   { name: 'Zenn', url: 'https://zenn.dev/ymmmtym/feed', icon: '📝' },
   { name: 'Qiita', url: 'https://qiita.com/yumenomatayume/feed', icon: '📚' },
   { name: 'はてな', url: 'https://ymmmtym.hateblo.jp/feed', icon: '📖' },
@@ -23,11 +23,16 @@ const RSS_FEEDS: RSSFeed[] = [
 
 /**
  * 外部RSSフィードから記事を取得する
- * 注意: Cloudflare Workers環境ではCORS制限により一部のRSSフィードが取得できない場合があります
+ * 個人ブログはローカルファイルから直接読み込み、自己参照フェッチ問題を回避
  */
 export async function fetchExternalPosts(maxPosts: number = 10): Promise<ExternalPost[]> {
   const allPosts: ExternalPost[] = []
 
+  // 個人ブログはローカルファイルから直接取得（自己参照フェッチ問題を回避）
+  const localPosts = getLocalPostsAsExternalPosts()
+  allPosts.push(...localPosts)
+
+  // 他の外部RSSフィードを取得
   for (const feed of RSS_FEEDS) {
     try {
       const response = await fetch(feed.url, {
@@ -68,10 +73,6 @@ export async function fetchExternalPosts(maxPosts: number = 10): Promise<Externa
       allPosts.push(...posts)
     } catch (error) {
       console.error(`Failed to fetch ${feed.name}:`, error)
-      // CORS エラーの場合は特別にログ出力
-      if (error instanceof TypeError && error.message.includes('fetch')) {
-        console.warn(`Possible CORS issue for ${feed.name} - this may be expected in Cloudflare Workers environment`)
-      }
     }
   }
   
