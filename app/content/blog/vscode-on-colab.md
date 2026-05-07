@@ -25,7 +25,7 @@ Google Colab で VS Code を使用する方法をご紹介します 🚀 普段�
 
 以下の記事に、`ngrok` を使用して SSH する詳細なやり方が記載されています 📚
 
-[Google ColabとVS Codeを用いた分析環境運用方法 〜kaggle Tipsを添えて〜](https://www.takapy.work/entry/2021/08/17/185047?utm_source=pocket_mylist)
+https://www.takapy.work/entry/2021/08/17/185047
 
 ## 方法2: colabcode モジュールを使用（推奨）
 

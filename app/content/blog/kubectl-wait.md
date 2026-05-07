@@ -7,7 +7,7 @@ tags: ["kubernetes"]
 
 `kubectl wait` コマンドを使用すると、1つ以上のリソースが特定の状態になるまで待つことができます ⏳ 実験的なコマンドですが、リソース間の依存関係を解決する際に便利です。
 
-[Kubectl Reference Docs](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#wait)
+https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#wait
 
 > Experimental: Wait for a specific condition on one or many resources.
 

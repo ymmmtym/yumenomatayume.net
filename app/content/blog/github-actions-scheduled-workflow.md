@@ -48,7 +48,7 @@ workflow を停止させないためには、何らかの活動をする必要�
 
 任意のブランチに push する action には、以下がオススメです 📤
 
-[ad-m/github-push-action](https://github.com/ad-m/github-push-action)
+https://github.com/ad-m/github-push-action
 
 ```yaml
 - name: Push changes
@@ -62,7 +62,7 @@ workflow を停止させないためには、何らかの活動をする必要�
 
 PR を作成できる action には、以下がオススメです 🔄
 
-[Create Pull Request · Actions · GitHub Marketplace](https://github.com/marketplace/actions/create-pull-request)
+https://github.com/marketplace/actions/create-pull-request
 
 ```yaml
 - name: Create Pull Request
@@ -77,7 +77,7 @@ PR を作成できる action には、以下がオススメです 🔄
 
 Issue を発行する actions には、以下がオススメです 📋
 
-[Create an issue · Actions · GitHub Marketplace](https://github.com/marketplace/actions/create-an-issue)
+https://github.com/marketplace/actions/create-an-issue
 
 ```yaml
 - name: Create issue

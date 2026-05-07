@@ -73,7 +73,7 @@ curl -s "https://qiita.com/api/v2/users/${USERNAME}/items?per_page=100&page=2"
 
 上記のスクリプトを GitHub Actions で自動実行するリポジトリを作成しました 🤖
 
-[ymmmtym/qiita: Qiita Articles](https://github.com/ymmmtym/qiita)
+https://github.com/ymmmtym/qiita
 
 ### 特徴
 

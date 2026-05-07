@@ -8,7 +8,7 @@ tags: ["bash","fish","shell","git","github"]
 GitHub で、Pull Request のクローズや Branch の削除をまとめて操作したかったので、GitHub CLI を用いてシェル芸をしてみました。
 
 記載した実行例では、以下のリポジトリで作業しております。  
-[ymmmtym/home: My home environment.](https://github.com/ymmmtym/home)
+https://github.com/ymmmtym/home
 
 
 ## PR をすべて Close するシェル芸

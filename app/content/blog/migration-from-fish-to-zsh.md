@@ -11,7 +11,7 @@ tags: ["fish", "zsh", "mac"]
 
 これを機に、Mac のデフォルトである zsh に戻そうと思います 🍎
 
-[Zsh](https://www.zsh.org/)
+https://www.zsh.org/
 
 ## 移行する理由
 

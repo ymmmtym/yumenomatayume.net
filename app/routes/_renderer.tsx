@@ -2,10 +2,9 @@ import { jsxRenderer, useRequestContext } from 'hono/jsx-renderer'
 import { Link, Script } from 'honox/server'
 import Header from '../components/Header'
 
-// 記事データを取得する関数
 const getBlogPosts = () => {
   try {
-    const modules = import.meta.glob('../content/blog/*.md', { eager: true })
+    const modules = import.meta.glob('../content/blog/*.{md,mdx}', { eager: true })
     return Object.entries(modules).map(([path, module]: [string, any]) => {
       const slug = path.split('/').pop()?.replace('.md', '')
       return { 
@@ -28,10 +27,9 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
   const baseUrl = 'https://yumenomatayume.net'
   const currentUrl = `${baseUrl}${c.req.path}`
   const ogImage = heroImage || 'https://img.yumenomatayume.net/og-image.png'
-  
-  // ブログページの場合のみ記事データを取得
+
   const posts = c.req.path.startsWith('/blog') ? getBlogPosts() : []
-  
+
   return (
     <html lang="ja">
       <head>
@@ -63,12 +61,10 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
               if (toggle) {
                 toggle.checked = isDark;
               }
-              
-              // Keyboard shortcuts for scrolling and search
+
               document.addEventListener('keydown', function(e) {
                 if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
                 
-                // Search shortcut (Ctrl+K or Cmd+K)
                 if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
                   e.preventDefault();
                   const searchInput = document.getElementById('search-input');
@@ -77,7 +73,7 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
                   }
                   return;
                 }
-                
+
                 if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
                 if (e.key === 'j') {
                   window.scrollBy({ top: 100, behavior: 'smooth' });
@@ -88,18 +84,18 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
                   showShortcutHelp();
                 }
               });
-              
+
               function showShortcutHelp() {
                 const existing = document.getElementById('shortcut-help');
                 if (existing) {
                   existing.remove();
                   return;
                 }
-                
+
                 const modal = document.createElement('div');
                 modal.id = 'shortcut-help';
                 modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:9999;';
-                
+
                 const content = document.createElement('div');
                 content.style.cssText = 'background:white;dark:bg-gray-800;padding:2rem;border-radius:8px;max-width:400px;width:90%;';
                 content.innerHTML = \`
@@ -115,14 +111,14 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
                     <button onclick="document.getElementById('shortcut-help').remove()" style="background:#6366f1;color:white;border:none;padding:0.5rem 1rem;border-radius:4px;cursor:pointer;">閉じる</button>
                   </div>
                 \`;
-                
+
                 modal.appendChild(content);
                 document.body.appendChild(modal);
-                
+
                 modal.addEventListener('click', function(e) {
                   if (e.target === modal) modal.remove();
                 });
-                
+
                 document.addEventListener('keydown', function escHandler(e) {
                   if (e.key === 'Escape') {
                     modal.remove();
@@ -130,17 +126,16 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
                   }
                 });
               }
-              
+
               window.showShortcutHelp = showShortcutHelp;
-              
+
               document.querySelectorAll('.prose a').forEach(function(link) {
                 if (link.hostname !== window.location.hostname) {
                   link.setAttribute('target', '_blank');
                   link.setAttribute('rel', 'noopener noreferrer');
                 }
               });
-              
-              // Add copy buttons to code blocks
+
               document.querySelectorAll('pre').forEach(function(pre) {
                 const button = document.createElement('button');
                 button.innerHTML = '📋';
@@ -150,9 +145,13 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
                   navigator.clipboard.writeText(code);
                   const tooltip = document.createElement('div');
                   tooltip.textContent = 'Copied!';
-                  tooltip.style.cssText = 'position:absolute;bottom:100%;right:0;margin-bottom:8px;background:#10b981;color:white;padding:4px 8px;border-radius:4px;font-size:12px;white-space:nowrap;z-index:20';
+                  tooltip.style.cssText = 'position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:8px;background:#10b981;color:white;padding:6px 12px;border-radius:6px;font-size:14px;white-space:nowrap;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);z-index:1000;opacity:0;transition:opacity 0.3s ease-in-out;';
                   button.appendChild(tooltip);
-                  setTimeout(function() { tooltip.remove(); }, 2000);
+                  setTimeout(function() { tooltip.style.opacity = '1'; }, 10);
+                  setTimeout(function() { 
+                    tooltip.style.opacity = '0';
+                    setTimeout(function() { tooltip.remove(); }, 300);
+                  }, 1000);
                 };
                 pre.style.position = 'relative';
                 pre.style.overflow = 'visible';

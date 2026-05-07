@@ -11,7 +11,7 @@ tags: ["git", "gitignore"]
 
 ## gitignore.io とは
 
-[gitignore.io](https://www.toptal.com/developers/gitignore/)
+https://www.toptal.com/developers/gitignore/
 
 適切な gitignore をレスポンスしてくれるサービスです 🎯
 

@@ -72,5 +72,5 @@ AWS CLI で `groff` エラーが出たときは、まずはバージョンアッ
 
 ## 参考
 
-[AWS CLI で groff エラーが出た場合の解決法](https://qiita.com/KDKK/items/6763c3757d42b938f32c)
+https://qiita.com/KDKK/items/6763c3757d42b938f32c
 

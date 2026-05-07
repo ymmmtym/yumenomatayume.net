@@ -10,7 +10,7 @@ tags: ["bash","linux","template"]
 
 ちなみに、使用頻度の高い言語が Python なので、Jinja2 というテンプレートエンジンをよく使っています。
 
-[Jinja — Jinja Documentation (3.0.x)](https://jinja.palletsprojects.com/en/3.0.x/)
+https://jinja.palletsprojects.com/en/3.0.x/
 
 しかし、このテンプレートエンジンを使うには、環境構築などの準備をする必要があります。
 もう少し手軽に使えるテンプレートエンジンがあればと思ってました。

@@ -9,7 +9,7 @@ tags: ["metallb","kubernetes","flannel","オンプレミス"]
 
 ## MetalLB とは
 
-[MetalLB, bare metal load-balancer for Kubernetes](https://metallb.universe.tf/installation/)
+https://metallb.universe.tf/installation/
 
 AWS や GCP などのクラウドプロバイダーの場合、Kubernetes の Service を `Type: LoadBalancer` に設定すると、自動的にグローバル IP アドレスを取得してくれます ☁️
 

@@ -9,7 +9,7 @@ fish shell のプラグインマネージャー「Fisher」のインストール
 
 ## Fisher とは
 
-[jorgebucaran/fisher: A plugin manager for Fish.](https://github.com/jorgebucaran/fisher)
+https://github.com/jorgebucaran/fisher
 
 Fisher とは、**fish shell のプラグインマネージャー**です 🔧
 
