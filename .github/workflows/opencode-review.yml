@@ -10,7 +10,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
-      pull-requests: write
+      pull-requests: read
       issues: read
     steps:
       - uses: actions/checkout@v6
@@ -18,7 +18,7 @@ jobs:
           persist-credentials: false
       - uses: anomalyco/opencode/github@latest
         env:
-          # ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           model: opencode/big-pickle
