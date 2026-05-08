@@ -25,10 +25,10 @@ const RSS_FEEDS: RSSFeed[] = [
  * ローカルのブログ記事を取得する（自己参照フェッチ問題を回避）
  */
 function getLocalBlogPosts(): ExternalPost[] {
-  const modules = import.meta.glob('../content/blog/*.md', { eager: true })
+  const modules = import.meta.glob('../content/blog/*.{md,mdx}', { eager: true })
   
   return Object.entries(modules).map(([path, module]: [string, any]) => {
-    const slug = path.split('/').pop()?.replace('.md', '')
+    const slug = path.split('/').pop()?.replace(/\.(md|mdx)$/, '')
     const frontmatter = module.frontmatter || {}
     return {
       title: frontmatter.title || '',
@@ -37,7 +37,7 @@ function getLocalBlogPosts(): ExternalPost[] {
       source: '個人ブログ',
       icon: '📋',
     }
-  }).sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
+  }).filter(p => p.title && p.link)
 }
 
 /**
@@ -81,6 +81,7 @@ export async function fetchExternalPosts(maxPosts: number = 10): Promise<Externa
       
       if (items.length === 0) {
         console.warn(`No items parsed from ${feed.name}`)
+        continue
       }
       
       const posts = items.map(item => ({
