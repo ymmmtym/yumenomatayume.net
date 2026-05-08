@@ -5,8 +5,9 @@ type Props = {
 }
 
 export function SkillCard({ skill }: Props) {
-  const filled = '★'.repeat(skill.proficiency)
-  const empty = '☆'.repeat(5 - skill.proficiency)
+  const clamped = Math.min(5, Math.max(0, skill.proficiency))
+  const filled = '★'.repeat(clamped)
+  const empty = '☆'.repeat(5 - clamped)
 
   return (
     <a
@@ -17,7 +18,7 @@ export function SkillCard({ skill }: Props) {
     >
       <div class="text-3xl mb-2">{skill.emoji}</div>
       <div class="font-bold text-gray-900 dark:text-gray-100 mb-1">{skill.name}</div>
-      <div class="text-sm text-yellow-500 dark:text-yellow-400">{filled}{empty}</div>
+      <div class="text-sm text-yellow-500 dark:text-yellow-400" aria-label={`Proficiency: ${skill.proficiency} out of 5`}>{filled}{empty}</div>
     </a>
   )
 }

@@ -58,7 +58,7 @@ export default createRoute(async (c) => {
         <h2 class="text-4xl font-bold border-b-2 border-gray-300 dark:border-gray-700 pb-2 mb-6 dark:text-gray-300">🤘 Skills</h2>
         <p class="mb-4 text-lg text-gray-700 dark:text-gray-300">主な技術スタックは以下の通りです。</p>
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {skills.map(skill => <SkillCard skill={skill} />)}
+          {skills.map(skill => <SkillCard skill={skill} key={skill.name} />)}
         </div>
       </section>
 
