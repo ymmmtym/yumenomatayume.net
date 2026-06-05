@@ -1,97 +1,123 @@
-import { FEED_URL, FETCH_TIMEOUT_MS } from "./constants.js";
+import { XMLParser } from "fast-xml-parser";
+import he from "he";
+import { FEED_URL, FETCH_TIMEOUT_MS, CACHE_TTL_MS } from "./constants.js";
 import type { Post } from "./types.js";
 
-/** RSSフィードを取得してパースし、Post一覧を返す */
-export async function fetchPosts(): Promise<Post[]> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+const parser = new XMLParser({
+  ignoreAttributes: false,
+  attributeNamePrefix: "@_",
+  isArray: (name: string) => name === "item" || name === "category",
+});
 
-  let text: string;
-  try {
-    const res = await fetch(FEED_URL, { signal: controller.signal });
-    if (!res.ok) {
-      throw new Error(`Feed fetch failed: ${res.status} ${res.statusText}`);
-    }
-    text = await res.text();
-  } finally {
-    clearTimeout(timer);
+let cachedPosts: Post[] | null = null;
+let cacheTimestamp = 0;
+
+export async function fetchPosts(): Promise<Post[]> {
+  if (cachedPosts && Date.now() - cacheTimestamp < CACHE_TTL_MS) {
+    return cachedPosts;
   }
 
-  return parseRss(text);
+  const xml = await fetchXml(FEED_URL);
+  const posts = parseRss(xml);
+
+  cachedPosts = posts;
+  cacheTimestamp = Date.now();
+  return posts;
 }
 
-/** RSS XML をパースして Post[] に変換する */
 function parseRss(xml: string): Post[] {
-  const items = xml.match(/<item>([\s\S]*?)<\/item>/g) ?? [];
+  const parsed = parser.parse(xml);
+  const items: Record<string, unknown>[] = parsed?.rss?.channel?.item ?? [];
 
   return items.map((item) => {
-    const title = extractCdata(item, "title") ?? extractTag(item, "title") ?? "";
-    const link = extractTag(item, "link") ?? "";
-    const pubDate = extractTag(item, "pubDate") ?? "";
-    const description = extractCdata(item, "description") ?? extractTag(item, "description") ?? "";
-
-    // <category> タグから複数タグを収集
-    const categoryMatches = item.match(/<category><!\[CDATA\[(.*?)\]\]><\/category>|<category>(.*?)<\/category>/g) ?? [];
-    const tags = categoryMatches.map((c) => {
-      const m = c.match(/CDATA\[(.*?)\]/) ?? c.match(/<category>(.*?)<\/category>/);
-      return m?.[1]?.trim() ?? "";
-    }).filter(Boolean);
+    const title = extractText(item, "title");
+    const link = extractText(item, "link");
+    const description = extractText(item, "description");
+    const pubDate = extractText(item, "pubDate");
+    const tags = extractTags(item);
 
     return {
       title: stripHtml(title).trim(),
       url: link.trim(),
-      publishedAt: pubDate ? new Date(pubDate).toISOString() : "",
+      publishedAt: safeParseDate(pubDate),
       description: stripHtml(description).slice(0, 200).trim(),
       tags,
     };
   });
 }
 
-/** ページ本文（HTML）をfetchしてプレーンテキストに変換する */
-export async function fetchPostContent(url: string): Promise<string> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-
-  let html: string;
-  try {
-    const res = await fetch(url, { signal: controller.signal });
-    if (!res.ok) {
-      throw new Error(`Page fetch failed: ${res.status} ${res.statusText}`);
-    }
-    html = await res.text();
-  } finally {
-    clearTimeout(timer);
+function extractText(item: Record<string, unknown>, key: string): string {
+  const val = item[key];
+  if (typeof val === "string") return val;
+  if (val && typeof val === "object" && "#text" in (val as object)) {
+    return (val as Record<string, string>)["#text"] ?? "";
   }
+  return "";
+}
 
-  // <article> または <main> タグの内容だけ抽出
+function extractTags(item: Record<string, unknown>): string[] {
+  const cat = item["category"];
+  if (!cat) return [];
+  const categories = Array.isArray(cat) ? cat : [cat];
+  return categories
+    .map((c: unknown) => {
+      if (typeof c === "string") return c.trim();
+      if (c && typeof c === "object" && "#text" in (c as object)) {
+        return ((c as Record<string, string>)["#text"] ?? "").trim();
+      }
+      return "";
+    })
+    .filter(Boolean);
+}
+
+function safeParseDate(dateStr: string): string {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return "";
+  return d.toISOString();
+}
+
+export async function fetchPostContent(url: string): Promise<string> {
+  const html = await fetchXml(url);
+
   const article =
     html.match(/<article[^>]*>([\s\S]*?)<\/article>/i)?.[1] ??
     html.match(/<main[^>]*>([\s\S]*?)<\/main>/i)?.[1] ??
     html;
 
-  return stripHtml(article).replace(/\n{3,}/g, "\n\n").trim();
+  const cleaned = article
+    .replace(/<(header|nav|footer|aside)[^>]*>[\s\S]*?<\/\1>/gi, "")
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "");
+
+  return stripHtml(cleaned).replace(/\n{3,}/g, "\n\n").trim();
 }
 
-// ---- helpers ----
+async function fetchXml(url: string): Promise<string> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
-function extractTag(xml: string, tag: string): string | undefined {
-  return xml.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`))?.[1];
-}
-
-function extractCdata(xml: string, tag: string): string | undefined {
-  return xml.match(new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>`))?.[1];
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+    if (!res.ok) {
+      throw new Error(`Fetch failed: ${res.status} ${res.statusText}`);
+    }
+    return await res.text();
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 function stripHtml(html: string): string {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/gi, "")
-    .replace(/<style[\s\S]*?<\/style>/gi, "")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&nbsp;/g, " ")
-    .replace(/\s+/g, " ");
+  return he.decode(
+    html
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim(),
+  );
+}
+
+export function clearCache(): void {
+  cachedPosts = null;
+  cacheTimestamp = 0;
 }

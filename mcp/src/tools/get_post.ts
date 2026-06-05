@@ -15,6 +15,14 @@ const InputSchema = z.object({
 
 type Input = z.infer<typeof InputSchema>;
 
+function truncateAtLimit(text: string, limit: number): string {
+  if (text.length <= limit) return text;
+  const truncated = text.slice(0, limit);
+  const lastSpace = truncated.lastIndexOf(" ");
+  const cut = lastSpace > limit * 0.8 ? lastSpace : limit;
+  return text.slice(0, cut) + "\n\n[コンテンツが長すぎるため省略されました]";
+}
+
 export function registerGetPost(server: McpServer): void {
   server.registerTool(
     "blog_get_post",
@@ -59,10 +67,7 @@ Error Handling:
       }
 
       const rawContent = await fetchPostContent(url);
-      const content =
-        rawContent.length > CHARACTER_LIMIT
-          ? rawContent.slice(0, CHARACTER_LIMIT) + "\n\n[コンテンツが長すぎるため省略されました]"
-          : rawContent;
+      const content = truncateAtLimit(rawContent, CHARACTER_LIMIT);
 
       const output = {
         title: meta.title,
@@ -74,7 +79,6 @@ Error Handling:
 
       return {
         content: [{ type: "text" as const, text: JSON.stringify(output, null, 2) }],
-        structuredContent: output,
       };
     }
   );
