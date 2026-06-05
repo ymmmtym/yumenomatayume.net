@@ -117,7 +117,4 @@ function stripHtml(html: string): string {
   );
 }
 
-export function clearCache(): void {
-  cachedPosts = null;
-  cacheTimestamp = 0;
-}
+
