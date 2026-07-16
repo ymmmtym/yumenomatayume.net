@@ -48,6 +48,7 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
         <meta name="twitter:title" content={pageTitle} />
         <meta name="twitter:description" content={pageDescription} />
         <meta name="twitter:image" content={ogImage} />
+        <meta name="google-adsense-account" content="ca-pub-3641744377792397" />
         <link rel="canonical" href={currentUrl} />
         <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed" />
         <link rel="icon" href="https://res.cloudinary.com/yumenomatayume/image/upload/v1675155499/yumenomatayume/icon.png" />
