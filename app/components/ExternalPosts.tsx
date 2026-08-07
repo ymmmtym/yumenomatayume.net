@@ -1,4 +1,5 @@
 import { parseRSS, type RSSItem } from './RSSParser'
+import { getBlogPosts } from '../utils/blog'
 
 export interface ExternalPost {
   title: string
@@ -25,15 +26,12 @@ const RSS_FEEDS: RSSFeed[] = [
  * ローカルのブログ記事を取得する（自己参照フェッチ問題を回避）
  */
 function getLocalBlogPosts(): ExternalPost[] {
-  const modules = import.meta.glob('../content/blog/*.{md,mdx}', { eager: true })
-  
-  return Object.entries(modules).map(([path, module]: [string, any]) => {
-    const slug = path.split('/').pop()?.replace(/\.(md|mdx)$/, '')
-    const frontmatter = module.frontmatter || {}
+  return getBlogPosts().map(({ slug, module }) => {
+    const { frontmatter } = module
     return {
-      title: frontmatter.title || '',
+      title: frontmatter?.title || '',
       link: `https://yumenomatayume.net/blog/${slug}`,
-      pubDate: frontmatter.pubDate || new Date().toISOString(),
+      pubDate: frontmatter?.pubDate || new Date().toISOString(),
       source: '個人ブログ',
       icon: '📋',
     }
