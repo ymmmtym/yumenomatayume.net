@@ -1,4 +1,5 @@
 import { parseRSS, type RSSItem } from './RSSParser'
+import { getBlogPosts } from '../utils/blog'
 
 export interface ExternalPost {
   title: string
@@ -22,13 +23,36 @@ const RSS_FEEDS: RSSFeed[] = [
 ]
 
 /**
+ * ローカルのブログ記事を取得する（自己参照フェッチ問題を回避）
+ */
+function getLocalBlogPosts(): ExternalPost[] {
+  return getBlogPosts().map(({ slug, module }) => {
+    const { frontmatter } = module
+    return {
+      title: frontmatter?.title || '',
+      link: `https://yumenomatayume.net/blog/${slug}`,
+      pubDate: frontmatter?.pubDate || new Date().toISOString(),
+      source: '個人ブログ',
+      icon: '📋',
+    }
+  }).filter(p => p.title && p.link)
+}
+
+/**
  * 外部RSSフィードから記事を取得する
- * 注意: Cloudflare Workers環境ではCORS制限により一部のRSSフィードが取得できない場合があります
+ * 個人ブログはローカルファイルから直接読み込み、他はHTTPフェッチ
  */
 export async function fetchExternalPosts(maxPosts: number = 10): Promise<ExternalPost[]> {
   const allPosts: ExternalPost[] = []
+  
+  // 個人ブログはローカルから直接取得（自己参照フェッチ問題を回避）
+  const localPosts = getLocalBlogPosts()
+  allPosts.push(...localPosts)
 
-  for (const feed of RSS_FEEDS) {
+  // 他のRSSフィードはHTTPフェッチ
+  const externalFeeds = RSS_FEEDS.filter(feed => feed.name !== '個人ブログ')
+  
+  for (const feed of externalFeeds) {
     try {
       const response = await fetch(feed.url, {
         headers: {
@@ -55,6 +79,7 @@ export async function fetchExternalPosts(maxPosts: number = 10): Promise<Externa
       
       if (items.length === 0) {
         console.warn(`No items parsed from ${feed.name}`)
+        continue
       }
       
       const posts = items.map(item => ({
@@ -68,10 +93,6 @@ export async function fetchExternalPosts(maxPosts: number = 10): Promise<Externa
       allPosts.push(...posts)
     } catch (error) {
       console.error(`Failed to fetch ${feed.name}:`, error)
-      // CORS エラーの場合は特別にログ出力
-      if (error instanceof TypeError && error.message.includes('fetch')) {
-        console.warn(`Possible CORS issue for ${feed.name} - this may be expected in Cloudflare Workers environment`)
-      }
     }
   }
   

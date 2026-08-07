@@ -1,11 +1,10 @@
 import { createRoute } from 'honox/factory'
-
-const modules = import.meta.glob('../content/blog/*.md', { eager: true })
+import { getBlogPosts } from '../utils/blog'
 
 export default createRoute(async (c) => {
-  const posts = Object.entries(modules).map(([path, module]: [string, any]) => {
-    const slug = path.split('/').pop()?.replace('.md', '')
-    return { slug, ...module.frontmatter }
+  const posts = getBlogPosts().map(({ slug, module }) => {
+    const { title = '', description = '', pubDate = '' } = module.frontmatter ?? {}
+    return { slug, title, description, pubDate }
   }).sort((a, b) => 
     new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
   ).slice(0, 20)

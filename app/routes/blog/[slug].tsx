@@ -1,28 +1,21 @@
 import { createRoute } from 'honox/factory'
 import { TableOfContents } from '../../components/TableOfContents'
 import { LinkCard } from '../../components/LinkCard'
-
-const modules = import.meta.glob('../../content/blog/*.{md,mdx}', { eager: true })
+import { getBlogPosts } from '../../utils/blog'
 
 export default createRoute(async (c) => {
   const slug = c.req.param('slug')
-  const modulePath = `../../content/blog/${slug}.md`
-  let module = modules[modulePath] as any
-  
-  // .mdxファイルも試す
-  if (!module) {
-    const mdxPath = `../../content/blog/${slug}.mdx`
-    module = modules[mdxPath] as any
-  }
-  
+  const module = getBlogPosts().find((post) => post.slug === slug)?.module
+
   if (!module) return c.notFound()
   
-  const { frontmatter, default: Content } = module
+  const { frontmatter = {}, default: Content } = module
+  if (!Content) return c.notFound()
   
-  const allPosts = Object.entries(modules)
-    .map(([path, mod]: [string, any]) => {
-      const postSlug = path.split('/').pop()?.replace(/\.(md|mdx)$/, '')
-      return { slug: postSlug, ...mod.frontmatter }
+  const allPosts = getBlogPosts()
+    .map(({ slug: postSlug, module: postModule }) => {
+      const { title = '', description = '', pubDate = '', tags = [], heroImage = '' } = postModule.frontmatter ?? {}
+      return { slug: postSlug, title, description, pubDate, tags, heroImage }
     })
     .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
   
@@ -173,7 +166,7 @@ export default createRoute(async (c) => {
         <a href={`https://b.hatena.ne.jp/entry/https://yumenomatayume.net/blog/${slug}`} target="_blank" rel="noopener noreferrer" class="flex items-center justify-center w-9 h-9 md:w-12 md:h-12 bg-white dark:bg-purple-900/40 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all" title="はてブに追加">
           <span class="text-base md:text-xl">📖</span>
         </a>
-        <a href={`https://raindrop.io/add?link=https://yumenomatayume.net/blog/${slug}&title=${encodeURIComponent(frontmatter.title)}`} target="_blank" rel="noopener noreferrer" class="flex items-center justify-center w-9 h-9 md:w-12 md:h-12 bg-white dark:bg-purple-900/40 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all" title="Raindropに保存">
+        <a href={`https://raindrop.io/add?link=https://yumenomatayume.net/blog/${slug}&title=${encodeURIComponent(frontmatter.title ?? '')}`} target="_blank" rel="noopener noreferrer" class="flex items-center justify-center w-9 h-9 md:w-12 md:h-12 bg-white dark:bg-purple-900/40 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all" title="Raindropに保存">
           <span class="text-base md:text-xl">☁️</span>
         </a>
       </div>
