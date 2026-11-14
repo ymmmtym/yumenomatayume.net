@@ -1,5 +1,7 @@
 import { createRoute } from 'honox/factory'
 import { fetchExternalPosts } from '../components/ExternalPosts'
+import { skills } from '../data/skills'
+import { SkillCard } from '../components/SkillCard'
 
 export default createRoute(async (c) => {
   const externalPosts = await fetchExternalPosts(10)
@@ -56,30 +58,7 @@ export default createRoute(async (c) => {
         <h2 class="text-4xl font-bold border-b-2 border-gray-300 dark:border-gray-700 pb-2 mb-6 dark:text-gray-300">🤘 Skills</h2>
         <p class="mb-4 text-lg text-gray-700 dark:text-gray-300">主な技術スタックは以下の通りです。</p>
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <a href="https://www.ansible.com/" target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-purple-900/20 rounded-lg p-4 shadow hover:shadow-lg hover:-translate-y-1 transition-all block">
-            <div class="text-3xl mb-2">🔧</div>
-            <div class="font-bold text-gray-900 dark:text-gray-100">Ansible</div>
-          </a>
-          <a href="https://www.linux.org/" target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-purple-900/20 rounded-lg p-4 shadow hover:shadow-lg hover:-translate-y-1 transition-all block">
-            <div class="text-3xl mb-2">🐧</div>
-            <div class="font-bold text-gray-900 dark:text-gray-100">Linux</div>
-          </a>
-          <a href="https://www.terraform.io/" target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-purple-900/20 rounded-lg p-4 shadow hover:shadow-lg hover:-translate-y-1 transition-all block">
-            <div class="text-3xl mb-2">🏗️</div>
-            <div class="font-bold text-gray-900 dark:text-gray-100">Terraform</div>
-          </a>
-          <a href="https://kubernetes.io/" target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-purple-900/20 rounded-lg p-4 shadow hover:shadow-lg hover:-translate-y-1 transition-all block">
-            <div class="text-3xl mb-2">☸️</div>
-            <div class="font-bold text-gray-900 dark:text-gray-100">Kubernetes</div>
-          </a>
-          <a href="https://aws.amazon.com/" target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-purple-900/20 rounded-lg p-4 shadow hover:shadow-lg hover:-translate-y-1 transition-all block">
-            <div class="text-3xl mb-2">☁️</div>
-            <div class="font-bold text-gray-900 dark:text-gray-100">AWS</div>
-          </a>
-          <a href="https://cloud.google.com/" target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-purple-900/20 rounded-lg p-4 shadow hover:shadow-lg hover:-translate-y-1 transition-all block">
-            <div class="text-3xl mb-2">🌐</div>
-            <div class="font-bold text-gray-900 dark:text-gray-100">GCP</div>
-          </a>
+          {skills.map(skill => <SkillCard skill={skill} key={skill.name} />)}
         </div>
       </section>
 
