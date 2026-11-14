@@ -2,20 +2,17 @@ import { jsxRenderer, useRequestContext } from 'hono/jsx-renderer'
 import { Link, Script } from 'honox/server'
 import Header from '../components/Header'
 import { prepareSearchBody } from '../utils/searchBody'
-import type { BlogModule } from '../utils/blog'
+import { getBlogPosts } from '../utils/blog'
 
 // 記事データを取得する関数
-const getBlogPosts = () => {
+const getPosts = () => {
   try {
-    const modules = import.meta.glob<BlogModule>('../content/blog/*.{md,mdx}', { eager: true })
     const sources = import.meta.glob<string>('../content/blog/*.{md,mdx}', {
       eager: true,
       query: '?raw',
       import: 'default'
     })
-    return Object.entries(modules).map(([path, module]) => {
-      const filename = path.split('/').pop() ?? ''
-      const slug = filename.replace(/\.(md|mdx)$/, '')
+    return getBlogPosts().map(({ path, slug, module }) => {
       const source = sources[path]
       const body = typeof source === 'string'
         ? source.replace(/^---\r?\n[\s\S]*?\r?\n---\s*/, '')
@@ -46,7 +43,7 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
   const ogImage = heroImage || 'https://img.yumenomatayume.net/og-image.png'
   
   // 全ページで記事データを取得（検索機能のため）
-  const posts = getBlogPosts()
+  const posts = getPosts()
   
   return (
     <html lang="ja">
