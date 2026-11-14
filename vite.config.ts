@@ -7,8 +7,8 @@ import remarkFrontmatter from 'remark-frontmatter'
 import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
 import remarkGfm from 'remark-gfm'
 import rehypePrism from 'rehype-prism-plus'
-import { remarkLinkCard } from './app/utils/remarkLinkCard'
-import { remarkReadingTime } from './app/utils/remarkReadingTime'
+import { remarkLinkCard } from './app/utils/remarkLinkCard.ts'
+import { remarkReadingTime } from './app/utils/remarkReadingTime.ts'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
