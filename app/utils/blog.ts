@@ -4,6 +4,7 @@ export interface BlogFrontmatter {
   title?: string
   description?: string
   pubDate?: string
+  updatedDate?: string
   tags?: string[]
   heroImage?: string
 }

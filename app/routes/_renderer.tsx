@@ -27,7 +27,8 @@ const getBlogPosts = () => {
         description: module.frontmatter?.description ?? '',
         tags: module.frontmatter?.tags ?? [],
         pubDate: module.frontmatter?.pubDate ?? '',
-        body: searchBody
+        body: searchBody,
+        updatedDate: module.frontmatter?.updatedDate || ''
       }
     })
   } catch (error) {

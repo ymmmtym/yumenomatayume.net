@@ -9,6 +9,7 @@ interface HeaderProps {
     tags: string[]
     pubDate: string
     body: string
+    updatedDate?: string
   }>
 }
 

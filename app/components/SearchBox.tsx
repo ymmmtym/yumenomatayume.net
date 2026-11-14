@@ -7,6 +7,7 @@ interface SearchResult {
   tags: string[]
   pubDate: string
   body: string
+  updatedDate?: string
 }
 
 interface SearchBoxProps {
