@@ -12,11 +12,6 @@ export function TableOfContents() {
             // 見出しアンカーリンク機能で既にIDが設定されるまで少し待つ
             setTimeout(() => {
               const headings = document.querySelectorAll('.prose h2, .prose h3, .prose h4, .prose h5, .prose h6');
-              if (headings.length === 0) {
-                tocContainer.style.display = 'none';
-                return;
-              }
-              
               tocList.innerHTML = '';
               
               headings.forEach((heading) => {
@@ -54,6 +49,9 @@ export function TableOfContents() {
                 li.appendChild(a);
                 tocList.appendChild(li);
               });
+
+              if (tocList.children.length === 0) return;
+              tocContainer.closest('aside').style.display = '';
               
               // スクロール位置ベースのアクティブセクション検出
               function updateActiveSection() {
