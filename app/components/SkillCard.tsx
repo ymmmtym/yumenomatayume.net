@@ -6,8 +6,8 @@ interface SkillCardProps {
 
 export function SkillCard({ skill }: SkillCardProps) {
   const clamped = Math.min(5, Math.max(0, skill.proficiency))
-  const filled = '★'.repeat(clamped)
-  const empty = '☆'.repeat(5 - clamped)
+  const filled = '★\uFE0E'.repeat(clamped)
+  const empty = '☆\uFE0E'.repeat(5 - clamped)
 
   return (
     <a
@@ -18,9 +18,9 @@ export function SkillCard({ skill }: SkillCardProps) {
     >
       <div class="text-3xl mb-2">{skill.emoji}</div>
       <div class="font-bold text-gray-900 dark:text-gray-100 mb-1">{skill.name}</div>
-      <div role="img" class="text-sm" aria-label={`Proficiency: ${clamped} out of 5`}>
-        <span class="text-yellow-500 dark:text-white">{filled}</span>
-        <span class="text-gray-300 dark:text-white/70">{empty}</span>
+      <div role="img" class="text-sm dark:text-gray-50" aria-label={`Proficiency: ${clamped} out of 5`}>
+        <span class="text-yellow-500 dark:text-gray-50">{filled}</span>
+        <span class="text-gray-300 dark:text-gray-50/70">{empty}</span>
       </div>
     </a>
   )
