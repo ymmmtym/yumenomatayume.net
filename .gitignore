@@ -33,3 +33,6 @@ lerna-debug.log*
 # misc
 mise.local.toml
 .DS_Store
+
+# lockfiles (npm)
+package-lock.json
