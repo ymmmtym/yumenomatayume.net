@@ -3,6 +3,7 @@ export function formatDate(date: string): string {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
+    ...(/^\d{4}-\d{2}-\d{2}$/.test(date) ? { timeZone: 'UTC' } : {}),
   })
 }
 
