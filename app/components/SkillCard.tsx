@@ -18,7 +18,7 @@ export function SkillCard({ skill }: Props) {
     >
       <div class="text-3xl mb-2">{skill.emoji}</div>
       <div class="font-bold text-gray-900 dark:text-gray-100 mb-1">{skill.name}</div>
-      <div class="text-sm text-yellow-500 dark:text-yellow-400" aria-label={`Proficiency: ${skill.proficiency} out of 5`}>{filled}{empty}</div>
+      <div role="img" class="text-sm text-yellow-500 dark:text-yellow-400" aria-label={`Proficiency: ${skill.proficiency} out of 5`}>{filled}{empty}</div>
     </a>
   )
 }
