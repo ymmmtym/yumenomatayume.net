@@ -1,18 +1,19 @@
 import { jsxRenderer, useRequestContext } from 'hono/jsx-renderer'
 import { Link, Script } from 'honox/server'
 import Header from '../components/Header'
+import type { BlogModule } from '../utils/blog'
 
 // 記事データを取得する関数
 const getBlogPosts = () => {
   try {
-    const modules = import.meta.glob('../content/blog/*.{md,mdx}', { eager: true })
-    const sources = import.meta.glob('../content/blog/*.{md,mdx}', {
+    const modules = import.meta.glob<BlogModule>('../content/blog/*.{md,mdx}', { eager: true })
+    const sources = import.meta.glob<string>('../content/blog/*.{md,mdx}', {
       eager: true,
       query: '?raw',
       import: 'default'
     })
-    return Object.entries(modules).map(([path, module]: [string, any]) => {
-      const filename = path.split('/').pop() || ''
+    return Object.entries(modules).map(([path, module]) => {
+      const filename = path.split('/').pop() ?? ''
       const slug = filename.replace(/\.(md|mdx)$/, '')
       const source = sources[path]
       const body = typeof source === 'string'
@@ -22,10 +23,10 @@ const getBlogPosts = () => {
       const searchBody = body.replace(/<[^>]*>/g, '')
       return { 
         slug, 
-        title: module.frontmatter?.title || '',
-        description: module.frontmatter?.description || '',
-        tags: module.frontmatter?.tags || [],
-        pubDate: module.frontmatter?.pubDate || '',
+        title: module.frontmatter?.title ?? '',
+        description: module.frontmatter?.description ?? '',
+        tags: module.frontmatter?.tags ?? [],
+        pubDate: module.frontmatter?.pubDate ?? '',
         body: searchBody
       }
     })
