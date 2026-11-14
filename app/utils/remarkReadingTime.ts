@@ -1,4 +1,5 @@
 import { visit } from 'unist-util-visit'
+import { parseDocument } from 'yaml'
 import type { Plugin } from 'unified'
 import type { Root } from 'mdast'
 
@@ -14,7 +15,7 @@ export const remarkReadingTime: Plugin<[], Root> = () => {
         const text = node.value || ''
         codeJpChars += (text.match(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/g) || []).length
         codeEnWords += (text.match(/[a-zA-Z]+/g) || []).length
-      } else if (node.type === 'text') {
+      } else if (node.type === 'text' || node.type === 'inlineCode') {
         const text = node.value || ''
         jpChars += (text.match(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/g) || []).length
         enWords += (text.match(/[a-zA-Z]+/g) || []).length
@@ -27,17 +28,18 @@ export const remarkReadingTime: Plugin<[], Root> = () => {
     const textMinutes = jpChars / JP_CHARS_PER_MIN + enWords / EN_WORDS_PER_MIN
     const codeMinutes = (codeJpChars / JP_CHARS_PER_MIN + codeEnWords / EN_WORDS_PER_MIN) * 2
 
-    const totalMinutes = Math.ceil(textMinutes + codeMinutes) || 1
+    const estimatedMinutes = textMinutes + codeMinutes
+    const totalMinutes = estimatedMinutes < 1 ? estimatedMinutes : Math.ceil(estimatedMinutes)
 
     const frontmatter = tree.children.find((node) =>
       node.type === 'yaml' && 'value' in node && typeof node.value === 'string'
     )
 
     if (frontmatter && 'value' in frontmatter && typeof frontmatter.value === 'string') {
-      const value = frontmatter.value
-        .replace(/^readingTime\s*:[^\r\n]*/m, '')
-        .trimEnd()
-      frontmatter.value = `${value}\nreadingTime: ${totalMinutes}`.trimStart()
+      const document = parseDocument(frontmatter.value)
+      if (document.errors.length > 0) throw document.errors[0]
+      document.set('readingTime', totalMinutes)
+      frontmatter.value = document.toString()
     }
   }
 }
