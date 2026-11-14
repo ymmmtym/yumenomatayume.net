@@ -192,7 +192,7 @@ export default createRoute(async (c) => {
           <h1 class="text-4xl font-bold mb-4">{frontmatter.title}</h1>
           <div class="flex items-center gap-3 flex-wrap">
             <time class="text-sm text-gray-600 dark:text-gray-400">{frontmatter.pubDate}</time>
-            {frontmatter.readingTime && (
+            {frontmatter.readingTime != null && (
               <span class="text-sm text-gray-600 dark:text-gray-400">
                 📖 {frontmatter.readingTime >= 1 ? `约${frontmatter.readingTime}分で読めます` : '1分未満で読めます'}
               </span>
