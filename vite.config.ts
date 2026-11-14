@@ -8,11 +8,12 @@ import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
 import remarkGfm from 'remark-gfm'
 import rehypePrism from 'rehype-prism-plus'
 import { remarkLinkCard } from './app/utils/remarkLinkCard.ts'
+import { remarkReadingTime } from './app/utils/remarkReadingTime.ts'
 import { defineConfig } from 'vite'
 
 const mdxPlugin = mdx({
   jsxImportSource: 'hono/jsx',
-  remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter, remarkLinkCard, remarkGfm],
+  remarkPlugins: [remarkFrontmatter, remarkReadingTime, remarkMdxFrontmatter, remarkLinkCard, remarkGfm],
   rehypePlugins: [rehypePrism]
 })
 

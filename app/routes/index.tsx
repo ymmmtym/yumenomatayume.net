@@ -1,8 +1,10 @@
 import { createRoute } from 'honox/factory'
 import { fetchExternalPosts } from '../components/ExternalPosts'
+import { skills } from '../data/skills'
+import { SkillCard } from '../components/SkillCard'
 
 export default createRoute(async (c) => {
-  const externalPosts = await fetchExternalPosts(10)
+  const { posts: externalPosts, isFallback } = await fetchExternalPosts(10)
   
   return c.render(
     <main class="max-w-3xl mx-auto py-8 px-4">
@@ -56,30 +58,7 @@ export default createRoute(async (c) => {
         <h2 class="text-4xl font-bold border-b-2 border-gray-300 dark:border-gray-700 pb-2 mb-6 dark:text-gray-300">🤘 Skills</h2>
         <p class="mb-4 text-lg text-gray-700 dark:text-gray-300">主な技術スタックは以下の通りです。</p>
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <a href="https://www.ansible.com/" target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-purple-900/20 rounded-lg p-4 shadow hover:shadow-lg hover:-translate-y-1 transition-all block">
-            <div class="text-3xl mb-2">🔧</div>
-            <div class="font-bold text-gray-900 dark:text-gray-100">Ansible</div>
-          </a>
-          <a href="https://www.linux.org/" target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-purple-900/20 rounded-lg p-4 shadow hover:shadow-lg hover:-translate-y-1 transition-all block">
-            <div class="text-3xl mb-2">🐧</div>
-            <div class="font-bold text-gray-900 dark:text-gray-100">Linux</div>
-          </a>
-          <a href="https://www.terraform.io/" target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-purple-900/20 rounded-lg p-4 shadow hover:shadow-lg hover:-translate-y-1 transition-all block">
-            <div class="text-3xl mb-2">🏗️</div>
-            <div class="font-bold text-gray-900 dark:text-gray-100">Terraform</div>
-          </a>
-          <a href="https://kubernetes.io/" target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-purple-900/20 rounded-lg p-4 shadow hover:shadow-lg hover:-translate-y-1 transition-all block">
-            <div class="text-3xl mb-2">☸️</div>
-            <div class="font-bold text-gray-900 dark:text-gray-100">Kubernetes</div>
-          </a>
-          <a href="https://aws.amazon.com/" target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-purple-900/20 rounded-lg p-4 shadow hover:shadow-lg hover:-translate-y-1 transition-all block">
-            <div class="text-3xl mb-2">☁️</div>
-            <div class="font-bold text-gray-900 dark:text-gray-100">AWS</div>
-          </a>
-          <a href="https://cloud.google.com/" target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-purple-900/20 rounded-lg p-4 shadow hover:shadow-lg hover:-translate-y-1 transition-all block">
-            <div class="text-3xl mb-2">🌐</div>
-            <div class="font-bold text-gray-900 dark:text-gray-100">GCP</div>
-          </a>
+          {skills.map(skill => <SkillCard skill={skill} key={skill.name} />)}
         </div>
       </section>
 
@@ -87,9 +66,16 @@ export default createRoute(async (c) => {
         <h2 class="text-4xl font-bold border-b-2 border-gray-300 dark:border-gray-700 pb-2 mb-6">🧚 Activity</h2>
         
         <h3 class="text-2xl font-bold mb-4">Blog</h3>
+        {isFallback && (
+          <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-4">
+            <p class="text-sm text-yellow-800 dark:text-yellow-200">
+              外部記事を一時的に取得できません。以下は各サイトへのリンクです。
+            </p>
+          </div>
+        )}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           {externalPosts.map(post => (
-            <a href={post.link} target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-purple-900/20 rounded-lg p-4 shadow hover:shadow-lg hover:-translate-y-1 transition-all block">
+            <a href={post.link} target="_blank" rel="noopener noreferrer" class={`bg-white dark:bg-purple-900/20 rounded-lg p-4 shadow hover:shadow-lg hover:-translate-y-1 transition-all block ${isFallback ? 'opacity-60' : ''}`}>
               <div class="flex items-start gap-2 mb-2">
                 <span class="text-xl">{post.icon}</span>
                 <span class="text-xs text-gray-600 dark:text-gray-400">{post.source}</span>

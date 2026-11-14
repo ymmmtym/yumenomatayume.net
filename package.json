@@ -12,6 +12,7 @@
   },
   "private": true,
   "dependencies": {
+    "@xmldom/xmldom": "^0.9.12",
     "fuse.js": "^7.3.0",
     "hono": "^4.10.7",
     "honox": "^0.1.53",
@@ -33,6 +34,7 @@
     "remark-mdx-frontmatter": "^6.0.0",
     "tailwindcss": "^4.0.9",
     "vite": "^8.0.0",
-    "wrangler": "^4.4.0"
+    "wrangler": "^4.4.0",
+    "yaml": "^2.8.2"
   }
 }
