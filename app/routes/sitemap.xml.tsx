@@ -1,11 +1,10 @@
 import { createRoute } from 'honox/factory'
-
-const modules = import.meta.glob('../content/blog/*.md', { eager: true })
+import { getBlogPosts } from '../utils/blog'
 
 export default createRoute(async (c) => {
-  const posts = Object.entries(modules).map(([path, module]: [string, any]) => {
-    const slug = path.split('/').pop()?.replace('.md', '')
-    return { slug, ...module.frontmatter }
+  const posts = getBlogPosts().map(({ slug, module }) => {
+    const { pubDate = '' } = module.frontmatter ?? {}
+    return { slug, pubDate }
   })
 
   const baseUrl = 'https://yumenomatayume.net'
