@@ -1,6 +1,8 @@
 import { visit } from 'unist-util-visit'
+import type { MdxJsxAttribute, MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
 import type { Plugin } from 'unified'
-import type { Root } from 'mdast'
+import type { Paragraph, Root } from 'mdast'
+import type { Parent } from 'unist'
 
 interface Metadata {
   title: string
@@ -11,6 +13,44 @@ interface Metadata {
 }
 
 const MAX_HTML_BYTES = 1_000_000
+
+function findCommentEnd(html: string, start: number): number {
+  const end = html.indexOf('-->', start + 4)
+  return end === -1 ? -1 : end + 3
+}
+
+function readTagName(html: string, lowerHtml: string, opening: number) {
+  const start = opening + 1
+  if (['/', '!', '?'].includes(html[start])) return undefined
+
+  let end = start
+  while (end < html.length && !/[\s/>]/.test(html[end])) end++
+  return end === start ? undefined : { name: lowerHtml.slice(start, end), end }
+}
+
+function findTagEnd(html: string, start: number): number {
+  let quote = ''
+
+  for (let index = start; index < html.length; index++) {
+    const character = html[index]
+    if (quote) {
+      if (character === quote) quote = ''
+    } else if (character === '"' || character === "'") {
+      quote = character
+    } else if (character === '>') {
+      return index
+    }
+  }
+
+  return -1
+}
+
+function findRawTextEnd(html: string, tagName: string, start: number): number {
+  const closingStart = html.toLowerCase().indexOf(`</${tagName}`, start)
+  if (closingStart === -1) return -1
+  const closingEnd = html.indexOf('>', closingStart)
+  return closingEnd === -1 ? -1 : closingEnd + 1
+}
 
 function findOpeningTags(html: string, targetName: string): string[] {
   const tags: string[] = []
@@ -23,51 +63,26 @@ function findOpeningTags(html: string, targetName: string): string[] {
     if (opening === -1) break
 
     if (html.startsWith('<!--', opening)) {
-      const commentEnd = html.indexOf('-->', opening + 4)
+      const commentEnd = findCommentEnd(html, opening)
       if (commentEnd === -1) break
-      position = commentEnd + 3
+      position = commentEnd
       continue
     }
 
-    let nameStart = opening + 1
-    if (html[nameStart] === '/' || html[nameStart] === '!' || html[nameStart] === '?') {
-      position = nameStart + 1
+    const tag = readTagName(html, lowerHtml, opening)
+    if (!tag) {
+      position = opening + 2
       continue
     }
 
-    let nameEnd = nameStart
-    while (nameEnd < html.length && !/[\s/>]/.test(html[nameEnd])) {
-      nameEnd++
-    }
-    if (nameEnd === nameStart) {
-      position = nameStart + 1
-      continue
-    }
-
-    const name = lowerHtml.slice(nameStart, nameEnd)
-    let quote = ''
-    let tagEnd = -1
-    for (let index = nameEnd; index < html.length; index++) {
-      const character = html[index]
-      if (quote) {
-        if (character === quote) quote = ''
-      } else if (character === '"' || character === "'") {
-        quote = character
-      } else if (character === '>') {
-        tagEnd = index
-        break
-      }
-    }
+    const tagEnd = findTagEnd(html, tag.end)
     if (tagEnd === -1) break
 
-    if (name === target) tags.push(html.slice(opening, tagEnd + 1))
+    if (tag.name === target) tags.push(html.slice(opening, tagEnd + 1))
 
-    if (name === 'script' || name === 'style') {
-      const closingStart = lowerHtml.indexOf(`</${name}`, tagEnd + 1)
-      if (closingStart === -1) break
-      const closingEnd = html.indexOf('>', closingStart)
-      if (closingEnd === -1) break
-      position = closingEnd + 1
+    if (tag.name === 'script' || tag.name === 'style') {
+      position = findRawTextEnd(html, tag.name, tagEnd + 1)
+      if (position === -1) break
     } else {
       position = tagEnd + 1
     }
@@ -76,43 +91,52 @@ function findOpeningTags(html: string, targetName: string): string[] {
   return tags
 }
 
-function parseAttributes(tag: string): Record<string, string> {
-  const attributes: Record<string, string> = {}
-  let index = 1
+function skipWhitespace(value: string, index: number): number {
+  while (index < value.length && /\s/.test(value[index])) index++
+  return index
+}
 
-  while (index < tag.length && !/[\s/>]/.test(tag[index])) index++
+function findAttributeEnd(tag: string, start: number): number {
+  let end = start
+  while (end < tag.length && !/[\s=/>]/.test(tag[end])) end++
+  return end
+}
+
+function readAttributeValue(tag: string, start: number): { value: string; end: number } {
+  if (tag[start] !== '=') return { value: '', end: start }
+
+  let valueStart = skipWhitespace(tag, start + 1)
+  const quote = tag[valueStart] === '"' || tag[valueStart] === "'" ? tag[valueStart++] : ''
+  let valueEnd = valueStart
+
+  if (quote) {
+    while (valueEnd < tag.length && tag[valueEnd] !== quote) valueEnd++
+  } else {
+    while (valueEnd < tag.length && !/[\s>]/.test(tag[valueEnd])) valueEnd++
+  }
+
+  const end = quote && tag[valueEnd] === quote ? valueEnd + 1 : valueEnd
+  return { value: tag.slice(valueStart, valueEnd), end }
+}
+
+function parseAttributes(tag: string): Map<string, string> {
+  const attributes = new Map<string, string>()
+  let index = findAttributeEnd(tag, 1)
 
   while (index < tag.length) {
-    while (index < tag.length && /[\s/]/.test(tag[index])) index++
+    index = skipWhitespace(tag, index)
     if (index >= tag.length || tag[index] === '>') break
 
-    const nameStart = index
-    while (index < tag.length && !/[\s=/>]/.test(tag[index])) index++
-    if (index === nameStart) {
+    const nameEnd = findAttributeEnd(tag, index)
+    if (nameEnd === index) {
       index++
       continue
     }
 
-    const name = tag.slice(nameStart, index).toLowerCase()
-    while (index < tag.length && /\s/.test(tag[index])) index++
-
-    let value = ''
-    if (tag[index] === '=') {
-      index++
-      while (index < tag.length && /\s/.test(tag[index])) index++
-
-      const quote = tag[index] === '"' || tag[index] === "'" ? tag[index++] : ''
-      const valueStart = index
-      if (quote) {
-        while (index < tag.length && tag[index] !== quote) index++
-      } else {
-        while (index < tag.length && !/[\s>]/.test(tag[index])) index++
-      }
-      value = tag.slice(valueStart, index)
-      if (quote) index++
-    }
-
-    if (!(name in attributes)) attributes[name] = value
+    const name = tag.slice(index, nameEnd).toLowerCase()
+    const parsedValue = readAttributeValue(tag, nameEnd)
+    if (!attributes.has(name)) attributes.set(name, parsedValue.value)
+    index = parsedValue.end
   }
 
   return attributes
@@ -147,9 +171,65 @@ async function readHtml(response: Response): Promise<string> {
   }
 }
 
+function getMetaContent(metaTags: Map<string, string>[], names: string[]): string | undefined {
+  for (const name of names) {
+    const match = metaTags.find((attributes) =>
+      attributes.get('property')?.toLowerCase() === name ||
+      attributes.get('name')?.toLowerCase() === name
+    )
+    const content = match?.get('content')?.trim()
+    if (content) return content
+  }
+}
+
+function getDocumentTitle(head: string): string | undefined {
+  const titleTag = findOpeningTags(head, 'title')[0]
+  if (!titleTag) return undefined
+
+  const titleStart = head.indexOf(titleTag) + titleTag.length
+  const titleEnd = head.toLowerCase().indexOf('</title>', titleStart)
+  if (titleEnd === -1) return undefined
+
+  const title = head.slice(titleStart, titleEnd).replace(/<[^>]*>/g, '').trim()
+  return title.length > 0 ? title : undefined
+}
+
+function getFavicon(linkTags: Map<string, string>[]): string | undefined {
+  return linkTags.find((attributes) =>
+    attributes.get('rel')?.toLowerCase().split(/\s+/).some((value) =>
+      value === 'icon' || value === 'apple-touch-icon'
+    )
+  )?.get('href')
+}
+
+function extractMetadata(html: string, url: string): Metadata {
+  const headEnd = html.toLowerCase().indexOf('</head>')
+  const head = headEnd === -1 ? html : html.slice(0, headEnd)
+  const baseUrl = new URL(url)
+  const metaTags = findOpeningTags(head, 'meta').map(parseAttributes)
+  const linkTags = findOpeningTags(head, 'link').map(parseAttributes)
+  const title = getMetaContent(metaTags, ['og:title', 'twitter:title']) ??
+    getDocumentTitle(head) ??
+    baseUrl.hostname
+  const description = getMetaContent(metaTags, ['og:description', 'twitter:description', 'description'])
+  const image = getMetaContent(metaTags, ['og:image', 'twitter:image'])
+  const favicon = getFavicon(linkTags)
+  const resolveUrl = (value: string): string => new URL(value, baseUrl).href
+
+  return {
+    title,
+    description,
+    image: image ? resolveUrl(image) : undefined,
+    favicon: favicon ? resolveUrl(favicon) : `${baseUrl.origin}/favicon.ico`,
+    domain: baseUrl.hostname
+  }
+}
+
 async function fetchMetadata(url: string): Promise<Metadata | null> {
   const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 5000)
+  const timeout = setTimeout(() => {
+    controller.abort()
+  }, 5000)
 
   try {
     const response = await fetch(url, {
@@ -163,119 +243,81 @@ async function fetchMetadata(url: string): Promise<Metadata | null> {
     }
 
     const html = await readHtml(response)
-    const headEnd = html.toLowerCase().indexOf('</head>')
-    const head = headEnd === -1 ? html : html.slice(0, headEnd)
-    const baseUrl = new URL(response.url || url)
-    const metaTags = findOpeningTags(head, 'meta').map(parseAttributes)
-    const linkTags = findOpeningTags(head, 'link').map(parseAttributes)
-    const getMeta = (names: string[]): string | undefined => {
-      for (const name of names) {
-        const match = metaTags.find((attributes) =>
-          (attributes.property?.toLowerCase() === name ||
-            attributes.name?.toLowerCase() === name) &&
-          Boolean(attributes.content?.trim())
-        )
-        if (match?.content?.trim()) return match.content.trim()
-      }
-      return undefined
-    }
-    const titleTag = findOpeningTags(head, 'title')[0]
-    const titleTagEnd = titleTag ? head.indexOf(titleTag) + titleTag.length : -1
-    const titleEnd = titleTagEnd === -1 ? -1 : head.toLowerCase().indexOf('</title>', titleTagEnd)
-    const documentTitle = titleEnd === -1
-      ? undefined
-      : head.slice(titleTagEnd, titleEnd).replace(/<[^>]*>/g, '').trim()
-    const favicon = linkTags.find((attributes) =>
-      attributes.rel?.toLowerCase().split(/\s+/).some((value) =>
-        value === 'icon' || value === 'apple-touch-icon'
-      )
-    )?.href
-    const resolveUrl = (value: string): string => new URL(value, baseUrl).href
-    const title = getMeta(['og:title', 'twitter:title']) || documentTitle
-    const description = getMeta(['og:description', 'twitter:description', 'description'])
-    const image = getMeta(['og:image', 'twitter:image'])
-
-    return {
-      title: title || baseUrl.hostname,
-      description,
-      image: image ? resolveUrl(image) : undefined,
-      favicon: favicon ? resolveUrl(favicon) : `${baseUrl.origin}/favicon.ico`,
-      domain: baseUrl.hostname
-    }
-  } catch {
+    const finalUrl = response.url.trim().length > 0 ? response.url : url
+    return extractMetadata(html, finalUrl)
+  } catch (error) {
+    console.warn(`Failed to fetch link metadata for ${url}:`, error)
     return null
   } finally {
     clearTimeout(timeout)
   }
 }
 
+function getLinkCardUrl(node: Paragraph): string | undefined {
+  if (node.children.length !== 1) return undefined
+
+  const child = node.children[0]
+  if (child.type === 'text') {
+    const url = child.value.trim()
+    return /^https?:\/\/[^\s<>"']+$/.test(url) ? url : undefined
+  }
+  if (child.type !== 'link') return undefined
+
+  const url = child.url.trim()
+  if (!/^https?:\/\/[^\s<>"']+$/.test(url)) return undefined
+  if (child.children.length === 0) return url
+
+  const label = child.children.length === 1 && child.children[0].type === 'text'
+    ? child.children[0].value.trim()
+    : undefined
+  return label === url ? url : undefined
+}
+
+function createAttribute(name: string, value: string): MdxJsxAttribute {
+  return { type: 'mdxJsxAttribute', name, value }
+}
+
+function createLinkCardNode(url: string, metadata: Metadata | null): MdxJsxFlowElement {
+  const attributes = [createAttribute('url', url)]
+
+  if (metadata) {
+    attributes.push(createAttribute('title', metadata.title))
+    if (metadata.description) attributes.push(createAttribute('description', metadata.description))
+    if (metadata.image) attributes.push(createAttribute('image', metadata.image))
+    if (metadata.favicon) attributes.push(createAttribute('favicon', metadata.favicon))
+    attributes.push(createAttribute('domain', metadata.domain))
+  }
+
+  return {
+    type: 'mdxJsxFlowElement',
+    name: 'LinkCard',
+    attributes,
+    children: []
+  }
+}
+
 export const remarkLinkCard: Plugin<[], Root> = () => {
   return async (tree) => {
-    const nodesToConvert: Array<{ parent: any; index: number; url: string }> = []
+    const nodesToConvert: { parent: Parent; index: number; url: string }[] = []
 
-    visit(tree, 'paragraph', (node: any, index, parent) => {
-      if (!parent || index === undefined) return
-      if (node.children.length !== 1) return
-
-      const child = node.children[0]
-      const urlRegex = /^https?:\/\/[^\s<>"']+$/
-      let urlToConvert: string | undefined
-
-      if (child.type === 'text') {
-        const text = child.value.trim()
-        if (urlRegex.test(text)) urlToConvert = text
-      } else if (child.type === 'link') {
-        if (child.children.length === 1 && child.children[0].type === 'text') {
-          if (child.url.trim() === child.children[0].value.trim() && urlRegex.test(child.url.trim())) {
-            urlToConvert = child.url.trim()
-          }
-        } else if (child.children.length === 0) {
-          const url = child.url.trim()
-          if (urlRegex.test(url)) urlToConvert = url
-        }
-      }
-
-      if (urlToConvert) {
-        nodesToConvert.push({ parent, index, url: urlToConvert })
+    visit(tree, 'paragraph', (node, index, parent) => {
+      const url = getLinkCardUrl(node)
+      if (parent && index !== undefined && url) {
+        nodesToConvert.push({ parent, index, url })
       }
     })
 
-    const results = await Promise.allSettled(
-      nodesToConvert.map(async ({ url }) => ({
-        url,
-        metadata: await fetchMetadata(url)
-      }))
-    )
+    const results = await Promise.all(nodesToConvert.map(async (candidate) => ({
+      candidate,
+      metadata: await fetchMetadata(candidate.url)
+    })))
 
-    for (let i = 0; i < nodesToConvert.length; i++) {
-      const { parent, index, url } = nodesToConvert[i]
-      const result = results[i]
-      const metadata = result.status === 'fulfilled' ? result.value.metadata : null
-
-      const attrs: any[] = [
-        { type: 'mdxJsxAttribute', name: 'url', value: url }
-      ]
-
-      if (metadata) {
-        attrs.push({ type: 'mdxJsxAttribute', name: 'title', value: metadata.title })
-        if (metadata.description) {
-          attrs.push({ type: 'mdxJsxAttribute', name: 'description', value: metadata.description })
-        }
-        if (metadata.image) {
-          attrs.push({ type: 'mdxJsxAttribute', name: 'image', value: metadata.image })
-        }
-        if (metadata.favicon) {
-          attrs.push({ type: 'mdxJsxAttribute', name: 'favicon', value: metadata.favicon })
-        }
-        attrs.push({ type: 'mdxJsxAttribute', name: 'domain', value: metadata.domain })
-      }
-
-      parent.children[index] = {
-        type: 'mdxJsxFlowElement' as const,
-        name: 'LinkCard',
-        attributes: attrs,
-        children: []
-      }
+    for (const { candidate, metadata } of results) {
+      candidate.parent.children.splice(
+        candidate.index,
+        1,
+        createLinkCardNode(candidate.url, metadata)
+      )
     }
   }
 }

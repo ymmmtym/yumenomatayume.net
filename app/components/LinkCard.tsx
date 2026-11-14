@@ -8,8 +8,8 @@ interface LinkCardProps {
 }
 
 export function LinkCard({ url, title, description, image, favicon, domain }: LinkCardProps) {
-  const displayDomain = domain || new URL(url).hostname
-  const hasMetadata = title || description || image
+  const displayDomain = domain?.trim() ? domain : new URL(url).hostname
+  const hasMetadata = [title, description, image].some((value) => Boolean(value?.trim()))
 
   if (hasMetadata) {
     return (
@@ -29,7 +29,7 @@ export function LinkCard({ url, title, description, image, favicon, domain }: Li
                 onerror="this.style.display='none'"
               />
             )}
-            {title || displayDomain}
+            {title?.trim() ? title : displayDomain}
           </div>
           {description && (
             <div class="text-xs text-gray-600 dark:text-gray-400 leading-tight mb-1 line-clamp-2">
