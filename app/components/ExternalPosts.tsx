@@ -27,11 +27,11 @@ const RSS_FEEDS: RSSFeed[] = [
  */
 function getLocalBlogPosts(): ExternalPost[] {
   return getBlogPosts().map(({ slug, module }) => {
-    const { frontmatter } = module
+    const frontmatter = module.frontmatter ?? {}
     return {
-      title: frontmatter?.title ?? '',
+      title: frontmatter.title ?? '',
       link: `https://yumenomatayume.net/blog/${slug}`,
-      pubDate: typeof frontmatter?.pubDate === 'string' ? frontmatter.pubDate : '',
+      pubDate: typeof frontmatter.pubDate === 'string' ? frontmatter.pubDate : '',
       source: '個人ブログ',
       icon: '📋',
     }
@@ -39,19 +39,32 @@ function getLocalBlogPosts(): ExternalPost[] {
 }
 
 /**
+ * 全フィード失敗時に表示するフォールバックデータ
+ */
+const FALLBACK_POSTS: ExternalPost[] = RSS_FEEDS.map(feed => ({
+  title: `${feed.name} の記事一覧`,
+  link: feed.url.replace(/\/feed$/, ''),
+  pubDate: new Date().toISOString(),
+  source: feed.name,
+  icon: feed.icon,
+}))
+
+/**
  * 外部RSSフィードから記事を取得する
  * 個人ブログはローカルファイルから直接読み込み、他はHTTPフェッチ
  */
-export async function fetchExternalPosts(maxPosts: number = 10): Promise<ExternalPost[]> {
+export async function fetchExternalPosts(maxPosts = 10): Promise<{
+  posts: ExternalPost[]
+  isFallback: boolean
+}> {
   const allPosts: ExternalPost[] = []
-  
+
   // 個人ブログはローカルから直接取得（自己参照フェッチ問題を回避）
-  const localPosts = getLocalBlogPosts()
-  allPosts.push(...localPosts)
+  allPosts.push(...getLocalBlogPosts())
 
   // 他のRSSフィードはHTTPフェッチ
   const externalFeeds = RSS_FEEDS.filter(feed => feed.name !== '個人ブログ')
-  
+
   for (const feed of externalFeeds) {
     try {
       const response = await fetch(feed.url, {
@@ -62,26 +75,26 @@ export async function fetchExternalPosts(maxPosts: number = 10): Promise<Externa
         },
         signal: AbortSignal.timeout(8000),
       })
-      
+
       if (!response.ok) {
         console.error(`HTTP error for ${feed.name}: ${response.status} ${response.statusText}`)
         continue
       }
-      
+
       const xml = await response.text()
-      
+
       if (xml.length === 0) {
         console.error(`Empty response for ${feed.name}`)
         continue
       }
-      
+
       const items = await parseRSS(xml)
-      
+
       if (items.length === 0) {
         console.warn(`No items parsed from ${feed.name}`)
         continue
       }
-      
+
       const posts = items.map(item => ({
         title: item.title.replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1').trim(),
         link: item.link,
@@ -89,14 +102,27 @@ export async function fetchExternalPosts(maxPosts: number = 10): Promise<Externa
         source: feed.name,
         icon: feed.icon,
       }))
-      
+
       allPosts.push(...posts)
     } catch (error) {
       console.error(`Failed to fetch ${feed.name}:`, error)
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        console.warn(`Possible CORS issue for ${feed.name} - this may be expected in Cloudflare Workers environment`)
+      }
     }
   }
-  
-  return allPosts
-    .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
-    .slice(0, maxPosts)
+
+  if (allPosts.length === 0) {
+    return {
+      posts: FALLBACK_POSTS.slice(0, maxPosts),
+      isFallback: true,
+    }
+  }
+
+  return {
+    posts: allPosts
+      .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
+      .slice(0, maxPosts),
+    isFallback: false,
+  }
 }

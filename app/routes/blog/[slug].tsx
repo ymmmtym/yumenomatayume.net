@@ -187,22 +187,27 @@ export default createRoute(async (c) => {
         )}
         <header class="mb-8">
           <h1 class="text-4xl font-bold mb-4">{frontmatter.title}</h1>
-          <div class="text-sm text-gray-600 dark:text-gray-400">
+          <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-3 flex-wrap">
             <time>{formatDate(frontmatter.pubDate ?? '')}</time>
             {(() => {
               const { showUpdated, isRecent } = getUpdateStatus(frontmatter.pubDate ?? '', frontmatter.updatedDate)
               if (!showUpdated) return null
               return (
                 <>
-                  <span class="mx-2">(更新: <time>{formatDate(frontmatter.updatedDate ?? '')}</time>)</span>
+                  <span>(更新: <time>{formatDate(frontmatter.updatedDate ?? '')}</time>)</span>
                   {isRecent && (
-                    <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                       最近更新
                     </span>
                   )}
                 </>
               )
             })()}
+            {frontmatter.readingTime != null && (
+              <span class="text-sm text-gray-600 dark:text-gray-400">
+                📖 {frontmatter.readingTime >= 1 ? `約${frontmatter.readingTime}分で読めます` : '1分未満で読めます'}
+              </span>
+            )}
           </div>
           {frontmatter.tags && (
             <div class="flex gap-2 flex-wrap mt-4">
