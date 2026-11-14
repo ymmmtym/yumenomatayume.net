@@ -8,6 +8,7 @@
         "fuse.js": "^7.3.0",
         "hono": "^4.10.7",
         "honox": "^0.1.53",
+        "mdast-util-from-markdown": "^2.0.2",
         "unist-util-visit": "^5.0.0",
       },
       "devDependencies": {

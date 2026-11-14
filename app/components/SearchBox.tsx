@@ -48,6 +48,7 @@ export function SearchBox({ posts }: SearchBoxProps) {
             
             let fuse = null;
             let loadingFuse = false;
+            let panelOpen = false;
             let canPersistHistory = true;
             let searchHistory = [];
 
@@ -79,10 +80,11 @@ export function SearchBox({ posts }: SearchBoxProps) {
                   ignoreLocation: true
                 });
                 loadingFuse = false;
-                performSearch(searchInput.value);
+                if (panelOpen) performSearch(searchInput.value);
               }).catch((error) => {
                 loadingFuse = false;
                 console.error('Could not load Fuse.js', error);
+                if (!panelOpen) return;
                 const message = document.createElement('span');
                 message.textContent = '検索機能を読み込めませんでした。';
                 const retryButton = document.createElement('button');
@@ -218,17 +220,18 @@ export function SearchBox({ posts }: SearchBoxProps) {
             }
             
             searchInput.addEventListener('input', function(e) {
+              panelOpen = true;
               performSearch(e.target.value);
             });
             
             searchInput.addEventListener('focus', function() {
-              if (this.value.length < 2) {
-                showSearchHistory();
-              }
+              panelOpen = true;
+              performSearch(this.value);
             });
             
             searchInput.addEventListener('keydown', function(e) {
               if (e.key === 'Escape') {
+                panelOpen = false;
                 searchResults.classList.add('hidden');
                 searchInput.value = '';
                 searchInput.blur();
@@ -238,6 +241,7 @@ export function SearchBox({ posts }: SearchBoxProps) {
             // Click outside to close
             document.addEventListener('click', function(e) {
               if (!searchContainer.contains(e.target)) {
+                panelOpen = false;
                 searchResults.classList.add('hidden');
               }
             });
@@ -245,6 +249,7 @@ export function SearchBox({ posts }: SearchBoxProps) {
             // Add click handlers to search results
             searchResults.addEventListener('click', function(e) {
               if (!e.target.closest('.search-history-item')) {
+                panelOpen = false;
                 searchResults.classList.add('hidden');
                 searchInput.value = '';
               }

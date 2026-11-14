@@ -8,13 +8,14 @@
     "deploy": "bun run build && wrangler deploy",
     "upload": "bun run scripts/upload-and-replace.ts",
     "test:smoke": "bun run scripts/smoke-test.ts",
-    "test:search": "bun run build && bun run scripts/test-search-body.ts"
+    "test:search": "bun run build && bun run scripts/test-search-body.ts && bun run scripts/test-search-dismissal.ts"
   },
   "private": true,
   "dependencies": {
     "fuse.js": "^7.3.0",
     "hono": "^4.10.7",
     "honox": "^0.1.53",
+    "mdast-util-from-markdown": "^2.0.2",
     "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {

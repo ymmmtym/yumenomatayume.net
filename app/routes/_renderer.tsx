@@ -1,6 +1,7 @@
 import { jsxRenderer, useRequestContext } from 'hono/jsx-renderer'
 import { Link, Script } from 'honox/server'
 import Header from '../components/Header'
+import { prepareSearchBody } from '../utils/searchBody'
 import type { BlogModule } from '../utils/blog'
 
 // 記事データを取得する関数
@@ -20,7 +21,7 @@ const getBlogPosts = () => {
         ? source.replace(/^---\r?\n[\s\S]*?\r?\n---\s*/, '')
         : ''
       // 本文からHTMLタグを除去して検索用テキストを作成
-      const searchBody = body.replace(/<[^>]*>/g, '')
+      const searchBody = prepareSearchBody(body)
       return { 
         slug, 
         title: module.frontmatter?.title ?? '',

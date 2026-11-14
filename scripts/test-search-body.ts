@@ -2,6 +2,9 @@ import assert from 'node:assert/strict'
 import { existsSync, readFileSync } from 'node:fs'
 import Fuse from 'fuse.js'
 import app from '../dist/index.js'
+import { fromMarkdown } from 'mdast-util-from-markdown'
+import { visit } from 'unist-util-visit'
+import { prepareSearchBody } from '../app/utils/searchBody'
 
 const response = await app.fetch(new Request('http://localhost/'))
 assert.equal(response.status, 200)
@@ -17,8 +20,9 @@ for (const post of posts) {
     .find(existsSync)
   assert.ok(path, `Source should exist for ${post.slug}`)
   const source = readFileSync(path, 'utf8')
-  const cleaned = source.replace(/^---\r?\n[\s\S]*?\r?\n---\s*/, '').replace(/<[^>]*>/g, '')
-  assert.equal(post.body, cleaned, `Search body should contain the complete article: ${post.slug}`)
+  visit(fromMarkdown(source), ['code', 'inlineCode'], (node) => {
+    assert.ok(post.body.includes(source.slice(node.position!.start.offset, node.position!.end.offset)), `Search body should preserve code in ${post.slug}`)
+  })
 }
 
 const post = posts.find(item => item.slug === 'ansible-managed-by-asdf')
@@ -34,4 +38,17 @@ const articleResponse = await app.fetch(new Request(`http://localhost/blog/${pos
 assert.equal(articleResponse.status, 200)
 assert.ok((await articleResponse.text()).includes('<h2>ansible を asdf 経由でインストール</h2>'),
   'Normal article imports should still compile to HTML')
-console.log(`Verified ${posts.length} complete search bodies and a match beyond character 500`)
+console.log(`Verified ${posts.length} search bodies with preserved code and a match beyond character 500`)
+
+// Exercise the production preparation path with terms occurring only inside code tags.
+for (const code of ['`<inlinequartzneedle>`', '```html\n<fencedzirconneedle>\n```', '~~~html\n<tildeopalneedle>\n~~~']) {
+  const term = code.includes('inline') ? 'inlinequartzneedle' : code.includes('fenced') ? 'fencedzirconneedle' : 'tildeopalneedle'
+  const body = prepareSearchBody('<div data-hidden="removedattribute">Visible prose</div>\n\n' + code)
+  assert.ok(!body.includes('removedattribute'), 'Actual HTML tags should be removed')
+  const index = new Fuse([{ body }], { keys: ['body'], threshold: 0.3, ignoreLocation: true })
+  assert.equal(index.search(term).length, 1, 'Code-only terms should remain searchable')
+}
+// Check the renderer actually uses the preservation path for existing articles too.
+for (const [slug, term] of [['bandcamp-download-discography', 'format-container'], ['edit-git-commit', 'oneline']]) {
+  assert.ok(fuse.search(term).some(({ item }) => item.slug === slug), `Embedded search index should find ${term}`)
+}

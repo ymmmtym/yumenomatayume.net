@@ -17,6 +17,12 @@ const mdxPlugin = mdx({
 })
 
 export default defineConfig({
+  ssr: {
+    resolve: {
+      // Prefer DOM-free exports when bundling for Cloudflare Workers.
+      conditions: ['workerd', 'module', 'browser', 'development|production']
+    }
+  },
   build: {
     ssrEmitAssets: true
   },
