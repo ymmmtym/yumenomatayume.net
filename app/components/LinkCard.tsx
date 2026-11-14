@@ -91,6 +91,12 @@ export function LinkCard({ url, title, description, image, favicon, domain }: Li
       <script dangerouslySetInnerHTML={{
         __html: `
           (function() {
+            function decodeHtmlEntities(text) {
+              const textarea = document.createElement('textarea');
+              textarea.innerHTML = text;
+              return textarea.value;
+            }
+            
             const card = document.getElementById('${cardId}');
             if (!card) return;
 
@@ -108,20 +114,20 @@ export function LinkCard({ url, title, description, image, favicon, domain }: Li
                 if (loading) loading.style.display = 'none';
                 if (content) content.style.display = 'block';
 
-                if (titleSpan) titleSpan.textContent = data.title || '${displayDomain}';
+                if (titleSpan) titleSpan.textContent = decodeHtmlEntities(data.title || '${displayDomain}');
                 if (faviconImg && data.favicon) {
                   faviconImg.src = data.favicon;
                   faviconImg.style.display = 'inline-block';
                 }
                 if (descEl) {
                   if (data.description) {
-                    descEl.textContent = data.description;
+                    descEl.textContent = decodeHtmlEntities(data.description);
                     descEl.style.display = 'block';
                   } else {
                     descEl.style.display = 'none';
                   }
                 }
-                if (domainEl) domainEl.textContent = data.domain || '${displayDomain}';
+                if (domainEl) domainEl.textContent = decodeHtmlEntities(data.domain || '${displayDomain}');
                 if (data.image && ogImage) {
                   ogImage.src = data.image;
                   ogImage.onload = () => { ogImage.style.display = 'block'; };
