@@ -10,8 +10,8 @@ export interface RSSItem {
 export async function parseRSS(xml: string): Promise<RSSItem[]> {
   // XML形式の簡易検証
   const trimmedXml = xml.trim()
-  if (!trimmedXml.includes('<rss') && !trimmedXml.includes('<feed') && !trimmedXml.includes('<RSS') && !trimmedXml.includes('<FEED')) {
-    throw new Error('Invalid XML format: missing <rss> or <feed> tag')
+  if (!/<(?:rss|feed|rdf:RDF)\b/i.test(trimmedXml)) {
+    throw new Error('Invalid XML format: missing RSS or Atom root tag')
   }
 
   const items: RSSItem[] = []
