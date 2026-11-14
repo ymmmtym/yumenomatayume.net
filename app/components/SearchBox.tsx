@@ -88,7 +88,10 @@ export function SearchBox({ posts }: SearchBoxProps) {
                 retryButton.type = 'button';
                 retryButton.textContent = '再試行';
                 retryButton.className = 'ml-2 underline';
-                retryButton.addEventListener('click', initializeFuse);
+                retryButton.addEventListener('click', function(event) {
+                  event.stopPropagation();
+                  initializeFuse();
+                });
                 searchResults.replaceChildren(message, retryButton);
                 searchResults.classList.remove('hidden');
               });

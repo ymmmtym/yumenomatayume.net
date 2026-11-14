@@ -11,6 +11,9 @@ import { remarkLinkCard } from './app/utils/remarkLinkCard.ts'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
+  build: {
+    ssrEmitAssets: true
+  },
   plugins: [
     honox({
       devServer: { adapter },
