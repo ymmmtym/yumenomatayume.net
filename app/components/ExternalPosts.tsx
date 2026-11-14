@@ -36,7 +36,7 @@ const FALLBACK_POSTS: ExternalPost[] = RSS_FEEDS.map(feed => ({
  * 外部RSSフィードから記事を取得する
  * 注意: Cloudflare Workers環境ではCORS制限により一部のRSSフィードが取得できない場合があります
  */
-export async function fetchExternalPosts(maxPosts: number = 10): Promise<{
+export async function fetchExternalPosts(maxPosts = 10): Promise<{
   posts: ExternalPost[]
   isFallback: boolean
 }> {
