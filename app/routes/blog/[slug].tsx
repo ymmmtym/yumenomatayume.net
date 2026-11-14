@@ -177,7 +177,7 @@ export default createRoute(async (c) => {
         </a>
       </div>
       <div class="max-w-7xl mx-auto py-8 px-4 flex flex-col lg:flex-row gap-8">
-        <aside class="hidden lg:block w-64 flex-shrink-0" style="display: none;">
+        <aside class="block w-64 flex-shrink-0" style="display: none;">
           <TableOfContents />
         </aside>
         <main class="flex-1 min-w-0 max-w-3xl mx-auto">
