@@ -25,13 +25,18 @@ export default createRoute(async (c) => {
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-  ${posts.map(post => `
+  ${posts.map(post => {
+    const pubDate = new Date(post.pubDate ?? '')
+    const updatedDate = new Date(post.updatedDate ?? '')
+    const lastmod = !Number.isNaN(updatedDate.getTime()) &&
+      (Number.isNaN(pubDate.getTime()) || updatedDate > pubDate) ? updatedDate : pubDate
+    return `
   <url>
     <loc>${baseUrl}/blog/${post.slug}</loc>
-    <lastmod>${new Date(post.updatedDate && new Date(post.updatedDate) > new Date(post.pubDate) ? post.updatedDate : post.pubDate).toISOString()}</lastmod>
+    ${Number.isNaN(lastmod.getTime()) ? '' : `<lastmod>${lastmod.toISOString()}</lastmod>`}
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-  </url>`).join('')}
+  </url>`}).join('')}
 </urlset>`
 
   return c.text(sitemap, 200, {
