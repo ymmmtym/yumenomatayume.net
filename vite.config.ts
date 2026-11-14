@@ -20,7 +20,7 @@ export default defineConfig({
     tailwindcss(),
     mdx({
       jsxImportSource: 'hono/jsx',
-        remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter, remarkLinkCard, remarkGfm, remarkReadingTime],
+        remarkPlugins: [remarkFrontmatter, remarkReadingTime, remarkMdxFrontmatter, remarkLinkCard, remarkGfm],
       rehypePlugins: [rehypePrism]
     }),
     build()

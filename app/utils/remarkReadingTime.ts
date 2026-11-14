@@ -3,7 +3,7 @@ import type { Plugin } from 'unified'
 import type { Root } from 'mdast'
 
 export const remarkReadingTime: Plugin<[], Root> = () => {
-  return (tree, file) => {
+  return (tree) => {
     let jpChars = 0
     let enWords = 0
     let codeJpChars = 0
@@ -29,9 +29,15 @@ export const remarkReadingTime: Plugin<[], Root> = () => {
 
     const totalMinutes = Math.ceil(textMinutes + codeMinutes) || 1
 
-    if (!file.data.frontmatter) {
-      file.data.frontmatter = {}
+    const frontmatter = tree.children.find((node) =>
+      node.type === 'yaml' && 'value' in node && typeof node.value === 'string'
+    )
+
+    if (frontmatter && 'value' in frontmatter && typeof frontmatter.value === 'string') {
+      const value = frontmatter.value
+        .replace(/^readingTime\s*:[^\r\n]*/m, '')
+        .trimEnd()
+      frontmatter.value = `${value}\nreadingTime: ${totalMinutes}`.trimStart()
     }
-    file.data.frontmatter.readingTime = totalMinutes
   }
 }
