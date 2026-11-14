@@ -10,7 +10,7 @@ export const remarkReadingTime: Plugin<[], Root> = () => {
     let codeJpChars = 0
     let codeEnWords = 0
 
-    visit(tree, (node: any) => {
+    visit(tree, (node) => {
       if (node.type === 'code' || node.type === 'html') {
         const text = node.value || ''
         codeJpChars += (text.match(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/g) || []).length
