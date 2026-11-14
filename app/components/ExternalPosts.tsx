@@ -31,11 +31,11 @@ function getLocalBlogPosts(): ExternalPost[] {
     return {
       title: frontmatter?.title || '',
       link: `https://yumenomatayume.net/blog/${slug}`,
-      pubDate: frontmatter?.pubDate || new Date().toISOString(),
+      pubDate: typeof frontmatter?.pubDate === 'string' ? frontmatter.pubDate : '',
       source: '個人ブログ',
       icon: '📋',
     }
-  }).filter(p => p.title && p.link)
+  }).filter(p => p.title && p.link && p.pubDate && Number.isFinite(Date.parse(p.pubDate)))
 }
 
 /**
