@@ -6,12 +6,20 @@ import Header from '../components/Header'
 const getBlogPosts = () => {
   try {
     const modules = import.meta.glob('../content/blog/*.{md,mdx}', { eager: true })
+    const sources = import.meta.glob('../content/blog/*.{md,mdx}', {
+      eager: true,
+      query: '?raw',
+      import: 'default'
+    })
     return Object.entries(modules).map(([path, module]: [string, any]) => {
       const filename = path.split('/').pop() || ''
       const slug = filename.replace(/\.(md|mdx)$/, '')
-      const body = module.default || module.compiledSource || ''
+      const source = sources[path]
+      const body = typeof source === 'string'
+        ? source.replace(/^---\r?\n[\s\S]*?\r?\n---\s*/, '')
+        : ''
       // 本文からHTMLタグを除去して検索用テキストを作成
-      const searchBody = typeof body === 'string' ? body.replace(/<[^>]*>/g, '').substring(0, 500) : ''
+      const searchBody = body.replace(/<[^>]*>/g, '').substring(0, 500)
       return { 
         slug, 
         title: module.frontmatter?.title || '',

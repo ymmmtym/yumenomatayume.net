@@ -34,7 +34,7 @@ export function SearchBox({ posts }: SearchBoxProps) {
       <script dangerouslySetInnerHTML={{
         __html: `
           (function() {
-            const posts = ${JSON.stringify(posts)};
+            const posts = ${JSON.stringify(posts).replace(/</g, '\\u003c')};
             const searchInput = document.getElementById('search-input');
             const searchResults = document.getElementById('search-results');
             const searchContainer = document.getElementById('search-container');
@@ -67,20 +67,31 @@ export function SearchBox({ posts }: SearchBoxProps) {
                 threshold: 0.3,
                 distance: 100
               });
+              performSearch(searchInput.value);
             });
             
             function highlightText(text, indices) {
-              if (!indices || indices.length === 0) return text;
+              if (!indices || indices.length === 0) return escapeHtml(text);
               let result = '';
               let lastIndex = 0;
               indices.sort((a, b) => a[0] - b[0]);
               indices.forEach(([start, end]) => {
-                result += text.substring(lastIndex, start);
-                result += '<mark class="bg-yellow-300 dark:bg-yellow-600 rounded px-0.5">' + text.substring(start, end + 1) + '</mark>';
+                result += escapeHtml(text.substring(lastIndex, start));
+                result += '<mark class="bg-yellow-300 dark:bg-yellow-600 rounded px-0.5">' + escapeHtml(text.substring(start, end + 1)) + '</mark>';
                 lastIndex = end + 1;
               });
-              result += text.substring(lastIndex);
+              result += escapeHtml(text.substring(lastIndex));
               return result;
+            }
+
+            function escapeHtml(value) {
+              return String(value).replace(/[&<>"']/g, (character) => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+              })[character]);
             }
             
             function saveSearchHistory(query) {
@@ -91,12 +102,13 @@ export function SearchBox({ posts }: SearchBoxProps) {
             function showSearchHistory() {
               if (searchHistory.length === 0) return;
               searchResults.innerHTML = '<div class="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">最近の検索</div>' +
-                searchHistory.map(query => 
-                  '<div class="search-history-item px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm text-gray-700 dark:text-gray-300" data-query="' + query + '">' +
+                searchHistory.map(query => {
+                  const escapedQuery = escapeHtml(query);
+                  return '<div class="search-history-item px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm text-gray-700 dark:text-gray-300" data-query="' + escapedQuery + '">' +
                     '<svg class="w-3 h-3 inline-block mr-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>' +
-                    query +
+                    escapedQuery +
                   '</div>'
-                ).join('');
+                }).join('');
               searchResults.classList.remove('hidden');
               
               // Add click handlers for history items
@@ -125,7 +137,7 @@ export function SearchBox({ posts }: SearchBoxProps) {
               saveSearchHistory(query);
               
               if (results.length === 0) {
-                searchResults.innerHTML = '<div class="m-1 px-4 py-3 text-gray-500 dark:text-gray-400 text-sm">「' + query + '」に一致する記事が見つかりませんでした</div>';
+                searchResults.innerHTML = '<div class="m-1 px-4 py-3 text-gray-500 dark:text-gray-400 text-sm">「' + escapeHtml(query) + '」に一致する記事が見つかりませんでした</div>';
                 searchResults.classList.remove('hidden');
                 return;
               }
@@ -133,8 +145,8 @@ export function SearchBox({ posts }: SearchBoxProps) {
               const countHtml = '<div class="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">' + results.length + '件見つかりました (' + Math.round(endTime - startTime) + 'ms)</div>';
               
               searchResults.innerHTML = countHtml + results.map(({ item, matches }) => {
-                let titleHtml = item.title;
-                let descHtml = item.description;
+                let titleHtml = escapeHtml(item.title);
+                let descHtml = escapeHtml(item.description);
                 
                 if (matches) {
                   matches.forEach(match => {
@@ -147,13 +159,13 @@ export function SearchBox({ posts }: SearchBoxProps) {
                   });
                 }
                 
-                return '<a href="/blog/' + item.slug + '" class="block m-1 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700 last:border-b-0 focus-visible:outline-2 focus-visible:outline-blue-500 dark:focus-visible:outline-cyan-400 focus-visible:outline-offset-2">' +
+                return '<a href="/blog/' + escapeHtml(item.slug) + '" class="block m-1 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700 last:border-b-0 focus-visible:outline-2 focus-visible:outline-blue-500 dark:focus-visible:outline-cyan-400 focus-visible:outline-offset-2">' +
                     '<div class="font-medium text-gray-800 dark:text-gray-100 mb-1">' + titleHtml + '</div>' +
                     '<div class="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">' + descHtml + '</div>' +
                     '<div class="flex items-center gap-2">' +
-                      '<time class="text-xs text-gray-500 dark:text-gray-500">' + item.pubDate + '</time>' +
+                      '<time class="text-xs text-gray-500 dark:text-gray-500">' + escapeHtml(item.pubDate) + '</time>' +
                       item.tags.slice(0, 3).map(tag => 
-                        '<span class="px-2 py-1 bg-gray-300 dark:bg-gray-700 rounded text-xs text-gray-700 dark:text-gray-300">' + tag + '</span>'
+                        '<span class="px-2 py-1 bg-gray-300 dark:bg-gray-700 rounded text-xs text-gray-700 dark:text-gray-300">' + escapeHtml(tag) + '</span>'
                       ).join('') +
                     '</div>' +
                   '</a>'
