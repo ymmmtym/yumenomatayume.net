@@ -12,6 +12,112 @@ interface Metadata {
 
 const MAX_HTML_BYTES = 1_000_000
 
+function findOpeningTags(html: string, targetName: string): string[] {
+  const tags: string[] = []
+  const lowerHtml = html.toLowerCase()
+  const target = targetName.toLowerCase()
+  let position = 0
+
+  while (position < html.length) {
+    const opening = html.indexOf('<', position)
+    if (opening === -1) break
+
+    if (html.startsWith('<!--', opening)) {
+      const commentEnd = html.indexOf('-->', opening + 4)
+      if (commentEnd === -1) break
+      position = commentEnd + 3
+      continue
+    }
+
+    let nameStart = opening + 1
+    if (html[nameStart] === '/' || html[nameStart] === '!' || html[nameStart] === '?') {
+      position = nameStart + 1
+      continue
+    }
+
+    let nameEnd = nameStart
+    while (nameEnd < html.length && !/[\s/>]/.test(html[nameEnd])) {
+      nameEnd++
+    }
+    if (nameEnd === nameStart) {
+      position = nameStart + 1
+      continue
+    }
+
+    const name = lowerHtml.slice(nameStart, nameEnd)
+    let quote = ''
+    let tagEnd = -1
+    for (let index = nameEnd; index < html.length; index++) {
+      const character = html[index]
+      if (quote) {
+        if (character === quote) quote = ''
+      } else if (character === '"' || character === "'") {
+        quote = character
+      } else if (character === '>') {
+        tagEnd = index
+        break
+      }
+    }
+    if (tagEnd === -1) break
+
+    if (name === target) tags.push(html.slice(opening, tagEnd + 1))
+
+    if (name === 'script' || name === 'style') {
+      const closingStart = lowerHtml.indexOf(`</${name}`, tagEnd + 1)
+      if (closingStart === -1) break
+      const closingEnd = html.indexOf('>', closingStart)
+      if (closingEnd === -1) break
+      position = closingEnd + 1
+    } else {
+      position = tagEnd + 1
+    }
+  }
+
+  return tags
+}
+
+function parseAttributes(tag: string): Record<string, string> {
+  const attributes: Record<string, string> = {}
+  let index = 1
+
+  while (index < tag.length && !/[\s/>]/.test(tag[index])) index++
+
+  while (index < tag.length) {
+    while (index < tag.length && /[\s/]/.test(tag[index])) index++
+    if (index >= tag.length || tag[index] === '>') break
+
+    const nameStart = index
+    while (index < tag.length && !/[\s=/>]/.test(tag[index])) index++
+    if (index === nameStart) {
+      index++
+      continue
+    }
+
+    const name = tag.slice(nameStart, index).toLowerCase()
+    while (index < tag.length && /\s/.test(tag[index])) index++
+
+    let value = ''
+    if (tag[index] === '=') {
+      index++
+      while (index < tag.length && /\s/.test(tag[index])) index++
+
+      const quote = tag[index] === '"' || tag[index] === "'" ? tag[index++] : ''
+      const valueStart = index
+      if (quote) {
+        while (index < tag.length && tag[index] !== quote) index++
+      } else {
+        while (index < tag.length && !/[\s>]/.test(tag[index])) index++
+      }
+      value = tag.slice(valueStart, index)
+      if (quote) index++
+    }
+
+    if (!(name in attributes)) attributes[name] = value
+  }
+
+  return attributes
+}
+
 async function readHtml(response: Response): Promise<string> {
   const reader = response.body?.getReader()
   if (!reader) return ''
@@ -51,27 +157,48 @@ async function fetchMetadata(url: string): Promise<Metadata | null> {
       signal: controller.signal
     })
 
-    if (!response.ok) return null
-
-    const html = await readHtml(response)
-    const baseUrl = new URL(url)
-
-    const resolveUrl = (urlStr: string): string => {
-      if (/^https?:\/\//.test(urlStr)) return urlStr
-      if (urlStr.startsWith('/')) return baseUrl.origin + urlStr
-      return baseUrl.origin + '/' + urlStr
+    if (!response.ok) {
+      await response.body?.cancel()
+      return null
     }
 
-    const ogTitle = html.match(/<meta[^>]*property=["']og:title["'][^>]*content=["']([^"']+)["']/i)?.[1]
-    const ogDesc = html.match(/<meta[^>]*property=["']og:description["'][^>]*content=["']([^"']+)["']/i)?.[1]
-    const ogImage = html.match(/<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']+)["']/i)?.[1]
-    const favicon = html.match(/<link[^>]*rel=["'](?:shortcut )?icon["'][^>]*href=["']([^"']+)["']/i)?.[1]
-    const title = html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]
+    const html = await readHtml(response)
+    const headEnd = html.toLowerCase().indexOf('</head>')
+    const head = headEnd === -1 ? html : html.slice(0, headEnd)
+    const baseUrl = new URL(response.url || url)
+    const metaTags = findOpeningTags(head, 'meta').map(parseAttributes)
+    const linkTags = findOpeningTags(head, 'link').map(parseAttributes)
+    const getMeta = (names: string[]): string | undefined => {
+      for (const name of names) {
+        const match = metaTags.find((attributes) =>
+          (attributes.property?.toLowerCase() === name ||
+            attributes.name?.toLowerCase() === name) &&
+          Boolean(attributes.content?.trim())
+        )
+        if (match?.content?.trim()) return match.content.trim()
+      }
+      return undefined
+    }
+    const titleTag = findOpeningTags(head, 'title')[0]
+    const titleTagEnd = titleTag ? head.indexOf(titleTag) + titleTag.length : -1
+    const titleEnd = titleTagEnd === -1 ? -1 : head.toLowerCase().indexOf('</title>', titleTagEnd)
+    const documentTitle = titleEnd === -1
+      ? undefined
+      : head.slice(titleTagEnd, titleEnd).replace(/<[^>]*>/g, '').trim()
+    const favicon = linkTags.find((attributes) =>
+      attributes.rel?.toLowerCase().split(/\s+/).some((value) =>
+        value === 'icon' || value === 'apple-touch-icon'
+      )
+    )?.href
+    const resolveUrl = (value: string): string => new URL(value, baseUrl).href
+    const title = getMeta(['og:title', 'twitter:title']) || documentTitle
+    const description = getMeta(['og:description', 'twitter:description', 'description'])
+    const image = getMeta(['og:image', 'twitter:image'])
 
     return {
-      title: ogTitle || title || baseUrl.hostname,
-      description: ogDesc || undefined,
-      image: ogImage ? resolveUrl(ogImage) : undefined,
+      title: title || baseUrl.hostname,
+      description,
+      image: image ? resolveUrl(image) : undefined,
       favicon: favicon ? resolveUrl(favicon) : `${baseUrl.origin}/favicon.ico`,
       domain: baseUrl.hostname
     }
@@ -144,7 +271,7 @@ export const remarkLinkCard: Plugin<[], Root> = () => {
       }
 
       parent.children[index] = {
-        type: 'mdxJsxFlowElement',
+        type: 'mdxJsxFlowElement' as const,
         name: 'LinkCard',
         attributes: attrs,
         children: []
