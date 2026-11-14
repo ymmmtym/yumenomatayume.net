@@ -22,7 +22,7 @@ const modules = import.meta.glob<BlogModule>('../content/blog/*.{md,mdx}', { eag
 
 export function getBlogPosts(): BlogPost[] {
   return Object.entries(modules).map(([path, module]) => ({
-    slug: path.split('/').pop()?.replace(/\.(md|mdx)$/, '') || '',
+    slug: path.split('/').pop()?.replace(/\.(md|mdx)$/, '') ?? '',
     module,
   }))
 }

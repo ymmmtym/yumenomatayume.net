@@ -29,7 +29,7 @@ function getLocalBlogPosts(): ExternalPost[] {
   return getBlogPosts().map(({ slug, module }) => {
     const { frontmatter } = module
     return {
-      title: frontmatter?.title || '',
+      title: frontmatter?.title ?? '',
       link: `https://yumenomatayume.net/blog/${slug}`,
       pubDate: typeof frontmatter?.pubDate === 'string' ? frontmatter.pubDate : '',
       source: '個人ブログ',
