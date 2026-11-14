@@ -1,4 +1,5 @@
 import { visit } from 'unist-util-visit'
+import { decodeHTML, decodeHTMLAttribute } from 'entities'
 import type { MdxJsxAttribute, MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
 import type { Plugin } from 'unified'
 import type { Paragraph, Root } from 'mdast'
@@ -116,7 +117,7 @@ function readAttributeValue(tag: string, start: number): { value: string; end: n
   }
 
   const end = quote && tag[valueEnd] === quote ? valueEnd + 1 : valueEnd
-  return { value: tag.slice(valueStart, valueEnd), end }
+  return { value: decodeHTMLAttribute(tag.slice(valueStart, valueEnd)), end }
 }
 
 function parseAttributes(tag: string): Map<string, string> {
@@ -190,7 +191,7 @@ function getDocumentTitle(head: string): string | undefined {
   const titleEnd = head.toLowerCase().indexOf('</title>', titleStart)
   if (titleEnd === -1) return undefined
 
-  const title = head.slice(titleStart, titleEnd).replace(/<[^>]*>/g, '').trim()
+  const title = decodeHTML(head.slice(titleStart, titleEnd).replace(/<[^<>]*>/g, '')).trim()
   return title.length > 0 ? title : undefined
 }
 
