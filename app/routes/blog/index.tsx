@@ -45,7 +45,7 @@ export default createRoute(async (c) => {
               <p class="text-gray-600 dark:text-gray-400 mb-3 text-sm line-clamp-3">{post.description}</p>
             </div>
             <div class="px-6 pb-6">
-              <div class="text-xs text-gray-500 dark:text-gray-500">
+              <div class="text-xs text-gray-500 dark:text-gray-500 flex items-center gap-2 mb-2">
                 <time>{formatDate(post.pubDate)}</time>
                 {(() => {
                   const { showUpdated, isRecent } = getUpdateStatus(post.pubDate, post.updatedDate)
@@ -61,6 +61,11 @@ export default createRoute(async (c) => {
                     </>
                   )
                 })()}
+                {post.readingTime && (
+                  <span class="text-xs text-gray-500 dark:text-gray-500">
+                    📖 {post.readingTime >= 1 ? `约${post.readingTime}分で読めます` : '1分未満で読めます'}
+                  </span>
+                )}
               </div>
               {post.tags && (
                 <div class="flex gap-1 flex-wrap mt-3">
