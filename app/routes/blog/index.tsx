@@ -1,4 +1,5 @@
 import { createRoute } from 'honox/factory'
+import { formatDate, getUpdateStatus } from '../../lib/dateUtils'
 
 const modules = import.meta.glob('../../content/blog/*.{md,mdx}', { eager: true })
 
@@ -44,8 +45,22 @@ export default createRoute(async (c) => {
               <p class="text-gray-600 dark:text-gray-400 mb-3 text-sm line-clamp-3">{post.description}</p>
             </div>
             <div class="px-6 pb-6">
-              <div class="flex items-center gap-2 mb-2">
-                <time class="text-xs text-gray-500 dark:text-gray-500">{post.pubDate}</time>
+              <div class="text-xs text-gray-500 dark:text-gray-500 flex items-center gap-2 mb-2">
+                <time>{formatDate(post.pubDate)}</time>
+                {(() => {
+                  const { showUpdated, isRecent } = getUpdateStatus(post.pubDate, post.updatedDate)
+                  if (!showUpdated) return null
+                  return (
+                    <>
+                      <span class="mx-1">(更新: <time>{formatDate(post.updatedDate)}</time>)</span>
+                      {isRecent && (
+                        <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                          最近更新
+                        </span>
+                      )}
+                    </>
+                  )
+                })()}
                 {post.readingTime && (
                   <span class="text-xs text-gray-500 dark:text-gray-500">
                     📖 {post.readingTime >= 1 ? `约${post.readingTime}分で読めます` : '1分未満で読めます'}
