@@ -1,5 +1,6 @@
 import { createRoute } from 'honox/factory'
 import { getBlogPosts } from '../../../utils/blog'
+import { formatDate, getUpdateStatus } from '../../../lib/dateUtils'
 
 export default createRoute(async (c) => {
   const tag = c.req.param('tag')
@@ -7,8 +8,8 @@ export default createRoute(async (c) => {
   
   const posts = getBlogPosts()
     .map(({ slug, module }) => {
-      const { title = '', description = '', pubDate = '', tags = [], heroImage = '' } = module.frontmatter ?? {}
-      return { slug, title, description, pubDate, tags, heroImage }
+      const { title = '', description = '', pubDate = '', updatedDate, tags = [], heroImage = '' } = module.frontmatter ?? {}
+      return { slug, title, description, pubDate, updatedDate, tags, heroImage }
     })
     .filter(post => post.tags.includes(tag))
     .sort((a, b) => 
@@ -38,7 +39,23 @@ export default createRoute(async (c) => {
               <div class="p-6">
                 <h2 class="text-xl font-bold mb-2 text-gray-900 dark:text-gray-100">{post.title}</h2>
                 <p class="text-gray-600 dark:text-gray-400 mb-3 text-sm line-clamp-3">{post.description}</p>
-                <time class="text-xs text-gray-500 dark:text-gray-500">{post.pubDate}</time>
+                <div class="text-xs text-gray-500 dark:text-gray-500">
+                  <time>{formatDate(post.pubDate)}</time>
+                  {(() => {
+                    const { showUpdated, isRecent } = getUpdateStatus(post.pubDate, post.updatedDate)
+                    if (!showUpdated) return null
+                    return (
+                      <>
+                        <span class="mx-1">(更新: <time>{formatDate(post.updatedDate ?? '')}</time>)</span>
+                        {isRecent && (
+                          <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                            最近更新
+                          </span>
+                        )}
+                      </>
+                    )
+                  })()}
+                </div>
                 {post.tags && (
                   <div class="flex gap-1 flex-wrap mt-3">
                     {post.tags.slice(0, 3).map((t: string) => (

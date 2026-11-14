@@ -1,6 +1,6 @@
 export function TableOfContents() {
   return (
-    <div id="toc-container" class="hidden lg:block fixed left-4 top-32 w-64 max-h-96 overflow-y-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-200 dark:border-gray-700">
+    <div id="toc-container" class="sticky top-32 w-64 max-h-[calc(100vh-10rem)] overflow-y-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-200 dark:border-gray-700">
       <text class="font-bold text-sm mb-3 text-gray-900 dark:text-gray-100">目次</text>
       <ul id="toc-list" class="space-y-1"></ul>
       <script dangerouslySetInnerHTML={{__html: `
@@ -12,11 +12,6 @@ export function TableOfContents() {
             // 見出しアンカーリンク機能で既にIDが設定されるまで少し待つ
             setTimeout(() => {
               const headings = document.querySelectorAll('.prose h2, .prose h3, .prose h4, .prose h5, .prose h6');
-              if (headings.length === 0) {
-                tocContainer.style.display = 'none';
-                return;
-              }
-              
               tocList.innerHTML = '';
               
               headings.forEach((heading) => {
@@ -54,6 +49,9 @@ export function TableOfContents() {
                 li.appendChild(a);
                 tocList.appendChild(li);
               });
+
+              if (tocList.children.length === 0) return;
+              tocContainer.closest('aside').style.display = '';
               
               // スクロール位置ベースのアクティブセクション検出
               function updateActiveSection() {
