@@ -1,4 +1,3 @@
-
 ---
 title: "[Qwiklabs] Introduction to AWS Identity and Access Management（ハンズオン）を実施してみました 🔐"
 description: ""

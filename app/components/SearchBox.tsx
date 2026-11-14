@@ -4,6 +4,7 @@ interface SearchResult {
   description: string
   tags: string[]
   pubDate: string
+  updatedDate?: string
 }
 
 interface SearchBoxProps {
@@ -34,6 +35,19 @@ export function SearchBox({ posts }: SearchBoxProps) {
             const searchInput = document.getElementById('search-input');
             const searchResults = document.getElementById('search-results');
             const searchContainer = document.getElementById('search-container');
+
+            function escapeHtml(value) {
+              return String(value ?? '').replace(/[&<>"']/g, function(ch) {
+                switch (ch) {
+                  case '&': return '&amp;';
+                  case '<': return '&lt;';
+                  case '>': return '&gt;';
+                  case '"': return '&quot;';
+                  case "'": return '&#39;';
+                  default: return ch;
+                }
+              });
+            }
             
             function performSearch(query) {
               if (query.length < 2) {
@@ -47,20 +61,20 @@ export function SearchBox({ posts }: SearchBoxProps) {
               }).slice(0, 5);
               
               if (results.length === 0) {
-                searchResults.innerHTML = '<div class="m-1 px-4 py-3 text-gray-500 dark:text-gray-400 text-sm bg-white dark:bg-gray-800 rounded">「' + query + '」に一致する記事が見つかりませんでした</div>';
+                searchResults.innerHTML = '<div class="m-1 px-4 py-3 text-gray-500 dark:text-gray-400 text-sm bg-white dark:bg-gray-800 rounded">「' + escapeHtml(query) + '」に一致する記事が見つかりませんでした</div>';
                 searchResults.classList.remove('hidden');
                 return;
               }
               
               searchResults.innerHTML = results.map(result => 
-                '<a href="/blog/' + result.slug + '" class="block m-1 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700 last:border-b-0 bg-white dark:bg-gray-800 rounded focus-visible:outline-2 focus-visible:outline-blue-500 dark:focus-visible:outline-cyan-400 focus-visible:outline-offset-2">' +
-                  '<div class="font-medium text-gray-800 dark:text-gray-100 mb-1">' + result.title + '</div>' +
-                  '<div class="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">' + result.description + '</div>' +
+                '<a href="/blog/' + encodeURIComponent(result.slug || '') + '" class="block m-1 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700 last:border-b-0 bg-white dark:bg-gray-800 rounded focus-visible:outline-2 focus-visible:outline-blue-500 dark:focus-visible:outline-cyan-400 focus-visible:outline-offset-2">' +
+                  '<div class="font-medium text-gray-800 dark:text-gray-100 mb-1">' + escapeHtml(result.title) + '</div>' +
+                  '<div class="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">' + escapeHtml(result.description) + '</div>' +
                   '<div class="flex items-center gap-2">' +
-                    '<time class="text-xs text-gray-500 dark:text-gray-500">' + result.pubDate + '</time>' +
-                    result.tags.slice(0, 3).map(tag => 
-                      '<span class="px-2 py-1 bg-gray-300 dark:bg-gray-700 rounded text-xs text-gray-700 dark:text-gray-300">' + tag + '</span>'
-                    ).join('') +
+                    '<time class="text-xs text-gray-500 dark:text-gray-500">' + escapeHtml(result.pubDate) + '</time>' +
+                    (Array.isArray(result.tags) ? result.tags.slice(0, 3).map(tag => 
+                      '<span class="px-2 py-1 bg-gray-300 dark:bg-gray-700 rounded text-xs text-gray-700 dark:text-gray-300">' + escapeHtml(tag) + '</span>'
+                    ).join('') : '') +
                   '</div>' +
                 '</a>'
               ).join('');
