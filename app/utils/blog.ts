@@ -15,6 +15,7 @@ export interface BlogModule {
 }
 
 export interface BlogPost {
+  path: string
   slug: string
   module: BlogModule
 }
@@ -23,6 +24,7 @@ const modules = import.meta.glob<BlogModule>('../content/blog/*.{md,mdx}', { eag
 
 export function getBlogPosts(): BlogPost[] {
   return Object.entries(modules).map(([path, module]) => ({
+    path,
     slug: path.split('/').pop()?.replace(/\.(md|mdx)$/, '') ?? '',
     module,
   }))
