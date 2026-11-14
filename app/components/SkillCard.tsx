@@ -1,6 +1,6 @@
 import type { Skill } from '../data/skills'
 
-type Props = {
+interface Props {
   skill: Skill
 }
 
