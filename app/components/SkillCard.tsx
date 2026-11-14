@@ -1,10 +1,10 @@
 import type { Skill } from '../data/skills'
 
-interface Props {
+interface SkillCardProps {
   skill: Skill
 }
 
-export function SkillCard({ skill }: Props) {
+export function SkillCard({ skill }: SkillCardProps) {
   const clamped = Math.min(5, Math.max(0, skill.proficiency))
   const filled = '★'.repeat(clamped)
   const empty = '☆'.repeat(5 - clamped)
@@ -18,7 +18,7 @@ export function SkillCard({ skill }: Props) {
     >
       <div class="text-3xl mb-2">{skill.emoji}</div>
       <div class="font-bold text-gray-900 dark:text-gray-100 mb-1">{skill.name}</div>
-      <div role="img" class="text-sm text-yellow-500 dark:text-yellow-400" aria-label={`Proficiency: ${skill.proficiency} out of 5`}>{filled}{empty}</div>
+      <div role="img" class="text-sm text-yellow-500 dark:text-yellow-400" aria-label={`Proficiency: ${clamped} out of 5`}>{filled}{empty}</div>
     </a>
   )
 }
