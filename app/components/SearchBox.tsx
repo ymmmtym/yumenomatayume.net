@@ -1,3 +1,5 @@
+import fuseUrl from 'fuse.js/min?url'
+
 interface SearchResult {
   slug: string
   title: string
@@ -39,36 +41,60 @@ export function SearchBox({ posts }: SearchBoxProps) {
             const searchResults = document.getElementById('search-results');
             const searchContainer = document.getElementById('search-container');
             
-            // Load Fuse.js dynamically
             function loadFuse() {
-              return new Promise((resolve, reject) => {
-                if (window.Fuse) return resolve(window.Fuse);
-                const script = document.createElement('script');
-                script.src = 'https://cdn.jsdelivr.net/npm/fuse.js@7.0.0';
-                script.onload = () => resolve(window.Fuse);
-                script.onerror = reject;
-                document.head.appendChild(script);
-              });
+              return import('${fuseUrl}').then((module) => module.default);
             }
             
             let fuse = null;
-            let searchHistory = JSON.parse(localStorage.getItem('searchHistory') || '[]');
-            
-            // Initialize Fuse.js
-            loadFuse().then((Fuse) => {
-              fuse = new Fuse(posts, {
-                keys: [
-                  { name: 'title', weight: 0.4 },
-                  { name: 'description', weight: 0.3 },
-                  { name: 'tags', weight: 0.2 },
-                  { name: 'body', weight: 0.1 }
-                ],
-                includeMatches: true,
-                threshold: 0.3,
-                distance: 100
+            let loadingFuse = false;
+            let canPersistHistory = true;
+            let searchHistory = [];
+
+            try {
+              const storedHistory = window.localStorage.getItem('searchHistory');
+              const parsedHistory = storedHistory ? JSON.parse(storedHistory) : [];
+              if (Array.isArray(parsedHistory)) {
+                searchHistory = parsedHistory.filter((query) => typeof query === 'string');
+              }
+            } catch (error) {
+              canPersistHistory = false;
+              console.warn('Could not read search history from localStorage', error);
+            }
+
+            function initializeFuse() {
+              if (fuse || loadingFuse) return;
+              loadingFuse = true;
+              loadFuse().then((Fuse) => {
+                fuse = new Fuse(posts, {
+                  keys: [
+                    { name: 'title', weight: 0.4 },
+                    { name: 'description', weight: 0.3 },
+                    { name: 'tags', weight: 0.2 },
+                    { name: 'body', weight: 0.1 }
+                  ],
+                  includeMatches: true,
+                  threshold: 0.3,
+                  distance: 100,
+                  ignoreLocation: true
+                });
+                loadingFuse = false;
+                performSearch(searchInput.value);
+              }).catch((error) => {
+                loadingFuse = false;
+                console.error('Could not load Fuse.js', error);
+                const message = document.createElement('span');
+                message.textContent = '検索機能を読み込めませんでした。';
+                const retryButton = document.createElement('button');
+                retryButton.type = 'button';
+                retryButton.textContent = '再試行';
+                retryButton.className = 'ml-2 underline';
+                retryButton.addEventListener('click', initializeFuse);
+                searchResults.replaceChildren(message, retryButton);
+                searchResults.classList.remove('hidden');
               });
-              performSearch(searchInput.value);
-            });
+            }
+
+            initializeFuse();
             
             function highlightText(text, indices) {
               if (!indices || indices.length === 0) return escapeHtml(text);
@@ -96,24 +122,34 @@ export function SearchBox({ posts }: SearchBoxProps) {
             
             function saveSearchHistory(query) {
               searchHistory = [query, ...searchHistory.filter(h => h !== query)].slice(0, 10);
-              localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+              if (!canPersistHistory) return;
+              try {
+                window.localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+              } catch (error) {
+                canPersistHistory = false;
+                console.warn('Could not save search history to localStorage', error);
+              }
             }
             
             function showSearchHistory() {
-              if (searchHistory.length === 0) return;
+              if (searchHistory.length === 0) {
+                searchResults.classList.add('hidden');
+                return;
+              }
               searchResults.innerHTML = '<div class="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">最近の検索</div>' +
                 searchHistory.map(query => {
                   const escapedQuery = escapeHtml(query);
-                  return '<div class="search-history-item px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm text-gray-700 dark:text-gray-300" data-query="' + escapedQuery + '">' +
+                  return '<button type="button" class="search-history-item block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm text-gray-700 dark:text-gray-300" data-query="' + escapedQuery + '">' +
                     '<svg class="w-3 h-3 inline-block mr-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>' +
                     escapedQuery +
-                  '</div>'
+                  '</button>'
                 }).join('');
               searchResults.classList.remove('hidden');
               
               // Add click handlers for history items
-              searchResults.querySelectorAll('.search-history-item').forEach(item => {
-                item.addEventListener('click', function() {
+              searchResults.querySelectorAll('button.search-history-item').forEach(item => {
+                item.addEventListener('click', function(event) {
+                  event.stopPropagation();
                   searchInput.value = this.dataset.query;
                   performSearch(this.dataset.query);
                 });
@@ -122,27 +158,30 @@ export function SearchBox({ posts }: SearchBoxProps) {
             
             function performSearch(query) {
               if (!query || query.length < 2) {
-                if (searchInput !== document.activeElement) {
-                  searchResults.classList.add('hidden');
-                }
+                if (searchInput === document.activeElement) showSearchHistory();
+                else searchResults.classList.add('hidden');
                 return;
               }
               
-              if (!fuse) return;
+              if (!fuse) {
+                initializeFuse();
+                return;
+              }
               
               const startTime = performance.now();
-              const results = fuse.search(query, { limit: 10 });
+              const allResults = fuse.search(query);
+              const results = allResults.slice(0, 10);
               const endTime = performance.now();
               
               saveSearchHistory(query);
               
-              if (results.length === 0) {
+              if (allResults.length === 0) {
                 searchResults.innerHTML = '<div class="m-1 px-4 py-3 text-gray-500 dark:text-gray-400 text-sm">「' + escapeHtml(query) + '」に一致する記事が見つかりませんでした</div>';
                 searchResults.classList.remove('hidden');
                 return;
               }
               
-              const countHtml = '<div class="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">' + results.length + '件見つかりました (' + Math.round(endTime - startTime) + 'ms)</div>';
+              const countHtml = '<div class="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">' + allResults.length + '件見つかりました (' + Math.round(endTime - startTime) + 'ms)</div>';
               
               searchResults.innerHTML = countHtml + results.map(({ item, matches }) => {
                 let titleHtml = escapeHtml(item.title);
