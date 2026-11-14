@@ -42,7 +42,6 @@ export default createRoute(async (c) => {
   
   return c.render(
     <>
-      <TableOfContents />
       <script dangerouslySetInnerHTML={{__html: `
         document.addEventListener('keydown', (e) => {
           if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
@@ -161,7 +160,7 @@ export default createRoute(async (c) => {
         });
       `}} />
       <div class="fixed top-20 right-2 md:top-24 md:right-4 z-50 flex flex-col gap-2">
-        <button onclick={`navigator.clipboard.writeText('https://yumenomatayume.net/blog/${slug}'); const t=document.createElement('div'); t.textContent='Copied!'; t.style.cssText='position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:8px;background:#10b981;color:white;padding:6px 12px;border-radius:6px;font-size:14px;white-space:nowrap;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);z-index:1000;opacity:0;animation:fadeIn 0.3s ease-in-out forwards;'; t.style.animation='fadeIn 0.3s ease-in-out forwards'; const style=document.createElement('style'); style.textContent='@keyframes fadeIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}'; document.head.appendChild(style); this.appendChild(t); setTimeout(() => t.remove(), 1000)`} class="flex items-center justify-center w-9 h-9 md:w-12 md:h-12 bg-white dark:bg-purple-900/40 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all cursor-pointer relative" title="URLをコピー">
+        <button onclick={`navigator.clipboard.writeText('https://yumenomatayume.net/blog/${slug}'); const t=document.createElement('div'); t.textContent='Copied!'; t.style.cssText='position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:8px;background:#10b981;color:white;padding:6px 12px;border-radius:6px;font-size:14px;white-space:nowrap;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);z-index:1000;opacity:0;transition:opacity 0.3s ease-in-out;'; this.appendChild(t); setTimeout(() => t.style.opacity='1', 10); setTimeout(() => { t.style.opacity='0'; setTimeout(() => t.remove(), 300); }, 1000)`} class="flex items-center justify-center w-9 h-9 md:w-12 md:h-12 bg-white dark:bg-purple-900/40 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all cursor-pointer relative" title="URLをコピー">
           <span class="text-base md:text-xl">🔗</span>
         </button>
         <a href={`https://twitter.com/intent/tweet?url=https://yumenomatayume.net/blog/${slug}&text=${encodeURIComponent(tweetText)}`} target="_blank" rel="noopener noreferrer" class="flex items-center justify-center w-9 h-9 md:w-12 md:h-12 bg-white dark:bg-purple-900/40 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all" title="Xでシェア">
@@ -177,7 +176,11 @@ export default createRoute(async (c) => {
           <span class="text-base md:text-xl">☁️</span>
         </a>
       </div>
-      <main class="max-w-3xl mx-auto py-8 px-4">
+      <div class="max-w-7xl mx-auto py-8 px-4 flex flex-col lg:flex-row gap-8">
+        <aside class="block w-64 flex-shrink-0" style="display: none;">
+          <TableOfContents />
+        </aside>
+        <main class="flex-1 min-w-0 max-w-3xl mx-auto">
       <article>
         {frontmatter.heroImage && (
           <div class="mb-8">
@@ -245,6 +248,7 @@ export default createRoute(async (c) => {
         </div>
       )}
     </main>
+    </div>
     </>,
     { title: frontmatter.title, description: frontmatter.description, heroImage: frontmatter.heroImage }
   )
