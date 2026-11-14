@@ -11,6 +11,7 @@
   },
   "private": true,
   "dependencies": {
+    "@xmldom/xmldom": "^0.9.12",
     "hono": "^4.10.7",
     "honox": "^0.1.53",
     "unist-util-visit": "^5.0.0"
