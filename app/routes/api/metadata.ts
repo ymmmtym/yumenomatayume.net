@@ -61,6 +61,16 @@ function isPrivateIpv6(hostname: string): boolean {
   // IPv4-mapped/compatible forms like ::ffff:127.0.0.1 or ::127.0.0.1
   const v4Mapped = h.match(/(?::ffff:|::)(\d+\.\d+\.\d+\.\d+)$/)
   if (v4Mapped) return isPrivateIpv4(v4Mapped[1])
+  // URL parsing normalizes dotted IPv4 tails to hexadecimal hextets.
+  const [head, tail] = h.split('::')
+  const left = head ? head.split(':') : []
+  const right = tail ? tail.split(':') : []
+  const groups = tail === undefined ? left : [...left, ...Array(8 - left.length - right.length).fill('0'), ...right]
+  const words = groups.map((group) => parseInt(group, 16))
+  if (words.length === 8 && words.slice(0, 5).every((word) => word === 0) && (words[5] === 0 || words[5] === 0xffff)) {
+    const ipv4 = [words[6] >> 8, words[6] & 255, words[7] >> 8, words[7] & 255].join('.')
+    return isPrivateIpv4(ipv4)
+  }
   return false
 }
 
@@ -101,6 +111,7 @@ async function fetchLinkMetadata(targetUrl: URL): Promise<LinkMetadata> {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
       },
+      redirect: 'error',
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS)
     })
 
