@@ -27,6 +27,37 @@ describe('parseRSS', () => {
     expect(await parseRSS('<rss xmlns:dc="http://purl.org/dc/elements/1.1/"><item><title>An article</title><guid>https://example.com/post</guid><dc:date>today</dc:date></item></rss>')).toEqual(expected)
   })
 
+  test('uses entry metadata when source fields precede it', async () => {
+    expect(await parseRSS(`<feed xmlns="http://www.w3.org/2005/Atom"><entry>
+      <source><title>Source title</title><link href="https://example.com/source"/>
+        <published>yesterday</published><updated>yesterday</updated></source>
+      <title>An article</title><link href="https://example.com/post"/>
+      <updated>today</updated>
+    </entry></feed>`)).toEqual(expected)
+  })
+
+  test('uses direct RSS item metadata', async () => {
+    expect(await parseRSS(`<rss><channel><item>
+      <extension><title>Nested title</title><link>https://example.com/nested</link>
+        <pubDate>yesterday</pubDate></extension>
+      <title>An article</title><link>https://example.com/post</link><pubDate>today</pubDate>
+    </item></channel></rss>`)).toEqual(expected)
+  })
+
+  for (const rel of ['', 'rel="alternate"']) {
+    for (const type of ['', 'type="text/html"', 'type="application/xhtml+xml"']) {
+      test(`prefers article link after self and non-HTML links (${rel}, ${type})`, async () => {
+        expect(await parseRSS(`<feed xmlns="http://www.w3.org/2005/Atom"><entry>
+          <title>An article</title>
+          <link rel="self" href="https://example.com/feed/entry"/>
+          <link rel="alternate" type="application/json" href="https://example.com/post.json"/>
+          <link ${rel} ${type} href="https://example.com/post"/>
+          <updated>today</updated>
+        </entry></feed>`)).toEqual(expected)
+      })
+    }
+  }
+
   test('ignores commented items and entries', async () => {
     expect(await parseRSS(`<rss><!-- ${item} --></rss>`)).toEqual([])
     expect(await parseRSS('<feed><!-- <entry><title>Fake</title><link href="https://example.com"/></entry> --></feed>')).toEqual([])
