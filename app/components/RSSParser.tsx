@@ -1,66 +1,66 @@
+import { DOMParser, type Element } from '@xmldom/xmldom'
+
 export interface RSSItem {
   title: string
   link: string
   pubDate: string
 }
 
+const ATOM_NAMESPACE = 'http://www.w3.org/2005/Atom'
+
+function collection(parent: Element, name: string, atom = false): Element[] {
+  return Array.from(parent.getElementsByTagName('*')).filter(element =>
+    element.tagName === name ||
+    (atom && element.localName === name && element.namespaceURI === ATOM_NAMESPACE)
+  )
+}
+
+function elements(parent: Element, name: string, atom = false): Element[] {
+  return collection(parent, name, atom).filter(element => element.parentNode === parent)
+}
+
+function value(parent: Element, name: string, atom = false): string {
+  return elements(parent, name, atom)[0]?.textContent?.trim() ?? ''
+}
+
 /**
  * RSS/Atomフィードをパースしてアイテムのリストを返す
  */
 export async function parseRSS(xml: string): Promise<RSSItem[]> {
+  const document = new DOMParser({
+    onError: () => { throw new Error('Invalid XML format') },
+  }).parseFromString(xml.trim(), 'application/xml')
+  const root = document.documentElement
+  if (!root || !(
+    /^(rss|feed|rdf:RDF)$/i.test(root.tagName) ||
+    (root.localName === 'feed' && root.namespaceURI === ATOM_NAMESPACE)
+  )) {
+    throw new Error('Invalid XML format: missing RSS or Atom root tag')
+  }
+
   const items: RSSItem[] = []
-  
-  // Try <item> tags (RSS 2.0)
-  let itemRegex = /<item[^>]*>([\s\S]*?)<\/item>/g
-  let match
-  
-  while ((match = itemRegex.exec(xml)) !== null) {
-    const item = match[1]
-    
-    // より柔軟なタイトル抽出
-    const titleMatch = item.match(/<title[^>]*><!\[CDATA\[([\s\S]*?)\]\]><\/title>/) ||
-                      item.match(/<title[^>]*>([\s\S]*?)<\/title>/)
-    const title = titleMatch ? titleMatch[1].trim() : ''
-    
-    // より柔軟なリンク抽出
-    const linkMatch = item.match(/<link[^>]*>([\s\S]*?)<\/link>/) ||
-                     item.match(/<guid[^>]*>(https?:\/\/[^<]+)<\/guid>/)
-    const link = linkMatch ? linkMatch[1].trim() : ''
-    
-    // より柔軟な日付抽出
-    const dateMatch = item.match(/<pubDate[^>]*>([\s\S]*?)<\/pubDate>/) ||
-                     item.match(/<dc:date[^>]*>([\s\S]*?)<\/dc:date>/) ||
-                     item.match(/<date[^>]*>([\s\S]*?)<\/date>/)
-    const pubDate = dateMatch ? dateMatch[1].trim() : ''
-    
-    if (title && link) {
-      items.push({ title, link, pubDate })
-    }
+  for (const item of collection(root, 'item')) {
+    const title = value(item, 'title')
+    const guid = value(item, 'guid')
+    const link = value(item, 'link') || (/^https?:\/\//.test(guid) ? guid : '')
+    const pubDate = value(item, 'pubDate') || value(item, 'dc:date') || value(item, 'date')
+    if (title && link) items.push({ title, link, pubDate })
   }
-  
-  // Try <entry> tags (Atom) if no RSS items found
+
   if (items.length === 0) {
-    itemRegex = /<entry[^>]*>([\s\S]*?)<\/entry>/g
-    while ((match = itemRegex.exec(xml)) !== null) {
-      const item = match[1]
-      
-      const titleMatch = item.match(/<title[^>]*><!\[CDATA\[([\s\S]*?)\]\]><\/title>/) ||
-                        item.match(/<title[^>]*>([\s\S]*?)<\/title>/)
-      const title = titleMatch ? titleMatch[1].trim() : ''
-      
-      const linkMatch = item.match(/<link[^>]*href=["']([^"']*)["'][^>]*>/) || 
-                       item.match(/<link[^>]*>([\s\S]*?)<\/link>/)
-      const link = linkMatch ? linkMatch[1].trim() : ''
-      
-      const dateMatch = item.match(/<published[^>]*>([\s\S]*?)<\/published>/) || 
-                       item.match(/<updated[^>]*>([\s\S]*?)<\/updated>/)
-      const pubDate = dateMatch ? dateMatch[1].trim() : ''
-      
-      if (title && link) {
-        items.push({ title, link, pubDate })
-      }
+    for (const entry of collection(root, 'entry', true)) {
+      const title = value(entry, 'title', true)
+      const linkElement = elements(entry, 'link', true).find(element => {
+        const rel = element.getAttribute('rel')?.trim()
+        const type = element.getAttribute('type')?.split(';')[0].trim().toLowerCase()
+        return (!rel || rel === 'alternate') &&
+          (!type || type === 'text/html' || type === 'application/xhtml+xml') &&
+          !!element.getAttribute('href')?.trim()
+      })
+      const link = linkElement?.getAttribute('href')?.trim() || value(entry, 'link', true)
+      const pubDate = value(entry, 'published', true) || value(entry, 'updated', true)
+      if (title && link) items.push({ title, link, pubDate })
     }
   }
-  
   return items
 }
