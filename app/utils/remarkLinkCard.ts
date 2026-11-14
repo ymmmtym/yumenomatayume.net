@@ -10,20 +10,50 @@ interface Metadata {
   domain: string
 }
 
-async function fetchMetadata(url: string): Promise<Metadata | null> {
-  try {
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 5000)
+const MAX_HTML_BYTES = 1_000_000
 
+async function readHtml(response: Response): Promise<string> {
+  const reader = response.body?.getReader()
+  if (!reader) return ''
+
+  const decoder = new TextDecoder()
+  let html = ''
+  let bytesRead = 0
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+
+      const bytesToRead = Math.min(value.byteLength, MAX_HTML_BYTES - bytesRead)
+      html += decoder.decode(value.subarray(0, bytesToRead), { stream: true })
+      bytesRead += bytesToRead
+
+      if (bytesToRead < value.byteLength || bytesRead >= MAX_HTML_BYTES) {
+        await reader.cancel()
+        break
+      }
+    }
+
+    return html + decoder.decode()
+  } finally {
+    reader.releaseLock()
+  }
+}
+
+async function fetchMetadata(url: string): Promise<Metadata | null> {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 5000)
+
+  try {
     const response = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0' },
       signal: controller.signal
     })
-    clearTimeout(timeout)
 
     if (!response.ok) return null
 
-    const html = await response.text()
+    const html = await readHtml(response)
     const baseUrl = new URL(url)
 
     const resolveUrl = (urlStr: string): string => {
@@ -47,6 +77,8 @@ async function fetchMetadata(url: string): Promise<Metadata | null> {
     }
   } catch {
     return null
+  } finally {
+    clearTimeout(timeout)
   }
 }
 
