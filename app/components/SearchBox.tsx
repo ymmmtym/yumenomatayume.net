@@ -232,12 +232,12 @@ export function SearchBox({ posts }: SearchBoxProps) {
               performSearch(this.value);
             });
             
-            searchInput.addEventListener('keydown', function(e) {
+            searchContainer.addEventListener('keydown', function(e) {
               if (e.key === 'Escape') {
+                searchInput.focus();
                 panelOpen = false;
                 searchResults.classList.add('hidden');
                 searchInput.value = '';
-                searchInput.blur();
               }
             });
             
