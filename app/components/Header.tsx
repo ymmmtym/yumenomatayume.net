@@ -55,7 +55,7 @@ export default function Header({ pathname, posts = [] }: HeaderProps) {
               onclick="document.documentElement.classList.toggle('dark');localStorage.setItem('theme',document.documentElement.classList.contains('dark')?'dark':'light');"
             />
             <span class="sr-only">ダークモードを切り替え</span>
-            <span class="inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition-colors peer-checked:bg-brand-600 dark:bg-gray-700 dark:peer-checked:bg-brand-500">
+            <span class="inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition-colors peer-checked:bg-brand-600 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand-500 dark:bg-gray-700 dark:peer-checked:bg-brand-500">
               <svg
                 class="ml-0.5 h-5 w-5 rounded-full bg-white p-0.5 text-amber-500 shadow-sm transition-transform peer-checked:translate-x-5 dark:bg-gray-900 dark:text-amber-300"
                 fill="currentColor"

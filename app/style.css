@@ -110,7 +110,7 @@ details[open] summary::before {
 }
 
 .prose :where(h2, h3, h4) {
-  scroll-margin-top: 6rem;
+  scroll-margin-top: 7rem;
 }
 
 .prose :where(p, li) {
