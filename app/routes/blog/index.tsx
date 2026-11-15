@@ -4,8 +4,8 @@ import { formatDate, getUpdateStatus } from '../../lib/dateUtils'
 
 export default createRoute(async (c) => {
   const posts = getBlogPosts().map(({ slug, module }) => {
-    const { title = '', description = '', pubDate = '', updatedDate, tags = [], heroImage = '' } = module.frontmatter ?? {}
-    return { slug, title, description, pubDate, updatedDate, tags, heroImage }
+    const { title = '', description = '', pubDate = '', updatedDate, tags = [], heroImage = '', readingTime } = module.frontmatter ?? {}
+    return { slug, title, description, pubDate, updatedDate, tags, heroImage, readingTime }
   }).sort((a, b) => 
     new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
   )

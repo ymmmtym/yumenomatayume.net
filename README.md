@@ -103,7 +103,7 @@ bun run upload
 ├── scripts/             # ユーティリティスクリプト
 │   ├── upload-and-replace.ts
 │   └── upload-single.ts
-├── skills/              # Codex 用スキル定義
+├── .claude/skills/      # エージェント向けスキル定義
 └── dist/                # ビルド出力
 ```
 
@@ -113,6 +113,8 @@ bun run upload
 - `build` - プロダクションビルド
 - `preview` - ローカルプレビュー (Wrangler)
 - `deploy` - Cloudflare Workers にデプロイ
+- `typecheck` - 型チェック (`tsc --noEmit`)
+- `lint` - Lint (oxlint)
 - `upload` - 画像を Cloudinary にアップロード
 
 ## License

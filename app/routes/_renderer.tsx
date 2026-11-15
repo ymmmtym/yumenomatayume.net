@@ -29,7 +29,7 @@ const getPosts = () => {
         updatedDate: module.frontmatter?.updatedDate || ''
       }
     })
-  } catch (error) {
+  } catch {
     return []
   }
 }

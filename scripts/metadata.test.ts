@@ -9,7 +9,7 @@ afterEach(() => { globalThis.fetch = originalFetch })
 
 test('rejects private IPv4 tails in dotted, hexadecimal, compressed and expanded IPv6', async () => {
   let calls = 0
-  globalThis.fetch = (async () => { calls++; throw new Error('Unexpected fetch') }) as typeof fetch
+  globalThis.fetch = (async () => { calls++; throw new Error('Unexpected fetch') }) as unknown as typeof fetch
   for (const ip of ['127.0.0.1', '10.0.0.1', '172.16.0.1', '192.168.0.1', '169.254.169.254', '0.0.0.10', '255.255.255.255']) {
     const bytes = ip.split('.').map(Number)
     const tail = `${((bytes[0] << 8) | bytes[1]).toString(16)}:${((bytes[2] << 8) | bytes[3]).toString(16)}`
@@ -21,11 +21,11 @@ test('rejects private IPv4 tails in dotted, hexadecimal, compressed and expanded
 })
 
 test('allows public IPv4 tails and ordinary public IPv6 and extracts metadata', async () => {
-  globalThis.fetch = (async () => new Response('<title>Public page</title>')) as typeof fetch
+  globalThis.fetch = (async () => new Response('<title>Public page</title>')) as unknown as typeof fetch
   for (const host of ['::ffff:8.8.8.8', '::8.8.8.8', '::ffff:808:808', '::808:808', '2606:4700:4700::1111']) {
     const response = await request(`https://[${host}]/`)
     expect(response.status).toBe(200)
-    expect((await response.json()).title).toBe('Public page')
+    expect(((await response.json()) as { title: string }).title).toBe('Public page')
   }
 })
 

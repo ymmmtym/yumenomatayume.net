@@ -7,6 +7,7 @@ export interface BlogFrontmatter {
   updatedDate?: string
   tags?: string[]
   heroImage?: string
+  readingTime?: number
 }
 
 export interface BlogModule {

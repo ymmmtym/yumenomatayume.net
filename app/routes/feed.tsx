@@ -3,8 +3,8 @@ import { getBlogPosts } from '../utils/blog'
 
 export default createRoute(async (c) => {
   const posts = getBlogPosts().map(({ slug, module }) => {
-    const { title = '', description = '', pubDate = '' } = module.frontmatter ?? {}
-    return { slug, title, description, pubDate }
+    const { title = '', description = '', pubDate = '', updatedDate } = module.frontmatter ?? {}
+    return { slug, title, description, pubDate, updatedDate }
   }).sort((a, b) => 
     new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
   ).slice(0, 20)
