@@ -34,7 +34,7 @@ const getPosts = () => {
   }
 }
 
-export default jsxRenderer(({ children, title, description, heroImage }) => {
+export default jsxRenderer(({ children, title, description, heroImage, noindex }) => {
   const c = useRequestContext()
   const pageTitle = title ? `${title} | yumenomatayume` : 'yumenomatayume'
   const pageDescription = description || 'SRE / Infrastructure Engineer'
@@ -62,6 +62,7 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
         <meta name="twitter:description" content={pageDescription} />
         <meta name="twitter:image" content={ogImage} />
         <meta name="google-adsense-account" content="ca-pub-3641744377792397" />
+        {noindex && <meta name="robots" content="noindex" />}
         <link rel="canonical" href={currentUrl} />
         <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed" />
         <link rel="icon" href="https://res.cloudinary.com/yumenomatayume/image/upload/v1675155499/yumenomatayume/icon.png" />
