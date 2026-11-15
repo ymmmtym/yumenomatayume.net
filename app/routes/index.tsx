@@ -10,7 +10,7 @@ export default createRoute(async (c) => {
     <main class="max-w-3xl mx-auto py-8 px-4">
       <section class="text-center mb-20">
         <p class="text-xs font-semibold tracking-[0.25em] uppercase text-purple-600 dark:text-purple-300 mb-4">Portfolio</p>
-        <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-gray-900 dark:text-gray-50 mb-4">yumenomatayume</h1>
+        <h1 class="text-5xl md:text-6xl font-bold tracking-tight break-words text-gray-900 dark:text-gray-50 mb-4">yumenomatayume</h1>
         <p class="text-lg md:text-xl text-gray-600 dark:text-gray-300">SRE / Infrastructure Engineer</p>
       </section>
 
