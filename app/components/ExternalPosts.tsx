@@ -34,6 +34,8 @@ const RSS_FEEDS: RSSFeed[] = [
 
 const CACHE_KEY = 'https://yumenomatayume.net/__cache/external-posts'
 const CACHE_TTL_MS = 10 * 60 * 1000
+// Retain stale posts for recovery when a feed refresh fails.
+const CACHE_RETENTION_SECONDS = 24 * 60 * 60
 
 function getLocalBlogPosts(): ExternalPost[] {
   return getBlogPosts().map(({ slug, module }) => {
@@ -84,7 +86,7 @@ async function writeCache(posts: ExternalPost[]): Promise<void> {
     const res = new Response(body, {
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
-        'Cache-Control': `public, max-age=${Math.floor(CACHE_TTL_MS / 1000)}`,
+        'Cache-Control': `public, max-age=${CACHE_RETENTION_SECONDS}`,
       },
     })
     await cache.put(CACHE_KEY, res)
