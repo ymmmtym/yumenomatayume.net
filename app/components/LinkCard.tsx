@@ -17,7 +17,7 @@ export function LinkCard({ url, title, description, image, favicon, domain }: Li
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        class="flex my-2 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors no-underline overflow-hidden min-h-20"
+        class="my-3 flex min-h-20 overflow-hidden rounded-xl border border-gray-200 no-underline transition-colors hover:border-brand-300 hover:bg-gray-50 dark:border-gray-800 dark:hover:border-brand-500/50 dark:hover:bg-gray-800/60"
       >
         <div class="flex-1 p-2 min-w-0 flex flex-col justify-center overflow-hidden">
           <div class="font-medium text-gray-900 dark:text-gray-100 text-sm leading-tight mb-1 truncate flex items-center gap-1">
@@ -63,7 +63,7 @@ export function LinkCard({ url, title, description, image, favicon, domain }: Li
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        class="flex my-2 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors no-underline overflow-hidden min-h-20"
+        class="my-3 flex min-h-20 overflow-hidden rounded-xl border border-gray-200 no-underline transition-colors hover:border-brand-300 hover:bg-gray-50 dark:border-gray-800 dark:hover:border-brand-500/50 dark:hover:bg-gray-800/60"
       >
         <div class="flex-1 p-2 min-w-0 flex flex-col justify-center overflow-hidden">
           <div class="metadata-loading">

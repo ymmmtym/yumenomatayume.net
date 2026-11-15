@@ -13,24 +13,24 @@ export default createRoute(async (c) => {
   const allTags = [...new Set(posts.flatMap(post => post.tags || []))].sort()
 
   return c.render(
-    <main class="max-w-6xl mx-auto py-8 px-4">
-      <div class="mb-4">
-        <h1 class="text-4xl font-bold tracking-tight">Blog</h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-2 text-lg">{posts.length}件の記事</p>
+    <main class="mx-auto max-w-6xl px-4 py-10">
+      <div class="mb-8">
+        <h1 class="text-4xl font-extrabold tracking-tight">Blog</h1>
+        <p class="mt-2 text-lg text-gray-500 dark:text-gray-400">{posts.length}件の記事</p>
       </div>
       
-      <details class="mb-8 p-4 bg-gray-50 dark:bg-purple-900/20 rounded-lg">
-        <summary class="text-sm font-semibold mb-3 text-gray-700 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-gray-100 transition-colors">タグ一覧を表示 ({allTags.length}個)</summary>
-        <div class="flex gap-2 flex-wrap mt-3">
+      <details class="mb-10 rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-900/60">
+        <summary class="cursor-pointer text-sm font-semibold text-gray-700 transition-colors hover:text-brand-600 dark:text-gray-300 dark:hover:text-brand-300">タグ一覧を表示 ({allTags.length}個)</summary>
+        <div class="mt-3 flex flex-wrap gap-2">
           {allTags.map(tag => (
-            <a href={`/blog/tag/${tag}`} class="px-3 py-1 bg-white dark:bg-purple-900/30 rounded-full text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-purple-900/40 transition-colors shadow-sm">{tag}</a>
+            <a href={`/blog/tag/${tag}`} class="rounded-full bg-white px-3 py-1 text-sm text-gray-800 shadow-sm transition-colors hover:bg-brand-50 hover:text-brand-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-brand-500/15 dark:hover:text-brand-300">{tag}</a>
           ))}
         </div>
       </details>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {posts.map(post => (
-          <article class="bg-white dark:bg-purple-900/20 rounded-lg shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-200 overflow-hidden relative">
+          <article class="relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900/60 dark:hover:border-brand-500/50">
             <a href={`/blog/${post.slug}`} class="absolute inset-0 z-0"></a>
             {post.heroImage && (
               <img 
@@ -53,7 +53,7 @@ export default createRoute(async (c) => {
                     <>
                       <span class="mx-1">(更新: <time>{formatDate(post.updatedDate ?? '')}</time>)</span>
                       {isRecent && (
-                        <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                        <span class="ml-1 inline-flex items-center rounded-full bg-brand-100 px-2 py-0.5 text-xs font-medium text-brand-700 dark:bg-brand-500/15 dark:text-brand-300">
                           最近更新
                         </span>
                       )}
@@ -69,7 +69,7 @@ export default createRoute(async (c) => {
               {post.tags && (
                 <div class="flex gap-1 flex-wrap mt-3">
                   {post.tags.slice(0, 3).map((tag: string) => (
-                    <a href={`/blog/tag/${tag}`} class="relative z-10 px-2 py-1 bg-gray-100 dark:bg-purple-900/30 rounded text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-purple-900/40 transition-colors">{tag}</a>
+                    <a href={`/blog/tag/${tag}`} class="relative z-10 rounded bg-gray-100 px-2 py-1 text-xs text-gray-700 transition-colors hover:bg-brand-100 hover:text-brand-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-brand-500/15 dark:hover:text-brand-300">{tag}</a>
                   ))}
                 </div>
               )}
