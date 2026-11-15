@@ -115,14 +115,24 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
                 modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:9999;';
                 
                 const content = document.createElement('div');
-                content.style.cssText = 'background:white;dark:bg-gray-800;padding:2rem;border-radius:8px;max-width:400px;width:90%;';
+                const isDarkMode = document.documentElement.classList.contains('dark');
+                content.style.cssText = [
+                  'background:' + (isDarkMode ? '#1f2937' : '#ffffff'),
+                  'color:' + (isDarkMode ? '#f3f4f6' : '#111827'),
+                  'padding:2rem',
+                  'border-radius:8px',
+                  'max-width:400px',
+                  'width:90%',
+                  'box-shadow:0 10px 25px rgba(0,0,0,0.2)'
+                ].join(';');
+                const kbdStyle = "background:" + (isDarkMode ? "#374151" : "#f3f4f6") + ";color:" + (isDarkMode ? "#f3f4f6" : "#111827") + ";padding:2px 6px;border-radius:3px;font-family:monospace;";
         content.innerHTML = '<h3 style="margin:0 0 1rem 0;font-size:1.25rem;font-weight:bold;">⌨️ ショートカットキー</h3>' +
                   '<div style="margin-bottom:1rem;">' +
-                    '<div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">⌘K / Ctrl+K</kbd> - 記事を検索</div>' +
-                    '<div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">j</kbd> - 下にスクロール</div>' +
-                    '<div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">k</kbd> - 上にスクロール</div>' +
-                    (window.location.pathname.includes('/blog/') ? '<div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">h</kbd> - 前の記事</div><div style="margin-bottom:0.5rem;"><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">l</kbd> - 次の記事</div>' : '') +
-                    '<div><kbd style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-family:monospace;">/</kbd> - このヘルプを表示</div>' +
+                    '<div style="margin-bottom:0.5rem;"><kbd style="' + kbdStyle + '">⌘K / Ctrl+K</kbd> - 記事を検索</div>' +
+                    '<div style="margin-bottom:0.5rem;"><kbd style="' + kbdStyle + '">j</kbd> - 下にスクロール</div>' +
+                    '<div style="margin-bottom:0.5rem;"><kbd style="' + kbdStyle + '">k</kbd> - 上にスクロール</div>' +
+                    (window.location.pathname.includes('/blog/') ? '<div style="margin-bottom:0.5rem;"><kbd style="' + kbdStyle + '">h</kbd> - 前の記事</div><div style="margin-bottom:0.5rem;"><kbd style="' + kbdStyle + '">l</kbd> - 次の記事</div>' : '') +
+                    '<div><kbd style="' + kbdStyle + '">/</kbd> - このヘルプを表示</div>' +
                   '</div>' +
                   '<div style="text-align:right;">' +
                     '<button id="shortcut-help-close" type="button" style="background:#6366f1;color:white;border:none;padding:0.5rem 1rem;border-radius:4px;cursor:pointer;">閉じる</button>' +
@@ -188,10 +198,10 @@ export default jsxRenderer(({ children, title, description, heroImage }) => {
       <body class="bg-white dark:bg-gray-900/95 dark:bg-gradient-to-br dark:from-gray-900 dark:to-purple-950">
         <Header pathname={c.req.path} posts={posts} />
         {children}
+        <footer class="py-4 px-4 text-center bg-gradient-to-r from-purple-900 to-indigo-900 dark:from-purple-50 dark:to-pink-50 border-t border-purple-700 dark:border-purple-200 text-gray-200 dark:text-gray-600">
+          &copy; 2025 yumenomatayume
+        </footer>
       </body>
-      <footer class="py-4 px-4 text-center bg-gradient-to-r from-purple-900 to-indigo-900 dark:from-purple-50 dark:to-pink-50 border-t border-purple-700 dark:border-purple-200 text-gray-200 dark:text-gray-600">
-        &copy; 2025 yumenomatayume
-      </footer>
     </html>
   )
 })
