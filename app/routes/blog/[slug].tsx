@@ -186,7 +186,7 @@ export default createRoute(async (c) => {
           </div>
         )}
         <header class="mb-8">
-          <h1 class="text-4xl font-bold mb-4">{frontmatter.title}</h1>
+          <h1 class="text-4xl font-bold tracking-tight mb-4">{frontmatter.title}</h1>
           <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-3 flex-wrap">
             <time>{formatDate(frontmatter.pubDate ?? '')}</time>
             {(() => {

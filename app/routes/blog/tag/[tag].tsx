@@ -22,8 +22,8 @@ export default createRoute(async (c) => {
     <main class="max-w-6xl mx-auto py-8 px-4">
       <div class="mb-8">
         <a href="/blog" class="text-blue-600 dark:text-gray-100 hover:underline text-sm">← Blog</a>
-        <h1 class="text-4xl font-bold mt-4">Tag: {tag}</h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-2">{posts.length}件の記事</p>
+        <h1 class="text-4xl font-bold tracking-tight mt-4">Tag: {tag}</h1>
+        <p class="text-gray-600 dark:text-gray-400 mt-2 text-lg">{posts.length}件の記事</p>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {posts.map(post => (

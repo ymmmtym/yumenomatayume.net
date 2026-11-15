@@ -8,13 +8,14 @@ export default createRoute(async (c) => {
   
   return c.render(
     <main class="max-w-3xl mx-auto py-8 px-4">
-      <section class="text-center mb-16">
-        <h1 class="text-4xl font-bold mb-2">yumenomatayume</h1>
-        <p class="text-xl text-gray-700 dark:text-gray-300">SRE / Infrastructure Engineer</p>
+      <section class="text-center mb-20">
+        <p class="text-xs font-semibold tracking-[0.25em] uppercase text-purple-600 dark:text-purple-300 mb-4">Portfolio</p>
+        <h1 class="text-5xl md:text-6xl font-bold tracking-tight break-words text-gray-900 dark:text-gray-50 mb-4">yumenomatayume</h1>
+        <p class="text-lg md:text-xl text-gray-600 dark:text-gray-300">SRE / Infrastructure Engineer</p>
       </section>
 
-      <section class="mb-12">
-        <h2 class="text-4xl font-bold border-b-2 border-gray-300 dark:border-gray-700 pb-2 mb-6">💬 About</h2>
+      <section class="mb-14">
+        <h2 class="text-3xl font-bold tracking-tight border-b border-gray-200 dark:border-gray-700 pb-3 mb-6">💬 About</h2>
         <p class="mb-4 text-lg text-gray-700 dark:text-gray-300">
           yumenomatayumeと申します。SREとして、AWSなどのクラウド環境の設計・構築・運用に携わっています。
           特に最近はKubernetesをはじめとするコンテナ技術を用いたインフラ構築に注力しており、
@@ -24,14 +25,14 @@ export default createRoute(async (c) => {
           このサイトは個人のブログで、SREやインフラエンジニア向けの技術記事から、趣味や日々の気付きといった幅広い内容を投稿しています。
           主に個人の備忘録としての利用しています。
         </p>
-        <h3 class="text-2xl font-bold mb-2">RSS</h3>
+        <h3 class="text-xl font-bold mb-2">RSS</h3>
         <p class="text-lg text-gray-700 dark:text-gray-300">
           <code class="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded dark:text-gray-100">https://yumenomatayume.net/feed</code> から本ブログのRSSを取得できます。
         </p>
       </section>
 
-      <section class="mb-12">
-        <h2 class="text-4xl font-bold border-b-2 border-gray-300 dark:border-gray-700 pb-2 mb-6 dark:text-gray-300">💼 Career</h2>
+      <section class="mb-14">
+        <h2 class="text-3xl font-bold tracking-tight border-b border-gray-200 dark:border-gray-700 pb-3 mb-6 dark:text-gray-300">💼 Career</h2>
         <div class="space-y-6">
           <div class="bg-white dark:bg-purple-900/20 rounded-lg p-6 shadow">
             <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">2023 - 現在</div>
@@ -54,18 +55,18 @@ export default createRoute(async (c) => {
         </div>
       </section>
 
-      <section class="mb-12">
-        <h2 class="text-4xl font-bold border-b-2 border-gray-300 dark:border-gray-700 pb-2 mb-6 dark:text-gray-300">🤘 Skills</h2>
+      <section class="mb-14">
+        <h2 class="text-3xl font-bold tracking-tight border-b border-gray-200 dark:border-gray-700 pb-3 mb-6 dark:text-gray-300">🤘 Skills</h2>
         <p class="mb-4 text-lg text-gray-700 dark:text-gray-300">主な技術スタックは以下の通りです。</p>
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
           {skills.map(skill => <SkillCard skill={skill} key={skill.name} />)}
         </div>
       </section>
 
-      <section class="mb-12">
-        <h2 class="text-4xl font-bold border-b-2 border-gray-300 dark:border-gray-700 pb-2 mb-6">🧚 Activity</h2>
+      <section class="mb-14">
+        <h2 class="text-3xl font-bold tracking-tight border-b border-gray-200 dark:border-gray-700 pb-3 mb-6">🧚 Activity</h2>
         
-        <h3 class="text-2xl font-bold mb-4">Blog</h3>
+        <h3 class="text-xl font-bold mb-4">Blog</h3>
         {isFallback && (
           <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-4">
             <p class="text-sm text-yellow-800 dark:text-yellow-200">
@@ -86,14 +87,14 @@ export default createRoute(async (c) => {
           ))}
         </div>
 
-        <h3 class="text-2xl font-bold mb-2">GitHub</h3>
+        <h3 class="text-xl font-bold mb-2">GitHub</h3>
         <a href="https://github.com/ymmmtym" target="_blank" rel="noopener noreferrer">
           <img src="https://raw.githubusercontent.com/ymmmtym/ymmmtym/main/dist/github-snake.svg" alt="GitHub Snake" class="w-full h-auto" />
         </a>
       </section>
 
-      <section class="mb-12">
-        <h2 class="text-4xl font-bold border-b-2 border-gray-300 dark:border-gray-700 pb-2 mb-6">🔗 Links</h2>
+      <section class="mb-14">
+        <h2 class="text-3xl font-bold tracking-tight border-b border-gray-200 dark:border-gray-700 pb-3 mb-6">🔗 Links</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <a href="mailto:yumenomatayume@yumenomatayume.net" class="bg-white dark:bg-purple-900/20 rounded-lg p-4 shadow hover:shadow-lg hover:-translate-y-1 transition-all block">
             <div class="text-2xl mb-2">📧</div>
