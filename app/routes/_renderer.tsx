@@ -66,6 +66,12 @@ export default jsxRenderer(({ children, title, description, heroImage, noindex }
         <link rel="canonical" href={currentUrl} />
         <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed" />
         <link rel="icon" href="https://res.cloudinary.com/yumenomatayume/image/upload/v1675155499/yumenomatayume/icon.png" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        />
         <Link href="/app/style.css" rel="stylesheet" />
         <script dangerouslySetInnerHTML={{
           __html: `
@@ -136,7 +142,7 @@ export default jsxRenderer(({ children, title, description, heroImage, noindex }
                     '<div><kbd style="' + kbdStyle + '">/</kbd> - このヘルプを表示</div>' +
                   '</div>' +
                   '<div style="text-align:right;">' +
-                    '<button id="shortcut-help-close" type="button" style="background:#6366f1;color:white;border:none;padding:0.5rem 1rem;border-radius:4px;cursor:pointer;">閉じる</button>' +
+                    '<button id="shortcut-help-close" type="button" style="background:#7c3aed;color:white;border:none;padding:0.5rem 1rem;border-radius:4px;cursor:pointer;">閉じる</button>' +
                   '</div>';
                 function closeShortcutHelp() {
                   modal.remove();
@@ -196,11 +202,23 @@ export default jsxRenderer(({ children, title, description, heroImage, noindex }
         }} />
         <Script src="/app/client.ts" async />
       </head>
-      <body class="bg-white dark:bg-gray-900/95 dark:bg-gradient-to-br dark:from-gray-900 dark:to-purple-950">
+      <body class="min-h-screen flex flex-col bg-white text-gray-900 antialiased dark:bg-gray-950 dark:text-gray-100">
         <Header pathname={c.req.path} posts={posts} />
-        {children}
-        <footer class="py-4 px-4 text-center bg-gradient-to-r from-purple-900 to-indigo-900 dark:from-purple-50 dark:to-pink-50 border-t border-purple-700 dark:border-purple-200 text-gray-200 dark:text-gray-600">
-          &copy; 2025 yumenomatayume
+        <div class="flex-1">{children}</div>
+        <footer class="border-t border-gray-200 py-8 px-4 text-center text-sm text-gray-500 dark:border-gray-800 dark:text-gray-400">
+          <p>&copy; 2025 yumenomatayume</p>
+          <p class="mt-2">
+            <a href="/feed" class="transition-colors hover:text-brand-600 dark:hover:text-brand-400">RSS</a>
+            <span class="mx-2 text-gray-300 dark:text-gray-700">·</span>
+            <a
+              href="https://github.com/ymmmtym"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="transition-colors hover:text-brand-600 dark:hover:text-brand-400"
+            >
+              GitHub
+            </a>
+          </p>
         </footer>
       </body>
     </html>

@@ -1,6 +1,6 @@
 export function TableOfContents() {
   return (
-    <div id="toc-container" class="sticky top-32 w-64 max-h-[calc(100vh-10rem)] overflow-y-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-200 dark:border-gray-700">
+    <div id="toc-container" class="sticky top-32 w-64 max-h-[calc(100vh-10rem)] overflow-y-auto rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900/60">
       <div class="font-bold text-sm mb-3 text-gray-900 dark:text-gray-100">目次</div>
       <ul id="toc-list" class="space-y-1"></ul>
       <script dangerouslySetInnerHTML={{__html: `
@@ -75,7 +75,7 @@ export function TableOfContents() {
                 if (activeHeading) {
                   const link = document.querySelector(\`a[data-heading-id="\${activeHeading.id}"]\`);
                   if (link) {
-                    link.className = 'block text-sm py-1 px-2 rounded transition-colors bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200';
+                    link.className = 'block text-sm py-1 px-2 rounded transition-colors bg-brand-100 dark:bg-brand-500/20 text-brand-700 dark:text-brand-200';
                   }
                 }
               }

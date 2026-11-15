@@ -19,15 +19,15 @@ export default createRoute(async (c) => {
   if (posts.length === 0) return c.notFound()
 
   return c.render(
-    <main class="max-w-6xl mx-auto py-8 px-4">
+    <main class="mx-auto max-w-6xl px-4 py-10">
       <div class="mb-8">
-        <a href="/blog" class="text-blue-600 dark:text-gray-100 hover:underline text-sm">← Blog</a>
-        <h1 class="text-4xl font-bold tracking-tight mt-4">Tag: {tag}</h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-2 text-lg">{posts.length}件の記事</p>
+        <a href="/blog" class="text-sm font-medium text-brand-600 no-underline transition-colors hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200">← Blog</a>
+        <h1 class="mt-4 text-4xl font-extrabold tracking-tight">Tag: {tag}</h1>
+        <p class="mt-2 text-lg text-gray-500 dark:text-gray-400">{posts.length}件の記事</p>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {posts.map(post => (
-          <article class="bg-white dark:bg-purple-900/20 rounded-lg shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-200 overflow-hidden">
+          <article class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900/60 dark:hover:border-brand-500/50">
             <a href={`/blog/${post.slug}`} class="block">
               {post.heroImage && (
                 <img 
@@ -48,7 +48,7 @@ export default createRoute(async (c) => {
                       <>
                         <span class="mx-1">(更新: <time>{formatDate(post.updatedDate ?? '')}</time>)</span>
                         {isRecent && (
-                          <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                          <span class="ml-1 inline-flex items-center rounded-full bg-brand-100 px-2 py-0.5 text-xs font-medium text-brand-700 dark:bg-brand-500/15 dark:text-brand-300">
                             最近更新
                           </span>
                         )}
@@ -59,7 +59,7 @@ export default createRoute(async (c) => {
                 {post.tags && (
                   <div class="flex gap-1 flex-wrap mt-3">
                     {post.tags.slice(0, 3).map((t: string) => (
-                      <span class="px-2 py-1 bg-gray-100 dark:bg-purple-900/30 rounded text-xs text-gray-700 dark:text-gray-300">{t}</span>
+                      <span class="rounded bg-gray-100 px-2 py-1 text-xs text-gray-700 dark:bg-gray-800 dark:text-gray-300">{t}</span>
                     ))}
                   </div>
                 )}

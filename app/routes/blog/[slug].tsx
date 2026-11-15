@@ -154,23 +154,23 @@ export default createRoute(async (c) => {
         });
       `}} />
       <div class="fixed top-20 right-2 md:top-24 md:right-4 z-50 flex flex-col gap-2">
-        <button onclick={`navigator.clipboard.writeText('https://yumenomatayume.net/blog/${slug}'); const t=document.createElement('div'); t.textContent='Copied!'; t.style.cssText='position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:8px;background:#10b981;color:white;padding:6px 12px;border-radius:6px;font-size:14px;white-space:nowrap;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);z-index:1000;opacity:0;transition:opacity 0.3s ease-in-out;'; this.appendChild(t); setTimeout(() => t.style.opacity='1', 10); setTimeout(() => { t.style.opacity='0'; setTimeout(() => t.remove(), 300); }, 1000)`} class="flex items-center justify-center w-9 h-9 md:w-12 md:h-12 bg-white dark:bg-purple-900/40 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all cursor-pointer relative" title="URLをコピー">
+        <button onclick={`navigator.clipboard.writeText('https://yumenomatayume.net/blog/${slug}'); const t=document.createElement('div'); t.textContent='Copied!'; t.style.cssText='position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:8px;background:#10b981;color:white;padding:6px 12px;border-radius:6px;font-size:14px;white-space:nowrap;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);z-index:1000;opacity:0;transition:opacity 0.3s ease-in-out;'; this.appendChild(t); setTimeout(() => t.style.opacity='1', 10); setTimeout(() => { t.style.opacity='0'; setTimeout(() => t.remove(), 300); }, 1000)`} class="flex items-center justify-center w-9 h-9 md:w-12 md:h-12 rounded-full border border-gray-200 bg-white shadow-sm hover:scale-110 hover:border-brand-400 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900/80 dark:hover:border-brand-500/60 transition-all cursor-pointer relative" title="URLをコピー">
           <span class="text-base md:text-xl">🔗</span>
         </button>
-        <a href={`https://twitter.com/intent/tweet?url=https://yumenomatayume.net/blog/${slug}&text=${encodeURIComponent(tweetText)}`} target="_blank" rel="noopener noreferrer" class="flex items-center justify-center w-9 h-9 md:w-12 md:h-12 bg-white dark:bg-purple-900/40 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all" title="Xでシェア">
+        <a href={`https://twitter.com/intent/tweet?url=https://yumenomatayume.net/blog/${slug}&text=${encodeURIComponent(tweetText)}`} target="_blank" rel="noopener noreferrer" class="flex items-center justify-center w-9 h-9 md:w-12 md:h-12 rounded-full border border-gray-200 bg-white shadow-sm hover:scale-110 hover:border-brand-400 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900/80 dark:hover:border-brand-500/60 transition-all" title="Xでシェア">
           <span class="text-base md:text-xl">𝕏</span>
         </a>
-        <a href={`https://www.facebook.com/sharer/sharer.php?u=https://yumenomatayume.net/blog/${slug}`} target="_blank" rel="noopener noreferrer" class="flex items-center justify-center w-9 h-9 md:w-12 md:h-12 bg-white dark:bg-purple-900/40 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all" title="Facebookでシェア">
+        <a href={`https://www.facebook.com/sharer/sharer.php?u=https://yumenomatayume.net/blog/${slug}`} target="_blank" rel="noopener noreferrer" class="flex items-center justify-center w-9 h-9 md:w-12 md:h-12 rounded-full border border-gray-200 bg-white shadow-sm hover:scale-110 hover:border-brand-400 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900/80 dark:hover:border-brand-500/60 transition-all" title="Facebookでシェア">
           <span class="text-base md:text-xl">📘</span>
         </a>
-        <a href={`https://b.hatena.ne.jp/entry/https://yumenomatayume.net/blog/${slug}`} target="_blank" rel="noopener noreferrer" class="flex items-center justify-center w-9 h-9 md:w-12 md:h-12 bg-white dark:bg-purple-900/40 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all" title="はてブに追加">
+        <a href={`https://b.hatena.ne.jp/entry/https://yumenomatayume.net/blog/${slug}`} target="_blank" rel="noopener noreferrer" class="flex items-center justify-center w-9 h-9 md:w-12 md:h-12 rounded-full border border-gray-200 bg-white shadow-sm hover:scale-110 hover:border-brand-400 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900/80 dark:hover:border-brand-500/60 transition-all" title="はてブに追加">
           <span class="text-base md:text-xl">📖</span>
         </a>
-        <a href={`https://raindrop.io/add?link=https://yumenomatayume.net/blog/${slug}&title=${encodeURIComponent(frontmatter.title ?? '')}`} target="_blank" rel="noopener noreferrer" class="flex items-center justify-center w-9 h-9 md:w-12 md:h-12 bg-white dark:bg-purple-900/40 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all" title="Raindropに保存">
+        <a href={`https://raindrop.io/add?link=https://yumenomatayume.net/blog/${slug}&title=${encodeURIComponent(frontmatter.title ?? '')}`} target="_blank" rel="noopener noreferrer" class="flex items-center justify-center w-9 h-9 md:w-12 md:h-12 rounded-full border border-gray-200 bg-white shadow-sm hover:scale-110 hover:border-brand-400 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900/80 dark:hover:border-brand-500/60 transition-all" title="Raindropに保存">
           <span class="text-base md:text-xl">☁️</span>
         </a>
       </div>
-      <div class="max-w-7xl mx-auto py-8 px-4 flex flex-col lg:flex-row gap-8">
+      <div class="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-10 lg:flex-row">
         <aside class="block w-64 flex-shrink-0" style="display: none;">
           <TableOfContents />
         </aside>
@@ -181,13 +181,13 @@ export default createRoute(async (c) => {
             <img 
               src={frontmatter.heroImage} 
               alt={frontmatter.title}
-              class="w-full h-64 object-cover rounded-lg"
+              class="h-64 w-full rounded-xl object-cover shadow-sm"
             />
           </div>
         )}
-        <header class="mb-8">
-          <h1 class="text-4xl font-bold tracking-tight mb-4">{frontmatter.title}</h1>
-          <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-3 flex-wrap">
+        <header class="mb-10 border-b border-gray-200 pb-6 dark:border-gray-800">
+          <h1 class="mb-4 text-4xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50">{frontmatter.title}</h1>
+          <div class="flex flex-wrap items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
             <time>{formatDate(frontmatter.pubDate ?? '')}</time>
             {(() => {
               const { showUpdated, isRecent } = getUpdateStatus(frontmatter.pubDate ?? '', frontmatter.updatedDate)
@@ -196,7 +196,7 @@ export default createRoute(async (c) => {
                 <>
                   <span>(更新: <time>{formatDate(frontmatter.updatedDate ?? '')}</time>)</span>
                   {isRecent && (
-                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                    <span class="inline-flex items-center rounded-full bg-brand-100 px-2 py-0.5 text-xs font-medium text-brand-700 dark:bg-brand-500/15 dark:text-brand-300">
                       最近更新
                     </span>
                   )}
@@ -204,15 +204,15 @@ export default createRoute(async (c) => {
               )
             })()}
             {frontmatter.readingTime != null && (
-              <span class="text-sm text-gray-600 dark:text-gray-400">
+              <span>
                 📖 {frontmatter.readingTime >= 1 ? `約${frontmatter.readingTime}分で読めます` : '1分未満で読めます'}
               </span>
             )}
           </div>
           {frontmatter.tags && (
-            <div class="flex gap-2 flex-wrap mt-4">
+            <div class="mt-4 flex flex-wrap gap-2">
               {frontmatter.tags.map((tag: string) => (
-                <a href={`/blog/tag/${tag}`} class="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-full text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">{tag}</a>
+                <a href={`/blog/tag/${tag}`} class="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700 no-underline transition-colors hover:bg-brand-100 hover:text-brand-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-brand-500/15 dark:hover:text-brand-300">{tag}</a>
               ))}
             </div>
           )}
@@ -223,37 +223,37 @@ export default createRoute(async (c) => {
       </article>
 
       {(prevPost || nextPost) && (
-        <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+        <nav class="mt-12 border-t border-gray-200 pt-8 dark:border-gray-800" aria-label="記事ナビゲーション">
           <div class="flex justify-between gap-4">
             {prevPost ? (
-              <a href={`/blog/${prevPost.slug}`} class="flex-1 p-4 bg-gray-50 dark:bg-purple-900/20 rounded-lg hover:bg-gray-100 dark:hover:bg-purple-900/30 transition-colors">
-                <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">← 前の記事</div>
+              <a href={`/blog/${prevPost.slug}`} class="flex-1 rounded-xl border border-gray-200 bg-white p-4 no-underline shadow-sm transition-all hover:-translate-y-1 hover:border-brand-300 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900/60 dark:hover:border-brand-500/50">
+                <div class="mb-1 text-sm text-gray-500 dark:text-gray-400">← 前の記事</div>
                 <div class="font-bold text-gray-900 dark:text-gray-100">{prevPost.title}</div>
               </a>
             ) : <div class="flex-1"></div>}
             {nextPost ? (
-              <a href={`/blog/${nextPost.slug}`} class="flex-1 p-4 bg-gray-50 dark:bg-purple-900/20 rounded-lg hover:bg-gray-100 dark:hover:bg-purple-900/30 transition-colors text-right">
-                <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">次の記事 →</div>
+              <a href={`/blog/${nextPost.slug}`} class="flex-1 rounded-xl border border-gray-200 bg-white p-4 text-right no-underline shadow-sm transition-all hover:-translate-y-1 hover:border-brand-300 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900/60 dark:hover:border-brand-500/50">
+                <div class="mb-1 text-sm text-gray-500 dark:text-gray-400">次の記事 →</div>
                 <div class="font-bold text-gray-900 dark:text-gray-100">{nextPost.title}</div>
               </a>
             ) : <div class="flex-1"></div>}
           </div>
-        </div>
+        </nav>
       )}
 
       {relatedPosts.length > 0 && (
-        <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
-          <h2 class="text-2xl font-bold mb-6">関連記事</h2>
+        <section class="mt-12 border-t border-gray-200 pt-8 dark:border-gray-800">
+          <h2 class="mb-6 text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-50">関連記事</h2>
           <div class="grid grid-cols-1 gap-4">
             {relatedPosts.map(post => (
-              <a href={`/blog/${post.slug}`} class="block p-4 bg-gray-50 dark:bg-purple-900/20 rounded-lg hover:bg-gray-100 dark:hover:bg-purple-900/30 transition-colors">
-                <p class="font-bold text-lg mb-2 text-gray-900 dark:text-gray-100">{post.title}</p>
-                <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{post.description}</p>
-                <time class="text-xs text-gray-500 dark:text-gray-500 mt-2 block">{formatDate(post.pubDate)}</time>
+              <a href={`/blog/${post.slug}`} class="block rounded-xl border border-gray-200 bg-white p-4 no-underline shadow-sm transition-all hover:-translate-y-1 hover:border-brand-300 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900/60 dark:hover:border-brand-500/50">
+                <p class="mb-2 text-lg font-bold text-gray-900 dark:text-gray-100">{post.title}</p>
+                <p class="line-clamp-2 text-sm text-gray-600 dark:text-gray-400">{post.description}</p>
+                <time class="mt-2 block text-xs text-gray-500 dark:text-gray-500">{formatDate(post.pubDate)}</time>
               </a>
             ))}
           </div>
-        </div>
+        </section>
       )}
     </main>
     </div>
