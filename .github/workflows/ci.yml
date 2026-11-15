@@ -21,6 +21,20 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Install MCP server dependencies
+        run: npm ci
+        working-directory: mcp
+
+      - name: Typecheck MCP server
+        run: npm run typecheck
+        working-directory: mcp
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Lint
+        run: bun run lint
+
       - name: Build
         run: bun run build
 

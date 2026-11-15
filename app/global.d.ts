@@ -5,4 +5,16 @@ declare module 'hono' {
     Variables: {}
     Bindings: {}
   }
+
+  interface ContextRenderer {
+    (
+      content: string | Promise<string>,
+      props?: {
+        title?: string
+        description?: string
+        heroImage?: string
+        noindex?: boolean
+      }
+    ): Response | Promise<Response>
+  }
 }

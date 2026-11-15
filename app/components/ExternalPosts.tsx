@@ -1,4 +1,4 @@
-import { parseRSS, type RSSItem } from './RSSParser'
+import { parseRSS } from './RSSParser'
 import { getBlogPosts } from '../utils/blog'
 
 export interface ExternalPost {

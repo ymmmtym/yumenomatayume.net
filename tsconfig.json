@@ -5,19 +5,26 @@
     "moduleResolution": "Bundler",
     "strict": true,
     "skipLibCheck": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
     "lib": [
       "ESNext",
       "DOM"
     ],
     "types": [
       "vite/client",
-      "@cloudflare/workers-types/2023-07-01"
+      "@cloudflare/workers-types",
+      "bun"
     ],
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx"
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx"
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "scripts/**/*.ts",
+    "types/**/*.d.ts",
+    "vite.config.ts",
+    "tailwind.config.ts"
   ]
 }

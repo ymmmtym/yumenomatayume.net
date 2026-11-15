@@ -3,8 +3,8 @@ import { getBlogPosts } from '../utils/blog'
 
 export default createRoute(async (c) => {
   const posts = getBlogPosts().map(({ slug, module }) => {
-    const { pubDate = '' } = module.frontmatter ?? {}
-    return { slug, pubDate }
+    const { pubDate = '', updatedDate } = module.frontmatter ?? {}
+    return { slug, pubDate, updatedDate }
   })
 
   const baseUrl = 'https://yumenomatayume.net'
