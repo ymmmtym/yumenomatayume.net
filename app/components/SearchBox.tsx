@@ -22,7 +22,7 @@ export function SearchBox({ posts }: SearchBoxProps) {
           type="text"
           id="search-input"
           placeholder="記事を検索... (⌘K / Ctrl+K)"
-          class="w-full px-4 py-2 pl-10 pr-4 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-100 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          class="w-full px-4 py-2 pl-10 pr-4 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
           autocomplete="off"
         />
         <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">

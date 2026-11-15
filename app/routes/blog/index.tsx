@@ -15,8 +15,8 @@ export default createRoute(async (c) => {
   return c.render(
     <main class="max-w-6xl mx-auto py-8 px-4">
       <div class="mb-4">
-        <h1 class="text-4xl font-bold">Blog</h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-2">{posts.length}件の記事</p>
+        <h1 class="text-4xl font-bold tracking-tight">Blog</h1>
+        <p class="text-gray-600 dark:text-gray-400 mt-2 text-lg">{posts.length}件の記事</p>
       </div>
       
       <details class="mb-8 p-4 bg-gray-50 dark:bg-purple-900/20 rounded-lg">
