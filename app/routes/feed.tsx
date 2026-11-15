@@ -4,7 +4,11 @@ import { getBlogPosts } from '../utils/blog'
 export default createRoute(async (c) => {
   const posts = getBlogPosts().map(({ slug, module }) => {
     const { title = '', description = '', pubDate = '', updatedDate } = module.frontmatter ?? {}
-    return { slug, title, description, pubDate, updatedDate }
+    // An invalid date would make toISOString() throw and break the whole feed.
+    const validUpdatedDate = updatedDate && !Number.isNaN(new Date(updatedDate).getTime())
+      ? updatedDate
+      : undefined
+    return { slug, title, description, pubDate, updatedDate: validUpdatedDate }
   }).sort((a, b) => 
     new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
   ).slice(0, 20)
