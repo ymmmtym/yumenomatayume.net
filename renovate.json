@@ -2,5 +2,14 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended"
+  ],
+  "packageRules": [
+    {
+      "description": "Keep ts-api-utils on 1.x. TypeScript 7 ships no JavaScript compiler API, so a hoisted ts-api-utils@2.x resolves the root typescript@7 stub and crashes `vite build` (precinct -> detective-typescript -> @typescript-eslint/typescript-estree reads ts.TypeFlags). The 1.x devDependency forces estree to nest its own ts-api-utils, which resolves precinct's bundled TypeScript 5.x. See PR #187 / #190.",
+      "matchPackageNames": [
+        "ts-api-utils"
+      ],
+      "allowedVersions": "<2.0.0"
+    }
   ]
 }
