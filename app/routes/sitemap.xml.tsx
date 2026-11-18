@@ -1,5 +1,6 @@
 import { createRoute } from 'honox/factory'
 import { getBlogPosts } from '../utils/blog'
+import { PRIVACY_LAST_UPDATED } from '../utils/privacy'
 
 export default createRoute(async (c) => {
   const posts = getBlogPosts().map(({ slug, module }) => {
@@ -26,7 +27,7 @@ export default createRoute(async (c) => {
   </url>
   <url>
     <loc>${baseUrl}/privacy</loc>
-    <lastmod>${now}</lastmod>
+    <lastmod>${PRIVACY_LAST_UPDATED}</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>

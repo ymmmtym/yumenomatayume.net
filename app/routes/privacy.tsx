@@ -1,6 +1,7 @@
 import { createRoute } from 'honox/factory'
+import { PRIVACY_LAST_UPDATED, formatJapaneseDate } from '../utils/privacy'
 
-const LAST_UPDATED = '2026年11月16日'
+const LAST_UPDATED = formatJapaneseDate(PRIVACY_LAST_UPDATED)
 
 const sectionTitle =
   'mt-10 mb-4 border-b border-gray-200 pb-2 text-xl font-bold tracking-tight text-gray-900 dark:border-gray-800 dark:text-gray-50'
@@ -46,15 +47,20 @@ export default createRoute((c) =>
 
       <h2 class={sectionTitle}>4. 広告の配信について（第三者配信事業者）</h2>
       <p class={bodyText}>
-        当サイトは、Google を含む第三者配信事業者による広告配信サービスを利用しています。これらの第三者配信事業者は、Cookie
-        を使用して、ユーザーの当サイトや他のサイトへの過去のアクセス情報に基づいて広告を配信します。これにより、ユーザーの興味関心に応じた広告が表示されることがあります。
+        当サイトは、第三者配信事業者として Google が提供する広告配信サービス（Google AdSense）を利用しています。Google
+        などの第三者配信事業者は、Cookie を使用して、ユーザーの当サイトや他のサイトへの過去のアクセス情報に基づいて広告を配信します。これにより、ユーザーの興味関心に応じた広告（パーソナライズ広告）が表示されることがあります。
       </p>
       <p class={bodyText}>
-        Google が広告配信に使用する Cookie（DoubleClick Cookie など）を無効にするには、
+        Google による広告配信の仕組みは、
+        <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer" class={linkClass}>
+          Google の広告に関するポリシー
+        </a>
+        でご確認いただけます。パーソナライズ広告を無効にするには、
         <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" class={linkClass}>
           広告設定
         </a>
-        からパーソナライズ広告を無効に設定してください。また、
+        から設定してください。なお、広告設定でパーソナライズ広告を無効にしても、広告の配信自体は継続され、フリークエンシーキャップや集計レポートのために Cookie
+        が使用される場合があります。広告 Cookie 自体を拒否したい場合は、ブラウザの設定で Cookie を無効にしてください。また、
         <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer" class={linkClass}>
           aboutads.info
         </a>
@@ -98,11 +104,16 @@ export default createRoute((c) =>
 
       <h2 class={sectionTitle}>10. お問い合わせ先</h2>
       <p class={bodyText}>
-        本プライバシーポリシーに関するお問い合わせは、
+        本プライバシーポリシーに関するお問い合わせ、およびご自身の情報の開示・訂正・削除のご請求は、
         <a href="/form" class={linkClass}>
           お問い合わせフォーム
         </a>
-        よりご連絡ください。
+        または下記のメールアドレスまでご連絡ください。
+      </p>
+      <p class={bodyText}>
+        <a href="mailto:yumenomatayume@yumenomatayume.net" class={linkClass}>
+          yumenomatayume@yumenomatayume.net
+        </a>
       </p>
 
       <p class="mt-10 text-sm text-gray-500 dark:text-gray-400">制定日: {LAST_UPDATED}</p>
