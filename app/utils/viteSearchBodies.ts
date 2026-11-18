@@ -10,12 +10,14 @@ const RESOLVED_ID = '\0' + VIRTUAL_ID
  * Strip each article's frontmatter and HTML at build time so the Worker never
  * runs the Markdown parser per request.
  */
-export function buildSearchBodies(contentDir: string): Record<string, string> {
+export function buildSearchBodies(contentDir: string, onRead?: (path: string) => void): Record<string, string> {
   const bodies: Record<string, string> = {}
   for (const file of readdirSync(contentDir)) {
     const match = /^(.*)\.(md|mdx)$/.exec(file)
     if (!match) continue
-    const source = readFileSync(join(contentDir, file), 'utf8')
+    const path = join(contentDir, file)
+    onRead?.(path)
+    const source = readFileSync(path, 'utf8')
     const body = source.replace(/^---\r?\n[\s\S]*?\r?\n---\s*/, '')
     bodies[match[1]] = prepareSearchBody(body)
   }
@@ -30,7 +32,7 @@ export function searchBodiesPlugin(contentDir: string): Plugin {
     },
     load(id) {
       if (id !== RESOLVED_ID) return
-      return `export default ${JSON.stringify(buildSearchBodies(contentDir))}`
+      return `export default ${JSON.stringify(buildSearchBodies(contentDir, path => this.addWatchFile(path)))}`
     }
   }
 }
