@@ -24,6 +24,12 @@ export default createRoute(async (c) => {
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>${baseUrl}/privacy</loc>
+    <lastmod>${now}</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
   ${posts.map(post => {
     const pubDate = new Date(post.pubDate ?? '')
     const updatedDate = new Date(post.updatedDate ?? '')

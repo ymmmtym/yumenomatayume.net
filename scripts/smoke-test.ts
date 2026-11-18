@@ -5,6 +5,7 @@ const BASE_URL = `http://127.0.0.1:${PORT}`;
 const PATHS = ["/", "/blog", "/feed", "/sitemap.xml", "/robots.txt"];
 const READY_TIMEOUT_MS = 60_000;
 const REQUEST_TIMEOUT_MS = 10_000;
+PATHS.push("/privacy");
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
