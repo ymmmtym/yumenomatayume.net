@@ -1,34 +1,23 @@
 import { jsxRenderer, useRequestContext } from 'hono/jsx-renderer'
 import { Link, Script } from 'honox/server'
 import Header from '../components/Header'
-import { prepareSearchBody } from '../utils/searchBody'
 import { getBlogPosts } from '../utils/blog'
+import searchBodies from 'virtual:search-bodies'
 
-// 記事データを取得する関数
+// Search bodies are stripped of frontmatter and HTML at build time (see
+// vite.config.ts / viteSearchBodies.ts), so this is a cheap lookup rather than
+// re-parsing every article's Markdown on each request.
 const getPosts = () => {
   try {
-    const sources = import.meta.glob<string>('../content/blog/*.{md,mdx}', {
-      eager: true,
-      query: '?raw',
-      import: 'default'
-    })
-    return getBlogPosts().map(({ path, slug, module }) => {
-      const source = sources[path]
-      const body = typeof source === 'string'
-        ? source.replace(/^---\r?\n[\s\S]*?\r?\n---\s*/, '')
-        : ''
-      // 本文からHTMLタグを除去して検索用テキストを作成
-      const searchBody = prepareSearchBody(body)
-      return { 
-        slug, 
-        title: module.frontmatter?.title ?? '',
-        description: module.frontmatter?.description ?? '',
-        tags: module.frontmatter?.tags ?? [],
-        pubDate: module.frontmatter?.pubDate ?? '',
-        body: searchBody,
-        updatedDate: module.frontmatter?.updatedDate || ''
-      }
-    })
+    return getBlogPosts().map(({ slug, module }) => ({
+      slug,
+      title: module.frontmatter?.title ?? '',
+      description: module.frontmatter?.description ?? '',
+      tags: module.frontmatter?.tags ?? [],
+      pubDate: module.frontmatter?.pubDate ?? '',
+      body: searchBodies[slug] ?? '',
+      updatedDate: module.frontmatter?.updatedDate || ''
+    }))
   } catch {
     return []
   }

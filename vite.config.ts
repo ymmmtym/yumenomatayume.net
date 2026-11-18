@@ -9,6 +9,8 @@ import remarkGfm from 'remark-gfm'
 import rehypePrism from 'rehype-prism-plus'
 import { remarkLinkCard } from './app/utils/remarkLinkCard.ts'
 import { remarkReadingTime } from './app/utils/remarkReadingTime.ts'
+import { searchBodiesPlugin } from './app/utils/viteSearchBodies.ts'
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 
 const mdxPlugin = mdx({
@@ -33,6 +35,7 @@ export default defineConfig({
       client: { input: ['/app/client.ts', '/app/style.css'] }
     }),
     tailwindcss(),
+    searchBodiesPlugin(fileURLToPath(new URL('./app/content/blog', import.meta.url))),
     {
       ...mdxPlugin,
       transform(code, id) {
