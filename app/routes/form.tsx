@@ -1,23 +1,17 @@
 import { createRoute } from 'honox/factory'
 import type { ContactFormErrors, ContactFormInput } from '../utils/contactForm'
-import { CONTACT_LIMITS, buildContactEmail, isHoneypotTripped, validateContactForm } from '../utils/contactForm'
+import {
+  boundContactInput,
+  buildContactEmail,
+  isHoneypotTripped,
+  validateContactForm
+} from '../utils/contactForm'
 
 const CONTACT_TO = 'yumenomatayume@yumenomatayume.net'
 const CONTACT_FROM = 'noreply@yumenomatayume.net'
 
 // Upper bound for a text-only contact form, enforced before parsing.
 const MAX_BODY_BYTES = 128 * 1024
-
-const asString = (value: unknown): string => (typeof value === 'string' ? value : '')
-
-// Bound the values echoed back on validation failure so an oversized submission
-// cannot be re-rendered in full.
-const boundInput = (raw: Record<string, unknown>): ContactFormInput => ({
-  name: asString(raw.name).slice(0, CONTACT_LIMITS.name),
-  email: asString(raw.email).slice(0, CONTACT_LIMITS.email),
-  subject: asString(raw.subject).slice(0, CONTACT_LIMITS.subject),
-  message: asString(raw.message).slice(0, CONTACT_LIMITS.message)
-})
 
 // Count bytes while reading so streamed bodies without a Content-Length are
 // also bounded. Returns null when the limit is exceeded.
@@ -250,7 +244,7 @@ export const POST = createRoute(async (c) => {
     return c.render(
       <main class="mx-auto max-w-3xl px-4 py-10">
         <h1 class="mb-6 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50">お問い合わせ</h1>
-        <ContactForm values={boundInput(raw)} errors={result.errors} />
+        <ContactForm values={boundContactInput(raw)} errors={result.errors} />
       </main>,
       { title: 'お問い合わせ', description: 'yumenomatayume へのお問い合わせフォームです。', noindex: true }
     )

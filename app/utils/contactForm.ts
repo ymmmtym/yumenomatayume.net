@@ -35,6 +35,17 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)+$/
 const readField = (raw: Record<string, unknown>, key: string): string =>
   typeof raw[key] === 'string' ? (raw[key] as string).trim() : ''
 
+// Bound the values echoed back on validation failure so an oversized submission
+// cannot be re-rendered in full. Trim first so the bounds match validation.
+export function boundContactInput(raw: Record<string, unknown>): ContactFormInput {
+  return {
+    name: readField(raw, 'name').slice(0, CONTACT_LIMITS.name),
+    email: readField(raw, 'email').slice(0, CONTACT_LIMITS.email),
+    subject: readField(raw, 'subject').slice(0, CONTACT_LIMITS.subject),
+    message: readField(raw, 'message').slice(0, CONTACT_LIMITS.message)
+  }
+}
+
 export function validateContactForm(
   raw: Record<string, unknown>
 ): { ok: true; value: ContactFormInput } | { ok: false; errors: ContactFormErrors } {

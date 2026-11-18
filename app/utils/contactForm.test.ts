@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import {
+  boundContactInput,
   buildContactEmail,
   isHoneypotTripped,
   validateContactForm
@@ -68,6 +69,27 @@ describe('validateContactForm', () => {
     const result = validateContactForm({ ...valid, name: 42 as unknown as string })
     expect(result.ok).toBe(false)
     if (!result.ok) expect(result.errors.name).toBeDefined()
+  })
+})
+
+describe('boundContactInput', () => {
+  test('trims before applying the echo limits', () => {
+    const bounded = boundContactInput({ ...valid, message: ` ${'a'.repeat(5000)}`, subject: '' })
+    expect(bounded.message.length).toBe(5000)
+    expect(bounded.message.startsWith(' ')).toBe(false)
+  })
+
+  test('bounds each field and ignores non-string values', () => {
+    const bounded = boundContactInput({
+      name: 'a'.repeat(200),
+      email: 42,
+      subject: 'b'.repeat(300),
+      message: 'c'.repeat(6000)
+    })
+    expect(bounded.name.length).toBe(100)
+    expect(bounded.email).toBe('')
+    expect(bounded.subject.length).toBe(200)
+    expect(bounded.message.length).toBe(5000)
   })
 })
 

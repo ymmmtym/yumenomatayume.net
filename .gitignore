@@ -37,3 +37,6 @@ mise.local.toml
 
 # lockfiles (npm)
 package-lock.json
+
+# agent working memory (local only)
+.openhands/
