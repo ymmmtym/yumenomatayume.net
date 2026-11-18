@@ -141,10 +141,10 @@ export default createRoute(async (c) => {
           <span aria-hidden="true">🔗</span> Links
         </h2>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <a href="mailto:yumenomatayume@yumenomatayume.net" class={cardClass}>
-            <div class="mb-2 text-2xl">📧</div>
-            <div class="mb-1 font-bold text-gray-900 dark:text-gray-100">Email</div>
-            <div class="text-sm text-gray-600 dark:text-gray-400">yumenomatayume@yumenomatayume.net</div>
+          <a href="/form" class={cardClass}>
+            <div class="mb-2 text-2xl">✉️</div>
+            <div class="mb-1 font-bold text-gray-900 dark:text-gray-100">Contact</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">お問い合わせフォーム</div>
           </a>
           <a href="https://github.com/ymmmtym" target="_blank" rel="noopener noreferrer" class={cardClass}>
             <div class="mb-2 text-2xl">🐙</div>

@@ -3,6 +3,7 @@ import { spawn } from "node:child_process";
 const PORT = Number(process.env.PORT ?? 8787);
 const BASE_URL = `http://127.0.0.1:${PORT}`;
 const PATHS = ["/", "/blog", "/feed", "/sitemap.xml", "/robots.txt"];
+PATHS.push("/form");
 const READY_TIMEOUT_MS = 60_000;
 const REQUEST_TIMEOUT_MS = 10_000;
 
