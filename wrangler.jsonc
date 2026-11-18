@@ -8,7 +8,15 @@
   ],
   "assets": {
     "directory": "./dist"
-  }
+  },
+  // 送信先は検証済みの宛先アドレスに限定します（無料プランでもこの宛先への送信は無料）。
+  // 実運用では to の値をご自身の Cloudflare アカウントで検証済みのアドレスに変更してください。
+  "send_email": [
+    {
+      "name": "SEND_EMAIL",
+      "destination_address": "yumenomatayume@yumenomatayume.net"
+    }
+  ]
   // "vars": {
   //   "MY_VAR": "my-variable"
   // },

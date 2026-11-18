@@ -197,6 +197,10 @@ export default jsxRenderer(({ children, title, description, heroImage, noindex }
         <footer class="border-t border-gray-200 py-8 px-4 text-center text-sm text-gray-500 dark:border-gray-800 dark:text-gray-400">
           <p>&copy; 2025 yumenomatayume</p>
           <p class="mt-2">
+            <a href="/form" class="transition-colors hover:text-brand-600 dark:hover:text-brand-400">お問い合わせ</a>
+            <span class="mx-2 text-gray-300 dark:text-gray-700">·</span>
+            <a href="/privacy" class="transition-colors hover:text-brand-600 dark:hover:text-brand-400">プライバシーポリシー</a>
+            <span class="mx-2 text-gray-300 dark:text-gray-700">·</span>
             <a href="/feed" class="transition-colors hover:text-brand-600 dark:hover:text-brand-400">RSS</a>
             <span class="mx-2 text-gray-300 dark:text-gray-700">·</span>
             <a

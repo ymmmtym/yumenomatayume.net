@@ -3,7 +3,9 @@ import type {} from 'hono'
 declare module 'hono' {
   interface Env {
     Variables: {}
-    Bindings: {}
+    Bindings: {
+      SEND_EMAIL: SendEmail
+    }
   }
 
   interface ContextRenderer {
