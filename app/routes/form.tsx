@@ -1,9 +1,50 @@
 import { createRoute } from 'honox/factory'
 import type { ContactFormErrors, ContactFormInput } from '../utils/contactForm'
-import { buildContactEmail, isHoneypotTripped, validateContactForm } from '../utils/contactForm'
+import { CONTACT_LIMITS, buildContactEmail, isHoneypotTripped, validateContactForm } from '../utils/contactForm'
 
 const CONTACT_TO = 'yumenomatayume@yumenomatayume.net'
 const CONTACT_FROM = 'noreply@yumenomatayume.net'
+
+// Upper bound for a text-only contact form, enforced before parsing.
+const MAX_BODY_BYTES = 128 * 1024
+
+const asString = (value: unknown): string => (typeof value === 'string' ? value : '')
+
+// Bound the values echoed back on validation failure so an oversized submission
+// cannot be re-rendered in full.
+const boundInput = (raw: Record<string, unknown>): ContactFormInput => ({
+  name: asString(raw.name).slice(0, CONTACT_LIMITS.name),
+  email: asString(raw.email).slice(0, CONTACT_LIMITS.email),
+  subject: asString(raw.subject).slice(0, CONTACT_LIMITS.subject),
+  message: asString(raw.message).slice(0, CONTACT_LIMITS.message)
+})
+
+// Count bytes while reading so streamed bodies without a Content-Length are
+// also bounded. Returns null when the limit is exceeded.
+async function readBodyWithinLimit(request: Request, limit: number): Promise<ArrayBuffer | null> {
+  const reader = request.body?.getReader()
+  if (!reader) return new ArrayBuffer(0)
+  const chunks: Uint8Array[] = []
+  let total = 0
+  for (;;) {
+    const { done, value } = await reader.read()
+    if (done) break
+    total += value.byteLength
+    if (total > limit) {
+      await reader.cancel()
+      return null
+    }
+    chunks.push(value)
+  }
+  const buffer = new ArrayBuffer(total)
+  const view = new Uint8Array(buffer)
+  let offset = 0
+  for (const chunk of chunks) {
+    view.set(chunk, offset)
+    offset += chunk.byteLength
+  }
+  return buffer
+}
 
 const labelClass = 'mb-1 block text-sm font-semibold text-gray-800 dark:text-gray-200'
 const inputClass =
@@ -12,7 +53,12 @@ const errorClass = 'mt-1 text-sm text-red-600 dark:text-red-400'
 
 const EMPTY: ContactFormInput = { name: '', email: '', subject: '', message: '' }
 
-function ContactForm(props: { values?: ContactFormInput; errors?: ContactFormErrors; sent?: boolean }) {
+function ContactForm(props: {
+  values?: ContactFormInput
+  errors?: ContactFormErrors
+  sent?: boolean
+  alert?: string
+}) {
   const values = props.values ?? EMPTY
   const errors = props.errors ?? {}
 
@@ -32,6 +78,15 @@ function ContactForm(props: { values?: ContactFormInput; errors?: ContactFormErr
 
   return (
     <form method="post" action="/form" class="space-y-6" novalidate>
+      {props.alert && (
+        <div
+          role="alert"
+          class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
+        >
+          {props.alert}
+        </div>
+      )}
+
       {Object.keys(errors).length > 0 && (
         <div
           role="alert"
@@ -53,9 +108,14 @@ function ContactForm(props: { values?: ContactFormInput; errors?: ContactFormErr
           required
           value={values.name}
           aria-invalid={errors.name ? 'true' : undefined}
+          aria-describedby={errors.name ? 'name-error' : undefined}
           class={inputClass}
         />
-        {errors.name && <p class={errorClass}>{errors.name}</p>}
+        {errors.name && (
+          <p id="name-error" class={errorClass}>
+            {errors.name}
+          </p>
+        )}
       </div>
 
       <div>
@@ -70,9 +130,14 @@ function ContactForm(props: { values?: ContactFormInput; errors?: ContactFormErr
           required
           value={values.email}
           aria-invalid={errors.email ? 'true' : undefined}
+          aria-describedby={errors.email ? 'email-error' : undefined}
           class={inputClass}
         />
-        {errors.email && <p class={errorClass}>{errors.email}</p>}
+        {errors.email && (
+          <p id="email-error" class={errorClass}>
+            {errors.email}
+          </p>
+        )}
       </div>
 
       <div>
@@ -86,9 +151,14 @@ function ContactForm(props: { values?: ContactFormInput; errors?: ContactFormErr
           required
           value={values.subject}
           aria-invalid={errors.subject ? 'true' : undefined}
+          aria-describedby={errors.subject ? 'subject-error' : undefined}
           class={inputClass}
         />
-        {errors.subject && <p class={errorClass}>{errors.subject}</p>}
+        {errors.subject && (
+          <p id="subject-error" class={errorClass}>
+            {errors.subject}
+          </p>
+        )}
       </div>
 
       <div>
@@ -101,11 +171,16 @@ function ContactForm(props: { values?: ContactFormInput; errors?: ContactFormErr
           rows={8}
           required
           aria-invalid={errors.message ? 'true' : undefined}
+          aria-describedby={errors.message ? 'message-error' : undefined}
           class={inputClass}
         >
           {values.message}
         </textarea>
-        {errors.message && <p class={errorClass}>{errors.message}</p>}
+        {errors.message && (
+          <p id="message-error" class={errorClass}>
+            {errors.message}
+          </p>
+        )}
       </div>
 
       {/* スパム対策: 人間には見えない入力欄。入力されていればボットと判定します。 */}
@@ -125,12 +200,36 @@ function ContactForm(props: { values?: ContactFormInput; errors?: ContactFormErr
 }
 
 export const POST = createRoute(async (c) => {
-  const contentType = c.req.header('content-type') ?? ''
-  if (!contentType.includes('application/x-www-form-urlencoded') && !contentType.includes('multipart/form-data')) {
+  const mediaType = (c.req.header('content-type') ?? '').split(';')[0].trim().toLowerCase()
+  if (mediaType !== 'application/x-www-form-urlencoded' && mediaType !== 'multipart/form-data') {
     return c.text('Unsupported Media Type', 415)
   }
 
-  const form = await c.req.formData()
+  const declaredLength = Number(c.req.header('content-length') ?? '')
+  if (Number.isFinite(declaredLength) && declaredLength > MAX_BODY_BYTES) {
+    return c.text('Content Too Large', 413)
+  }
+
+  const body = await readBodyWithinLimit(c.req.raw, MAX_BODY_BYTES)
+  if (body === null) {
+    return c.text('Content Too Large', 413)
+  }
+
+  // Reconstruct the request so the original Content-Type (including any
+  // multipart boundary) is preserved for the parser.
+  const request = new Request(c.req.url, {
+    method: 'POST',
+    headers: c.req.raw.headers,
+    body
+  })
+
+  let form: FormData
+  try {
+    form = await request.formData()
+  } catch {
+    return c.text('Bad Request', 400)
+  }
+
   const raw: Record<string, unknown> = {}
   for (const [key, value] of form.entries()) {
     if (typeof value === 'string') raw[key] = value
@@ -151,15 +250,7 @@ export const POST = createRoute(async (c) => {
     return c.render(
       <main class="mx-auto max-w-3xl px-4 py-10">
         <h1 class="mb-6 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50">お問い合わせ</h1>
-        <ContactForm
-          values={{
-            name: typeof raw.name === 'string' ? raw.name : '',
-            email: typeof raw.email === 'string' ? raw.email : '',
-            subject: typeof raw.subject === 'string' ? raw.subject : '',
-            message: typeof raw.message === 'string' ? raw.message : ''
-          }}
-          errors={result.errors}
-        />
+        <ContactForm values={boundInput(raw)} errors={result.errors} />
       </main>,
       { title: 'お問い合わせ', description: 'yumenomatayume へのお問い合わせフォームです。', noindex: true }
     )
@@ -180,15 +271,11 @@ export const POST = createRoute(async (c) => {
     console.error('Failed to send contact form email:', error)
     return c.render(
       <main class="mx-auto max-w-3xl px-4 py-10">
-        <div
-          role="alert"
-          class="rounded-xl border border-red-200 bg-red-50 p-6 dark:border-red-900 dark:bg-red-950/40"
-        >
-          <h1 class="mb-2 text-lg font-bold text-red-800 dark:text-red-200">送信に失敗しました</h1>
-          <p class="text-red-800 dark:text-red-200">
-            お手数ですが、時間をおいて再度お試しください。
-          </p>
-        </div>
+        <h1 class="mb-6 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50">お問い合わせ</h1>
+        <ContactForm
+          values={result.value}
+          alert="送信に失敗しました。お手数ですが、時間をおいて再度お試しください。"
+        />
       </main>,
       { title: '送信に失敗しました', description: 'お問い合わせの送信に失敗しました。', noindex: true }
     )

@@ -29,6 +29,10 @@ HonoX + Cloudflare Workers で構築されたブログサイトです。
 bun install
 ```
 
+### 前提条件
+
+- Node.js 22.12.0 以上（`bun run preview` / `bun run deploy` で使用する Wrangler がこのバージョンを要求します。ビルド自体はこれより古い Node.js でも動作します）
+
 ### 環境変数
 
 Cloudinary を使用する場合は以下の環境変数を設定:

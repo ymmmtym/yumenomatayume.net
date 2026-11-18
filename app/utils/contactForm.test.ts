@@ -35,7 +35,16 @@ describe('validateContactForm', () => {
   })
 
   test('rejects malformed email addresses', () => {
-    for (const email of ['foo', 'foo@bar', 'foo bar@example.com', 'a@b@c.com', '@example.com']) {
+    for (const email of [
+      'foo',
+      'foo@bar',
+      'foo bar@example.com',
+      'a@b@c.com',
+      '@example.com',
+      'taro@example..com',
+      'taro@.example.com',
+      'taro@example.com.'
+    ]) {
       const result = validateContactForm({ ...valid, email })
       expect(result.ok).toBe(false)
       if (!result.ok) expect(result.errors.email).toBeDefined()
