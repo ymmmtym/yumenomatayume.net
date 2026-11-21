@@ -1,6 +1,7 @@
 import { createRoute } from 'honox/factory'
 import type { ContactFormErrors, ContactFormInput } from '../utils/contactForm'
 import {
+  CONTACT_LIMITS,
   boundContactInput,
   buildContactEmail,
   isHoneypotTripped,
@@ -100,6 +101,7 @@ function ContactForm(props: {
           type="text"
           autocomplete="name"
           required
+          maxlength={CONTACT_LIMITS.name}
           value={values.name}
           aria-invalid={errors.name ? 'true' : undefined}
           aria-describedby={errors.name ? 'name-error' : undefined}
@@ -122,6 +124,7 @@ function ContactForm(props: {
           type="email"
           autocomplete="email"
           required
+          maxlength={CONTACT_LIMITS.email}
           value={values.email}
           aria-invalid={errors.email ? 'true' : undefined}
           aria-describedby={errors.email ? 'email-error' : undefined}
@@ -143,6 +146,7 @@ function ContactForm(props: {
           name="subject"
           type="text"
           required
+          maxlength={CONTACT_LIMITS.subject}
           value={values.subject}
           aria-invalid={errors.subject ? 'true' : undefined}
           aria-describedby={errors.subject ? 'subject-error' : undefined}
@@ -164,6 +168,7 @@ function ContactForm(props: {
           name="message"
           rows={8}
           required
+          maxlength={CONTACT_LIMITS.message}
           aria-invalid={errors.message ? 'true' : undefined}
           aria-describedby={errors.message ? 'message-error' : undefined}
           class={inputClass}
