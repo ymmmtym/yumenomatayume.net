@@ -10,7 +10,7 @@
     "directory": "./dist"
   },
   // 送信先は検証済みの宛先アドレスに限定します（無料プランでもこの宛先への送信は無料）。
-  // 実運用では app/routes/form.tsx の CONTACT_TO と下記 destination_address を、ご自身の Cloudflare アカウントで検証済みの同じアドレスに変更してください。
+  // 実運用では app/routes/contact.tsx の CONTACT_TO と下記 destination_address を、ご自身の Cloudflare アカウントで検証済みの同じアドレスに変更してください。
   "send_email": [
     {
       "name": "SEND_EMAIL",
