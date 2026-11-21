@@ -121,6 +121,8 @@ watch -n 60 node delete-deployments.mjs
 
 この方法なら、途中でスクリプトが終了しても、次の実行で残っているデプロイの先頭ページから処理を再開できます。
 
+なお、API の `force` はアクティブな alias を持つ**非本番**デプロイの削除を許可するもので、アクティブな本番デプロイを削除するものではありません（[API ドキュメント](https://developers.cloudflare.com/api/resources/pages/subresources/projects/subresources/deployments/methods/delete/)）。そのため、本番デプロイが1件だけ残ると削除に失敗し、`watch` を続けても `done: 0` が繰り返されるだけです。削除件数が増えなくなったら `watch` を `Ctrl+C` で終了し、そのまま次の Wrangler でのプロジェクト削除に進んでください。今回のようにプロジェクトごと削除する場合は、本番デプロイが残っていても問題ありません ⚠️
+
 実際にはコンソールで残件数を確認しながら進め、1時間足らずで完了しました ✅
 
 ただし、これはレート制限に応じて待機時間を調整する仕組みではありません。再利用するなら、HTTP ステータスの確認や `429` に対する待機・再試行を組み込んだ方が、状況を把握しやすくなります。
@@ -130,10 +132,10 @@ watch -n 60 node delete-deployments.mjs
 デプロイ履歴の削除を進めたあと、最後に Wrangler からプロジェクトを削除しました 🚀
 
 ```bash
-npx wrangler pages project delete astro-notion-blog --yes
+npx wrangler pages project delete astro-notion-blog
 ```
 
-`--yes` を付けると確認を省略するため、プロジェクト名は実行前に確認しておきます。実行結果は次のとおりでした。
+プロジェクト名には、スクリプトの `PROJECT` と同じ値を指定します。今回は確認を省略するため `--yes` を付けて実行しましたが、誤削除を防ぐため、再利用する場合は `--yes` を付けずに確認へ進むことをおすすめします。実行結果は次のとおりでした。
 
 ```text
 Deleting astro-notion-blog
