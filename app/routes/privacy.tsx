@@ -105,15 +105,10 @@ export default createRoute((c) =>
       <h2 class={sectionTitle}>10. お問い合わせ先</h2>
       <p class={bodyText}>
         本プライバシーポリシーに関するお問い合わせ、およびご自身の情報の開示・訂正・削除のご請求は、
-        <a href="/form" class={linkClass}>
+        <a href="/contact" class={linkClass}>
           お問い合わせフォーム
         </a>
-        または下記のメールアドレスまでご連絡ください。
-      </p>
-      <p class={bodyText}>
-        <a href="mailto:yumenomatayume@yumenomatayume.net" class={linkClass}>
-          yumenomatayume@yumenomatayume.net
-        </a>
+        よりご連絡ください。
       </p>
 
       <p class="mt-10 text-sm text-gray-500 dark:text-gray-400">制定日: {LAST_UPDATED}</p>
