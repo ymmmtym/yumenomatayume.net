@@ -5,6 +5,7 @@ declare module 'hono' {
     Variables: {}
     Bindings: {
       SEND_EMAIL: SendEmail
+      CONTACT_RATE_LIMITER?: RateLimit
     }
   }
 
