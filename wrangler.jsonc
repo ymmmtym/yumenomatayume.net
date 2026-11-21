@@ -9,6 +9,18 @@
   "assets": {
     "directory": "./dist"
   },
+  // お問い合わせフォームの連続送信を抑止します（IP 単位・1 分あたり 5 回）。
+  // Rate Limiting API はロケーション単位の近似カウントで、period は 10 か 60 秒のみ指定できます。
+  "ratelimits": [
+    {
+      "name": "CONTACT_RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": {
+        "limit": 5,
+        "period": 60
+      }
+    }
+  ],
   // 送信先は検証済みの宛先アドレスに限定します（無料プランでもこの宛先への送信は無料）。
   // 実運用では app/routes/contact.tsx の CONTACT_TO と下記 destination_address を、ご自身の Cloudflare アカウントで検証済みの同じアドレスに変更してください。
   "send_email": [

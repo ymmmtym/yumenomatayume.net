@@ -7,6 +7,7 @@ import {
   isHoneypotTripped,
   validateContactForm
 } from '../utils/contactForm'
+import { isRateLimited, rateLimitKey } from '../utils/rateLimit'
 
 const CONTACT_TO = 'yumenomatayume@yumenomatayume.net'
 const CONTACT_FROM = 'noreply@yumenomatayume.net'
@@ -202,6 +203,18 @@ export const POST = createRoute(async (c) => {
   const mediaType = (c.req.header('content-type') ?? '').split(';')[0].trim().toLowerCase()
   if (mediaType !== 'application/x-www-form-urlencoded' && mediaType !== 'multipart/form-data') {
     return c.text('Unsupported Media Type', 415)
+  }
+
+  const clientIp = c.req.header('cf-connecting-ip')
+  if (await isRateLimited(c.env.CONTACT_RATE_LIMITER, rateLimitKey(c.req.path, clientIp))) {
+    c.status(429)
+    return c.render(
+      <main class="mx-auto max-w-3xl px-4 py-10">
+        <h1 class="mb-6 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50">お問い合わせ</h1>
+        <ContactForm alert="短時間に送信が集中しています。しばらく時間をおいてから、再度お試しください。" />
+      </main>,
+      { title: '送信できませんでした', description: 'お問い合わせの送信を受け付けられませんでした。', noindex: true }
+    )
   }
 
   const declaredLength = Number(c.req.header('content-length') ?? '')
