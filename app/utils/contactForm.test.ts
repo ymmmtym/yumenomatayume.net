@@ -79,6 +79,16 @@ describe('boundContactInput', () => {
     expect(bounded.message.startsWith(' ')).toBe(false)
   })
 
+  test('normalizes CRLF so a newline counts as one character', () => {
+    // 4998 + CRLF(2) + 1 = 5001 chars before normalization, 5000 after.
+    const message = `${'a'.repeat(4998)}\r\nb`
+    expect(validateContactForm({ ...valid, message }).ok).toBe(true)
+    const bounded = boundContactInput({ ...valid, message })
+    expect(bounded.message.length).toBe(5000)
+    expect(bounded.message).toContain('\n')
+    expect(bounded.message).not.toContain('\r')
+  })
+
   test('bounds each field and ignores non-string values', () => {
     const bounded = boundContactInput({
       name: 'a'.repeat(200),

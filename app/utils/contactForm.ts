@@ -32,8 +32,11 @@ export const CONTACT_LIMITS = {
 // separated by dots (so `a@example..com` and `a@b@c.com` are rejected).
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)+$/
 
+// Textarea values arrive with CRLF line endings (HTML form submission
+// normalizes to CRLF), which would count a newline as two characters. Normalize
+// to LF so validation and the bounded redisplay agree with what the user typed.
 const readField = (raw: Record<string, unknown>, key: string): string =>
-  typeof raw[key] === 'string' ? (raw[key] as string).trim() : ''
+  typeof raw[key] === 'string' ? (raw[key] as string).replace(/\r\n?/g, '\n').trim() : ''
 
 // Bound the values echoed back on validation failure so an oversized submission
 // cannot be re-rendered in full. Trim first so the bounds match validation.
