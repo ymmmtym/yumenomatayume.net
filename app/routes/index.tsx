@@ -171,6 +171,11 @@ export default createRoute(async (c) => {
             <div class="mb-1 font-bold text-gray-900 dark:text-gray-100">Cosense</div>
             <div class="text-sm text-gray-600 dark:text-gray-400">@yumenomatayume</div>
           </a>
+          <a href="https://websidian.yumenomatayume.net/" target="_blank" rel="noopener noreferrer" class={cardClass}>
+            <div class="mb-2 text-2xl">🗂️</div>
+            <div class="mb-1 font-bold text-gray-900 dark:text-gray-100">Websidian</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">Obsidian Vault の技術メモ</div>
+          </a>
         </div>
       </section>
     </main>
