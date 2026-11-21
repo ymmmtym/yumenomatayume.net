@@ -199,6 +199,8 @@ export default jsxRenderer(({ children, title, description, heroImage, noindex }
           <p class="mt-2">
             <a href="/feed" class="transition-colors hover:text-brand-600 dark:hover:text-brand-400">RSS</a>
             <span class="mx-2 text-gray-300 dark:text-gray-700">·</span>
+            <a href="/contact" class="transition-colors hover:text-brand-600 dark:hover:text-brand-400">お問い合わせ</a>
+            <span class="mx-2 text-gray-300 dark:text-gray-700">·</span>
             <a
               href="https://github.com/ymmmtym"
               target="_blank"
