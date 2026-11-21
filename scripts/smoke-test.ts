@@ -6,6 +6,7 @@ const PATHS = ["/", "/blog", "/feed", "/sitemap.xml", "/robots.txt"];
 PATHS.push("/contact");
 const READY_TIMEOUT_MS = 60_000;
 const REQUEST_TIMEOUT_MS = 10_000;
+PATHS.push("/privacy");
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
