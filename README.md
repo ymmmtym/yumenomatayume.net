@@ -76,6 +76,22 @@ bun run preview
 bun run deploy
 ```
 
+## Ads
+
+Google AdSense の自動広告を利用しています。読み込みタグは `app/routes/_renderer.tsx` にあります。
+
+以下のページでは広告を読み込みません（薄いページやフォーム、法務ページへの配信はポリシー違反になり得るため）。
+
+| パス | 理由 |
+| --- | --- |
+| `/contact` | お問い合わせフォーム |
+| `/privacy` | プライバシーポリシー |
+| `/form` | `/contact` の旧 URL |
+| `/blog/tag/*` | タグ別の薄い一覧ページ |
+| 404 を含む `noindex` ページ | インデックス対象外のため |
+
+判定は `app/utils/ads.ts` の `isAdExcludedPath` と、各ページの `noindex` 指定で行います。除外対象を変更する場合は `isAdExcludedPath` のパターンを更新してください。
+
 ## Image Upload
 
 `public/images/` に配置された画像を Cloudinary にアップロードし、記事内のリンクを自動で置き換えます。

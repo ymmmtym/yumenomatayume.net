@@ -2,6 +2,7 @@ import { jsxRenderer, useRequestContext } from 'hono/jsx-renderer'
 import { Link, Script } from 'honox/server'
 import Header from '../components/Header'
 import { getBlogPosts } from '../utils/blog'
+import { isAdExcludedPath } from '../utils/ads'
 import searchBodies from 'virtual:search-bodies'
 
 // Search bodies are stripped of frontmatter and HTML at build time (see
@@ -30,6 +31,8 @@ export default jsxRenderer(({ children, title, description, heroImage, noindex }
   const baseUrl = 'https://yumenomatayume.net'
   const currentUrl = `${baseUrl}${c.req.path}`
   const ogImage = heroImage || 'https://img.yumenomatayume.net/og-image.png'
+  // noindex のページ（404・フォーム・法務）と薄い一覧ページでは自動広告を読み込みません。
+  const showAds = !noindex && !isAdExcludedPath(c.req.path)
   
   // 全ページで記事データを取得（検索機能のため）
   const posts = getPosts()
@@ -51,11 +54,13 @@ export default jsxRenderer(({ children, title, description, heroImage, noindex }
         <meta name="twitter:description" content={pageDescription} />
         <meta name="twitter:image" content={ogImage} />
         <meta name="google-adsense-account" content="ca-pub-3641744377792397" />
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3641744377792397"
-          crossOrigin="anonymous"
-        ></script>
+        {showAds && (
+          <script
+            async
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3641744377792397"
+            crossOrigin="anonymous"
+          ></script>
+        )}
         {noindex && <meta name="robots" content="noindex" />}
         <link rel="canonical" href={currentUrl} />
         <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed" />
