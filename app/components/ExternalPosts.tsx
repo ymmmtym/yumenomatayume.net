@@ -1,4 +1,5 @@
 import { parseRSS } from './RSSParser'
+import { parseSitemap, toSitemapPosts } from './SitemapParser'
 import { getBlogPosts } from '../utils/blog'
 
 export interface ExternalPost {
@@ -13,6 +14,7 @@ export interface RSSFeed {
   name: string
   url: string
   icon: string
+  type?: 'rss' | 'sitemap'
 }
 
 interface ExternalPostsResult {
@@ -27,6 +29,8 @@ interface CachedExternalPosts {
 
 const RSS_FEEDS: RSSFeed[] = [
   { name: '個人ブログ', url: 'https://yumenomatayume.net/feed', icon: '📋' },
+  // Quartz の RSS はトップ/タグページのみで日付もビルド時刻のため、sitemap からノートを取得する
+  { name: 'Websidian', url: 'https://websidian.yumenomatayume.net', icon: '🗂', type: 'sitemap' },
   { name: 'Zenn', url: 'https://zenn.dev/ymmmtym/feed', icon: '📝' },
   { name: 'Qiita', url: 'https://qiita.com/yumenomatayume/feed', icon: '📚' },
   { name: 'はてな', url: 'https://ymmmtym.hateblo.jp/feed', icon: '📖' },
@@ -95,11 +99,57 @@ async function writeCache(posts: ExternalPost[]): Promise<void> {
   }
 }
 
+const USER_AGENT = 'Mozilla/5.0 (compatible; yumenomatayume.net RSS Reader)'
+
+async function fetchSitemapPosts(feed: RSSFeed): Promise<ExternalPost[]> {
+  const base = feed.url.replace(/\/+$/, '')
+  const request = (path: string, accept: string) => fetch(`${base}${path}`, {
+    headers: { 'User-Agent': USER_AGENT, 'Accept': accept },
+    signal: AbortSignal.timeout(8000),
+  })
+
+  try {
+    const [sitemapResult, indexResult] = await Promise.allSettled([
+      request('/sitemap.xml', 'application/xml, text/xml, */*'),
+      request('/static/contentIndex.json', 'application/json, */*'),
+    ])
+
+    if (sitemapResult.status !== 'fulfilled' || !sitemapResult.value.ok) {
+      const reason = sitemapResult.status === 'fulfilled' ? sitemapResult.value.status : sitemapResult.reason
+      console.error(`HTTP error for ${feed.name} sitemap: ${reason}`)
+      return []
+    }
+
+    const entries = parseSitemap(await sitemapResult.value.text())
+
+    // contentIndex はタイトル補完用。取得できなくても slug で表示できる
+    let contentIndex: Record<string, { title?: string }> = {}
+    if (indexResult.status === 'fulfilled' && indexResult.value.ok) {
+      try {
+        contentIndex = await indexResult.value.json()
+      } catch {
+        console.warn(`Failed to parse content index for ${feed.name}`)
+      }
+    }
+
+    return toSitemapPosts(entries, contentIndex).map(post => ({
+      ...post,
+      source: feed.name,
+      icon: feed.icon,
+    }))
+  } catch (error) {
+    console.error(`Failed to fetch ${feed.name} sitemap:`, error)
+    return []
+  }
+}
+
 async function fetchFeedPosts(feed: RSSFeed): Promise<ExternalPost[]> {
+  if (feed.type === 'sitemap') return fetchSitemapPosts(feed)
+
   try {
     const response = await fetch(feed.url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; yumenomatayume.net RSS Reader)',
+        'User-Agent': USER_AGENT,
         'Accept': 'application/rss+xml, application/xml, text/xml, */*',
       },
       signal: AbortSignal.timeout(8000),
