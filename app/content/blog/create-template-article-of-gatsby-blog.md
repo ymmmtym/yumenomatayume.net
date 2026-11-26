@@ -1,6 +1,6 @@
 ---
 title: "【Gatsby】 個人ブログ記事のテンプレートファイルを Go 言語で作成する 📝"
-description: ""
+description: "Gatsby ブログの記事テンプレートを Go 言語の CLI で自動生成する仕組みを作りました。markdown を毎回コピーする手間をなくす実装を紹介します。"
 pubDate: "2021-09-07"
 tags: ["go","gatsby","blog"]
 ---

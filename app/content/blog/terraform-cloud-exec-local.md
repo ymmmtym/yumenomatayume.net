@@ -1,6 +1,6 @@
 ---
 title: "terraform cloud で tfstate を管理している時ローカルで terraform を実行する方法 🌍"
-description: ""
+description: "Terraform Cloud で tfstate を管理している構成で、ローカルから terraform plan/apply を実行するためのトークン設定と手順を紹介します。"
 pubDate: "2021-08-30"
 tags: ["terraform","github"]
 ---

@@ -1,6 +1,6 @@
 ---
 title: "Mac に Elasticsearch と Kibana をインストールする 🔍"
-description: ""
+description: "Mac に Elasticsearch と Kibana を公式バイナリからインストールし、起動して動作を確認するまでの手順をまとめました。"
 pubDate: "2021-08-29"
 tags: ["elasticsearch","kibana","mac"]
 heroImage: "https://res.cloudinary.com/yumenomatayume/image/upload/f_auto,q_auto/v1/yumenomatayume.net/elasticsearch-kibana-setup?_a=BAMAMiFE0"

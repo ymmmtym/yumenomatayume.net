@@ -1,4 +1,4 @@
---- 
+---
 title: "Tailscale でいつでもおうち kubernetes に VPN アクセス 🏠"
 description: "Tailscale は複数端末で無料で使える VPN サービスです。そんな Tailscale をおうち k8s にインストールすれば、いつでもどこでもクラスターにアクセスできます。"
 pubDate: "2022-09-14"

@@ -1,11 +1,10 @@
---- 
+---
 title: "Viteって何？使うと何が嬉しいの？実例で理解するモダンビルドツール ⚡"
-description: "Viteを使ってみました。"
+description: "開発サーバーの起動と HMR が速い Vite の特徴を、Webpack との比較や実例を交えて初心者向けに解説します。導入して何が嬉しいのかがつかめます。"
 pubDate: "2024-09-14"
 tags: ["vite", "webpack", "javascript"]
 ---
 
-# 
 こんにちは！今回は、最近のJavaScript開発で話題の「Vite（ヴィート）」について、初心者の方にもわかりやすく解説していきます。
 
 ## Viteとの出会い

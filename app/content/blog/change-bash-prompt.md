@@ -1,6 +1,6 @@
 ---
 title: "Bash でプロンプトを変更する 🎨"
-description: ""
+description: "bash のプロンプトを PS1 変数で変更する方法を、Ubuntu 20.04 の既定値を例に、色付けや表示項目のカスタマイズとあわせて解説します。"
 pubDate: "2021-09-09"
 tags: ["bash","linux"]
 ---

@@ -1,8 +1,8 @@
---- 
+---
 title: "Ansible Role のテストに Molecule をインストールしてみた 🧪"
-description: "Molecule を利用すると、Ansible Role の Lint, Test などが実行できます。CI に Molecure を組み込むことで、さまざまなプラットフォームで再現性の高い Role を開発できます。"
+description: "Molecule を利用すると、Ansible Role の Lint, Test などが実行できます。CI に Molecule を組み込むことで、さまざまなプラットフォームで再現性の高い Role を開発できます。"
 pubDate: "2022-09-11"
-tags: ["molecure", "ansible"]
+tags: ["molecule", "ansible"]
 ---
 
 Ansible roleのテストにMoleculeを導入してみました！
@@ -54,7 +54,7 @@ pip install "molecule[ansible,docker,lint]"
 今回使用した 3 つの引数は以下になります。
 
 - ansible
-  - molecure と同時に ansible をインストールします。
+  - molecule と同時に ansible をインストールします。
   - すでに ansible がインストールされている場合は不要なオプションです。
 - docker
   - テスト環境に docker を使用するためインストールしています。
@@ -197,7 +197,7 @@ molecule init scenario -r my-role
 $ tree molecule/
 molecule/
 └── default
-    └── molecure.yml
+    └── molecule.yml
 
 1 directory, 1 files
 ```

@@ -1,6 +1,6 @@
 ---
 title: "【Python】dict 型で KeyError が発生する時の処理 🐍"
-description: ""
+description: "Python の dict で存在しないキーを参照したときの KeyError を回避する方法を、get メソッドと try/except による例外処理の例とあわせて解説します。"
 pubDate: "2021-09-18"
 tags: ["python","error"]
 ---
