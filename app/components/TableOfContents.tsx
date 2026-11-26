@@ -50,8 +50,13 @@ export function TableOfContents() {
                 tocList.appendChild(li);
               });
 
-              if (tocList.children.length === 0) return;
-              tocContainer.closest('aside').style.display = '';
+              const tocAside = tocContainer.closest('aside');
+              // 見出しが無い記事ではサイドバー自体を出さない（モバイルは常に非表示）。
+              if (tocList.children.length === 0) {
+                if (tocAside) tocAside.classList.remove('lg:block');
+                return;
+              }
+              if (tocAside) tocAside.classList.add('lg:block');
               
               // スクロール位置ベースのアクティブセクション検出
               function updateActiveSection() {

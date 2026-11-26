@@ -1,13 +1,15 @@
 import { createRoute } from 'honox/factory'
 import { getBlogPosts } from '../utils/blog'
-import { resolvePostDate } from '../lib/dateUtils'
+import { resolvePostDate, resolvePubDate } from '../lib/dateUtils'
 
 export default createRoute(async (c) => {
   const posts = getBlogPosts().flatMap(({ slug, module }) => {
     const { title = '', description = '', pubDate = '', updatedDate } = module.frontmatter ?? {}
     // An invalid date would make toISOString() throw and break the whole feed.
     const date = resolvePostDate(pubDate, updatedDate)
-    return date ? [{ slug, title, description, date }] : []
+    // pubDate is the publication date; the resolved date is only a fallback.
+    const published = resolvePubDate(pubDate, updatedDate)
+    return date && published ? [{ slug, title, description, date, published }] : []
   }).sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 20)
 
   const baseUrl = 'https://yumenomatayume.net'
@@ -28,7 +30,7 @@ export default createRoute(async (c) => {
       <description><![CDATA[${post.description || ''}]]></description>
       <link>${baseUrl}/blog/${post.slug}</link>
       <guid>${baseUrl}/blog/${post.slug}</guid>
-      <pubDate>${post.date.toUTCString()}</pubDate>
+      <pubDate>${post.published.toUTCString()}</pubDate>
       <atom:updated>${post.date.toISOString()}</atom:updated>
     </item>`).join('')}
   </channel>

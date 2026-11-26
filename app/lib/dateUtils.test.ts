@@ -1,5 +1,5 @@
 import { afterEach, expect, setSystemTime, test } from 'bun:test'
-import { getUpdateStatus, resolvePostDate } from './dateUtils'
+import { getUpdateStatus, resolvePostDate, resolvePubDate } from './dateUtils'
 
 afterEach(() => setSystemTime())
 
@@ -57,4 +57,16 @@ test('resolvePostDate returns null when no date is valid', () => {
   expect(resolvePostDate('not-a-date')).toBeNull()
   expect(resolvePostDate(undefined, 'not-a-date')).toBeNull()
   expect(resolvePostDate('2026-11-10', 'not-a-date')?.toISOString()).toBe('2026-11-10T00:00:00.000Z')
+})
+
+test('resolvePubDate keeps the publication date when an update is newer', () => {
+  expect(resolvePubDate('2026-11-01', '2026-11-10')?.toISOString()).toBe('2026-11-01T00:00:00.000Z')
+  expect(resolvePubDate('2026-11-10', '2026-11-01')?.toISOString()).toBe('2026-11-10T00:00:00.000Z')
+})
+
+test('resolvePubDate falls back to the update date only when publication is invalid', () => {
+  expect(resolvePubDate('not-a-date', '2026-11-10')?.toISOString()).toBe('2026-11-10T00:00:00.000Z')
+  expect(resolvePubDate('2026-11-01')?.toISOString()).toBe('2026-11-01T00:00:00.000Z')
+  expect(resolvePubDate()).toBeNull()
+  expect(resolvePubDate('', 'not-a-date')).toBeNull()
 })

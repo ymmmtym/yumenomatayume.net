@@ -24,6 +24,13 @@ export function resolvePostDate(pubDate?: string, updatedDate?: string): Date | 
   return pub
 }
 
+/**
+ * RSS の pubDate 用。公開日を優先し、公開日が不正なときだけ更新日で補う。
+ */
+export function resolvePubDate(pubDate?: string, updatedDate?: string): Date | null {
+  return parseDate(pubDate) ?? parseDate(updatedDate)
+}
+
 export function getUpdateStatus(pubDate: string, updatedDate?: string) {
   if (!updatedDate) return { showUpdated: false, isRecent: false }
   const pub = new Date(pubDate)
