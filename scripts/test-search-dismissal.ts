@@ -4,7 +4,7 @@ import Fuse from 'fuse.js'
 import app from '../dist/index.js'
 
 const html = await (await app.fetch(new Request('http://localhost/'))).text()
-const script = html.match(/<script[^>]*>\s*(\(function\(\) \{\s*const posts = [\s\S]*?)<\/script>/)?.[1]
+const script = html.match(/<script[^>]*>\s*(\(function\(\) \{\s*let posts = \[\];[\s\S]*?)<\/script>/)?.[1]
 assert.ok(script, 'SearchBox script should be rendered')
 
 for (const outcome of ['success', 'failure']) {
@@ -80,6 +80,10 @@ for (const outcome of ['success', 'failure']) {
       document, URLSearchParams,
       window: { localStorage: { getItem: () => JSON.stringify(['ansible']), setItem() {} }, location: { search: '' } },
       performance, console: { error() {}, warn() {} }, loadFuseForTest: () => pending,
+      fetch: () => Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve([{ slug: 'ansible', title: 'ansible', description: '', tags: [], pubDate: '', body: 'ansible python module location' }])
+      }),
     })
     listeners.get('focus')!.call(input, {})
     assert.equal(results.getAttribute('role'), 'dialog', 'History uses the dialog popup role')

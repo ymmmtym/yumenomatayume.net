@@ -1,20 +1,6 @@
 import fuseUrl from 'fuse.js/min?url'
 
-interface SearchResult {
-  slug: string
-  title: string
-  description: string
-  tags: string[]
-  pubDate: string
-  body: string
-  updatedDate?: string
-}
-
-interface SearchBoxProps {
-  posts: SearchResult[]
-}
-
-export function SearchBox({ posts }: SearchBoxProps) {
+export function SearchBox() {
   return (
     <div class="relative" id="search-container" role="search">
       <label for="search-input" class="sr-only">記事を検索</label>
@@ -45,7 +31,28 @@ export function SearchBox({ posts }: SearchBoxProps) {
       <script dangerouslySetInnerHTML={{
         __html: `
           (function() {
-            const posts = ${JSON.stringify(posts).replace(/</g, '\\u003c')};
+            let posts = [];
+            let indexPromise = null;
+
+            function loadIndex() {
+              if (!indexPromise) {
+                indexPromise = fetch('/api/search-index')
+                  .then(function(response) {
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    return response.json();
+                  })
+                  .then(function(data) {
+                    posts = Array.isArray(data) ? data : [];
+                    return posts;
+                  })
+                  .catch(function(error) {
+                    indexPromise = null;
+                    throw error;
+                  });
+              }
+              return indexPromise;
+            }
+
             const searchInput = document.getElementById('search-input');
             const searchResults = document.getElementById('search-results');
             const searchContainer = document.getElementById('search-container');
@@ -121,7 +128,8 @@ export function SearchBox({ posts }: SearchBoxProps) {
             function initializeFuse() {
               if (fuse || loadingFuse) return;
               loadingFuse = true;
-              loadFuse().then((Fuse) => {
+              Promise.all([loadFuse(), loadIndex()]).then(function(results) {
+                const Fuse = results[0];
                 fuse = new Fuse(posts, {
                   keys: [
                     { name: 'title', weight: 0.4 },
@@ -138,7 +146,7 @@ export function SearchBox({ posts }: SearchBoxProps) {
                 if (panelOpen) performSearch(searchInput.value);
               }).catch((error) => {
                 loadingFuse = false;
-                console.error('Could not load Fuse.js', error);
+                console.error('Could not load the search index', error);
                 if (!panelOpen) return;
                 const message = document.createElement('span');
                 message.textContent = '検索機能を読み込めませんでした。';
@@ -157,8 +165,6 @@ export function SearchBox({ posts }: SearchBoxProps) {
                 openPanel();
               });
             }
-
-            initializeFuse();
             
             function highlightText(text, indices) {
               if (!indices || indices.length === 0) return escapeHtml(text);

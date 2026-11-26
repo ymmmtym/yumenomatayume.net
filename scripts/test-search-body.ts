@@ -9,10 +9,11 @@ import { prepareSearchBody } from '../app/utils/searchBody'
 const response = await app.fetch(new Request('http://localhost/'))
 assert.equal(response.status, 200)
 const html = await response.text()
-const embedded = html.match(/const posts = (\[.*?\]);\s*const searchInput =/s)
-assert.ok(embedded, 'Search data should be embedded in the page')
+assert.ok(!html.includes('"body":'), 'Search index must not be embedded in the page')
 
-const posts: Array<{ slug: string; body: string }> = JSON.parse(embedded[1])
+const indexResponse = await app.fetch(new Request('http://localhost/api/search-index'))
+assert.equal(indexResponse.status, 200)
+const posts: Array<{ slug: string; body: string }> = await indexResponse.json()
 assert.ok(posts.length > 0, 'Search data should contain articles')
 for (const post of posts) {
   const path = ['md', 'mdx']
