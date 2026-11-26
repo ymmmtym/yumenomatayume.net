@@ -2,6 +2,8 @@ import { expect, test } from 'bun:test'
 import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { parse } from 'yaml'
+import { fromMarkdown } from 'mdast-util-from-markdown'
+import { visit } from 'unist-util-visit'
 
 const BLOG_DIR = join(import.meta.dir, '../content/blog')
 const FILES = readdirSync(BLOG_DIR).filter((name) => /\.mdx?$/.test(name)).sort()
@@ -24,35 +26,21 @@ export interface Heading {
   text: string
 }
 
+function nodeText(node: unknown): string {
+  const current = node as { value?: string; children?: unknown[] }
+  if (typeof current.value === 'string') return current.value
+  return (current.children ?? []).map(nodeText).join('')
+}
+
 /**
- * 見出し行を返す。CommonMark に合わせて、コードブロック内の # は無視し、
- * 閉じフェンスは開始フェンスと同じ文字・同じ長さ以上のみ有効とする。
- * 見出しは最大 3 文字のインデントを許容し、末尾の閉じ # は取り除く。
+ * 見出しを Markdown パーサから取得する。コードブロック（リスト内のフェンスを含む）や
+ * インデント、末尾の閉じ # の扱いは CommonMark の実装に任せる。
  */
 export function headings(body: string): Heading[] {
   const found: Heading[] = []
-  let fence: { char: string; length: number } | null = null
-
-  for (const [index, line] of body.split(/\r?\n/).entries()) {
-    const fenceMatch = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(line)
-    if (fenceMatch) {
-      const char = fenceMatch[1][0]
-      const length = fenceMatch[1].length
-      const rest = fenceMatch[2]
-      if (!fence) {
-        fence = { char, length }
-      } else if (char === fence.char && length >= fence.length && rest.trim() === '') {
-        fence = null
-      }
-      continue
-    }
-    if (fence) continue
-
-    const heading = /^ {0,3}(#{1,6})(?:[ \t]+(.*?))?[ \t]*$/.exec(line)
-    if (!heading) continue
-    const text = (heading[2] ?? '').replace(/(?:^|[ \t]+)#+[ \t]*$/, '').trim()
-    found.push({ line: index + 1, level: heading[1].length, text })
-  }
+  visit(fromMarkdown(body), 'heading', (node) => {
+    found.push({ line: node.position?.start.line ?? 0, level: node.depth, text: nodeText(node).trim() })
+  })
   return found
 }
 
@@ -88,6 +76,11 @@ test('article bodies have no empty headings and no h1', () => {
 
 test('headings ignores fences longer than the closing fence', () => {
   const body = ['````', '```', '# example', '````'].join('\n')
+  expect(headings(body)).toEqual([])
+})
+
+test('headings ignores fenced code inside list items', () => {
+  const body = ['- ```', '  # example', '  ```'].join('\n')
   expect(headings(body)).toEqual([])
 })
 
