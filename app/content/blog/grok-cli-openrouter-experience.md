@@ -117,6 +117,5 @@ LLM の性能自体は悪くありませんが、**CLI ツールとしての使�
 
 ## 参考リンク
 
-- [Grok CLI - Conversational AI CLI Tool](https://grokcli.io/)
 - [GitHub - superagent-ai/grok-cli](https://github.com/superagent-ai/grok-cli)
 - [OpenRouter](https://openrouter.ai/)

@@ -15,12 +15,6 @@ tags: ["easy-notion-blog", "notion", "blog"]
 
 記事の投稿先は主に個人ブログとZennを使い分けています。個人ブログの方はZennに上げるほどでもない雑なメモが多いです。
 
-参考にしているフローはこちら：
-https://zenn.dev/yoshiko/articles/99f187322d8d64
-
-サービスの使い分けについてはこの記事も参考になります：
-https://zenn.dev/daisuke2029/articles/e64627c2f0f295
-
 どちらのブログも記事はGitHubで管理しています。ブラウザ上で文章を編集するのが苦手なのと、CI による校正の自動化を実装したいからです 🛠️
 
 ### notion-blogを試してみた
@@ -42,9 +36,7 @@ https://zenn.dev/daisuke2029/articles/e64627c2f0f295
 
 ### easy-notion-blogとの出会い
 
-notion-blogを本格運用していない状態が続く中で、この記事を見かけました：
-
-https://zenn.dev/otoyo/articles/a6a7b7440b8a4f
+notion-blogを本格運用していない状態が続く中で、easy-notion-blog の紹介記事を見かけました。
 
 notion-blogを作成した時は（Vercelを使ったことがなかったのもあり）多少時間がかかったんですが、この記事に「15分ほどで作成できる」と書いてあったので「ちょっと使ってみよう」という軽い気持ちで始めてみました。
 
@@ -53,16 +45,9 @@ notion-blogを作成した時は（Vercelを使ったことがなかったのも
 ## 参考サイト
 
 - **GitHub Actionsでの変換方法**：Notionページをmarkdown形式に変換する方法もあります
-  https://m-tani.com/2022/01/01/notion-hexo-blog/
 
-- **Demoサイト**：実際の動作を確認できます
-  https://easy-notion-blog.otoyo.me/
-
-- **本家ブログ**：easy-notion-blogのアップデート情報や活用方法
-  https://otoyo.me/
-
-- **参考記事**：実際に使ってみた感想
-  https://www.rasukarusan.com/entry/easy-notion-blog-merit)
+- **本家リポジトリ**：easy-notion-blogのソースコード
+  https://github.com/otoyo/easy-notion-blog
 
 ### 便利なTips 💡
 
@@ -71,8 +56,8 @@ notion-blogを作成した時は（Vercelを使ったことがなかったのも
 ## ブログ設定の更新履歴
 
 本ブログのソースコードは、本家GitHubリポジトリをForkしたものを利用しています。
-本家との差分となるコミットの一覧は、以下のページで確認できます：
+本家リポジトリはこちらです：
 
-https://github.com/otoyo/easy-notion-blog/compare/main...yumenomatayume:easy-notion-blog:main
+https://github.com/otoyo/easy-notion-blog
 
 これからも色々とカスタマイズしていく予定です！🚀

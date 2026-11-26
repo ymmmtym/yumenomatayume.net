@@ -249,7 +249,7 @@ tags: ["kubernetes", "serverless", "cloud", "infrastructure", "aws", "gcp", "azu
 - [Statista - Kubernetes Platforms Usage Global 2024](https://www.statista.com/statistics/1478579/firms-usage-of-kubernetes-platforms-global/)
 - [Statista - Cloud Market Share 2024](https://www.statista.com/chart/18819/worldwide-market-share-of-leading-cloud-infrastructure-service-providers/)
 - [Top 31 Kubernetes Statistics 2024-25](https://unyaml.com/blog/kubernetes-statistics)
-- [Cloud Market Share Analysis 2024](https://holori.com/cloud-market-share-2024-aws-azure-gcp/)
+- [Cloud Market Share Analysis 2024（アーカイブ）](http://web.archive.org/web/20261105174523/https://holori.com/cloud-market-share-2024-aws-azure-gcp/)
 - [Virtual Machine Market Trends 2025-2035](https://www.futuremarketinsights.com/reports/virtual-machine-market)
 - [Serverless Architecture Market Growth 2025](https://www.gminsights.com/industry-analysis/serverless-architecture-market)
 

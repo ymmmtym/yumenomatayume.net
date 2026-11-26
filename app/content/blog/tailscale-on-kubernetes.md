@@ -67,4 +67,5 @@ Mac で tailscale を起動してみます。疎通確認をしてみます。
 
 ## Reference（参考）
 
-https://tailscale.com/blog/kubernetes/
+- tailscale-relay チャート: https://github.com/mvisonneau/helm-charts/tree/main/charts/tailscale-relay
+- Tailscale Kubernetes Operator: https://tailscale.com/kb/1236/kubernetes-operator

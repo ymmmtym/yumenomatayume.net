@@ -36,7 +36,7 @@ CRD を使っていたのでエラーになっているかと思います。
 発生したエラーでは、`ERR  - stdin` とありどこの箇所でエラーが出ているのかが特定できません。
 代わりに sealed-seacrets の Helm Chart で生成される生マニフェストに対して、kubeval を実行します。sealed-secrets のリポジトリを追加していない場合は、以下を実行します。
 ```bash
-helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
+helm repo add sealed-secrets https://bitnami.github.io/sealed-secrets
 ```
 `helm template` コマンドの出力に対して、kubeval を実行します。
 ```bash

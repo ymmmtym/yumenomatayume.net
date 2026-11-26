@@ -29,7 +29,29 @@ kubectl wait -A --for=condition=available deployment --all --timeout=300s
 
 ## 実際の使用例
 
-[manifests/jupyter-notebook](https://github.com/ymmmtym/manifests/tree/main/jupyter-notebook) を使って実際に試してみます 📝
+以下のマニフェストを `jupyter-notebook.yaml` として保存して、実際に試してみます 📝
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jupyter-notebook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jupyter-notebook
+  template:
+    metadata:
+      labels:
+        app: jupyter-notebook
+    spec:
+      containers:
+        - name: jupyter-notebook
+          image: jupyter/base-notebook:latest
+          ports:
+            - containerPort: 8888
+```
 
 `deployment/jupyter-notebook` が available になるまで300秒待つコマンド：
 
@@ -47,7 +69,7 @@ kubectl wait --for=condition=available deployment/jupyter-notebook --timeout=300
 
 2. **別のターミナルで manifest を apply**
    ```bash
-   kubectl apply -f jupyter-notebook/
+   kubectl apply -f jupyter-notebook.yaml
    ```
 
 3. **デプロイメントの状態を確認**

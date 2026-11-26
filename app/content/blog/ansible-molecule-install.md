@@ -7,17 +7,13 @@ tags: ["molecure", "ansible"]
 
 Ansible roleのテストにMoleculeを導入してみました！
 
-https://molecule.readthedocs.io/en/latest/
+https://ansible.readthedocs.io/projects/molecule/
 
 Moleculeとは、ansible roleの開発やテストを支援するツールです 🛠️
 
 これまでLinterとして `ansible-lint`、テストとして `Serverspec` などを使用していたものを、Moleculeだけで管理することができるようになります。
 
-すでに作成済みのroleにも簡単に導入できるため、先日以下のroleにMoleculeを導入しました。GitHub ActionsでMoleculeが動作するようになっています：
-
-https://github.com/yumenomatayume/ansible-role-macos-dev-setup
-
-（こちらはMac開発環境をセットアップするために作成したroleです）
+すでに作成済みのroleにも簡単に導入できるため、先日、Mac の開発環境をセットアップするための自作 role に Molecule を導入しました。GitHub Actions で Molecule が動作するようになっています 🚀
 
 こちらを参考にMoleculeの導入方法をご紹介します 😊
 
@@ -31,7 +27,7 @@ https://github.com/yumenomatayume/ansible-role-macos-dev-setup
 
 ## Molecule のインストール
 
-https://molecule.readthedocs.io/en/latest/installation.html
+https://ansible.readthedocs.io/projects/molecule/installation/
 
 インストールに必要な前提条件は以下の通りです。
 
@@ -211,6 +207,5 @@ molecule/
 
 ## Reference（参考文献）
 
-- [Molecule - Test your Ansible roles](https://molecule.readthedocs.io/en/latest/)
-- [Molecule Installation Guide](https://molecule.readthedocs.io/en/latest/installation.html)
-- [Ansible RoleのテストにMoleculeを導入した話 - Qiita](https://qiita.com/yuuki-m/items/60f78d38b0f80b1e4b9e)
+- [Molecule - Test your Ansible roles](https://ansible.readthedocs.io/projects/molecule/)
+- [Molecule Installation Guide](https://ansible.readthedocs.io/projects/molecule/installation/)

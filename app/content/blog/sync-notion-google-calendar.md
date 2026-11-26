@@ -17,7 +17,7 @@ Notionでタスク管理をしているんですが、カレンダー機能も�
 
 Notionの公式ヘルプを見てみました：
 
-https://www.notion.so/ja-jp/help/calendar-syncing
+https://www.notion.com/ja/help
 
 > NotionカレンダーとGoogle/Apple/Microsoftカレンダーをインテグレーションするには、どうすればよいですか？
 > 弊社API（現在パブリックベータ）を使用して、Notionと外部プラットフォームをインテグレーションできます！
@@ -30,7 +30,7 @@ https://www.notion.so/ja-jp/help/calendar-syncing
 
 調べていたら、まさに探していたツールを発見しました！
 
-https://www.notion.so/product/automations
+https://www.notion.com/connections/2sync
 
 <video src="https://www.youtube.com/watch?v=YvcfiMY5EqM"></video>
 
@@ -65,12 +65,9 @@ https://clickup.com/
 - **タスク管理機能がNotionより充実** ✅
 - **動作が軽快** ⚡
 
-https://boxil.jp/mag/a7505/
+https://clickup.com/features/calendar
 
 ### 🔄 実際に移行してみた感想
-
-この記事も参考になりました：
-https://note.com/yusuke_s/n/nc379895c52ae
 
 実際に使ってみると：
 
@@ -111,9 +108,9 @@ NotionとGoogleカレンダーの連携を調べた結果：
 
 ## 🔗 参考リンク
 
-- [Notion カレンダー同期ヘルプ](https://www.notion.so/ja-jp/help/calendar-syncing)
-- [Notion Automations](https://www.notion.so/product/automations)
+- [Notion ヘルプ](https://www.notion.com/ja/help)
+- [2sync（旧 Notion Automations）](https://www.notion.com/connections/2sync)
 - [ClickUp公式サイト](https://clickup.com/)
-- [ClickUp機能解説記事](https://boxil.jp/mag/a7505/)
+- [ClickUp のカレンダー機能](https://clickup.com/features/calendar)
 
 スケジュール管理、頑張りましょう！ 💪✨

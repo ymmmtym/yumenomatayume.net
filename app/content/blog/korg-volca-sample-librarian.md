@@ -24,7 +24,7 @@ volca sample Librarianをインストールして、以下のことができる�
 
 KORG のサイトから volca sample2 のマニュアル・ソフトウェアをダウンロードします。
 
-https://www.korg.com/jp/products/dj/volca_sample2/download.php
+https://www.korg.com/jp/products/dj/volca_sample2/
 
 必須のソフトウェアは以下の 2 つです。
 
@@ -68,8 +68,4 @@ Applications にドラッグ & ドロップします。
 
 ## 参考
 
-**[@Kurippersynth](https://twitter.com/Kurippersynth?ref_src=twsrc%5Etfw%7Ctwcamp%5Etweetembed%7Ctwterm%5E1148929000191885312&ref_url=http%3A%2F%2Fmarronfieldsproduction.hatenablog.com%2F)** 氏のブログと youtube がとても参考になりました。
-
-http://marronfieldsproduction.hatenablog.com/entry/2019/07/08/210344
-
-http://marronfieldsproduction.hatenablog.com/entry/2019/07/11/200424
+**[@Kurippersynth](https://twitter.com/Kurippersynth?ref_src=twsrc%5Etfw%7Ctwcamp%5Etweetembed%7Ctwterm%5E1148929000191885312&ref_url=http%3A%2F%2Fmarronfieldsproduction.hatenablog.com%2F)** 氏の youtube がとても参考になりました。
