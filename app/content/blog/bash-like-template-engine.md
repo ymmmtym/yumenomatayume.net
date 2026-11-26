@@ -1,6 +1,6 @@
 ---
 title: "【bash】ファイルの変数を展開して出力する方法 📄"
-description: ""
+description: "bash でテンプレートエンジンのように変数を展開してファイルへ出力する方法を、envsubst やシェル芸の実例とあわせて紹介します。"
 pubDate: "2021-09-09"
 tags: ["bash","linux","template"]
 ---

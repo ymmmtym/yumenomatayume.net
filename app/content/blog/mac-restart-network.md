@@ -1,6 +1,6 @@
 ---
 title: "Mac のネットワークを再起動する 🔄"
-description: ""
+description: "Mac でネットワークを再起動する方法を紹介します。ip コマンドで en0 を down/up する手順と、ネットワーク設定をリセットする方法をまとめました。"
 pubDate: "2021-09-11"
 tags: ["mac","network"]
 heroImage: "https://res.cloudinary.com/yumenomatayume/image/upload/f_auto,q_auto/v1/yumenomatayume.net/mac-network-restart?_a=BAMAMiFE0"

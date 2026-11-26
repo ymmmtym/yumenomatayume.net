@@ -1,6 +1,6 @@
 ---
 title: "GitHub の PR や branch を CLI で操作するシェル芸 🚀"
-description: ""
+description: "GitHub CLI とシェル芸で PR をまとめて Close したり、マージ済みブランチを一括削除したりする方法を、bash と fish の実行例つきで紹介します。"
 pubDate: "2021-09-08"
 tags: ["bash","fish","shell","git","github"]
 ---

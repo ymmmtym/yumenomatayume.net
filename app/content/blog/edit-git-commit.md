@@ -1,6 +1,6 @@
 ---
 title: "git commit の削除と編集 🔧"
-description: ""
+description: "git commit を取り消す git reset --soft や、直前のコミットメッセージを編集する git commit --amend など、コミットを削除・編集する方法をまとめます。"
 pubDate: "2021-09-09"
 tags: ["git"]
 ---
