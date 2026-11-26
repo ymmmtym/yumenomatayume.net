@@ -111,6 +111,7 @@ export function SearchBox() {
             }
 
             function closePanel() {
+              announce('');
               searchResults.classList.add('hidden');
               searchInput.setAttribute('aria-expanded', 'false');
               searchInput.removeAttribute('aria-activedescendant');
@@ -148,6 +149,7 @@ export function SearchBox() {
                 loadingFuse = false;
                 console.error('Could not load the search index', error);
                 if (!panelOpen) return;
+                announce('検索機能を読み込めませんでした');
                 const message = document.createElement('span');
                 message.textContent = '検索機能を読み込めませんでした。';
                 const retryButton = document.createElement('button');

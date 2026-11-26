@@ -36,6 +36,7 @@ for (const outcome of ['success', 'failure']) {
       },
       addEventListener: (name: string, fn: any) => listeners.set(name, fn),
     }
+    const status = { textContent: '' }
     const container = {
       contains: () => false,
       addEventListener: (name: string, fn: any) => listeners.set('container:' + name, fn),
@@ -65,7 +66,7 @@ for (const outcome of ['success', 'failure']) {
     const pending = new Promise((yes, no) => { resolve = yes; reject = no })
     const document = {
       activeElement: input as object,
-      getElementById: (id: string) => id === 'search-input' ? input : id === 'search-results' ? results : container,
+      getElementById: (id: string) => id === 'search-input' ? input : id === 'search-results' ? results : id === 'search-status' ? status : container,
       addEventListener: (name: string, fn: any) => listeners.set('document:' + name, fn),
       createElement: () => {
         const element = {
@@ -99,6 +100,7 @@ for (const outcome of ['success', 'failure']) {
     input.value = 'ansible'
     listeners.get('input')!({ target: input })
     assert.ok(results.innerHTML.includes('読み込んでいます'), 'First search should announce the index loading state')
+    assert.ok(status.textContent.includes('読み込んでいます'), 'The loading state should be announced')
     if (dismissal === 'outside') listeners.get('document:click')!({ target: {} })
     if (dismissal === 'history-Escape') {
       // A history button's keydown bubbles to the search container.
@@ -117,6 +119,9 @@ for (const outcome of ['success', 'failure']) {
       assert.equal(input.getAttribute('aria-activedescendant'), undefined, 'Hidden panel must not select an option')
       listeners.get('container:keydown')!({ key: 'Enter' })
       assert.equal(activated, 0, 'Hidden panel must not activate an option')
+    }
+    if (dismissal !== 'none') {
+      assert.equal(status.textContent, '', 'Dismissing should clear the loading announcement')
     }
     if (outcome === 'success') resolve({ default: Fuse })
     else reject(new Error('Simulated loading failure'))
@@ -137,6 +142,7 @@ for (const outcome of ['success', 'failure']) {
       assert.equal(input.getAttribute('aria-activedescendant'), 'search-option-0', 'ArrowDown should select the first option')
     }
     if (outcome === 'failure' && dismissal === 'none') {
+      assert.ok(status.textContent.includes('読み込めませんでした'), 'A load failure should be announced')
       // 再試行で表示が置き換わっても、フォーカスは入力欄に残る
       const retry = results.children.find((node: any) => node.textContent === '再試行')
       assert.ok(retry, 'Retry button should be rendered after a load failure')
