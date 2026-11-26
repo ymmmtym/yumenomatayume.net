@@ -27,8 +27,10 @@ export interface Heading {
 }
 
 function nodeText(node: unknown): string {
-  const current = node as { value?: string; children?: unknown[] }
+  const current = node as { value?: string; alt?: string; children?: unknown[] }
   if (typeof current.value === 'string') return current.value
+  // image / imageReference は alt にしか文字を持たない
+  if (typeof current.alt === 'string') return current.alt
   return (current.children ?? []).map(nodeText).join('')
 }
 
@@ -77,6 +79,13 @@ test('article bodies have no empty headings and no h1', () => {
 test('headings ignores fences longer than the closing fence', () => {
   const body = ['````', '```', '# example', '````'].join('\n')
   expect(headings(body)).toEqual([])
+})
+
+test('headings keeps image alternative text and rejects truly empty headings', () => {
+  expect(headings('## ![Architecture](architecture.png)')).toEqual([
+    { line: 1, level: 2, text: 'Architecture' },
+  ])
+  expect(headings('##')).toEqual([{ line: 1, level: 2, text: '' }])
 })
 
 test('headings ignores fenced code inside list items', () => {
