@@ -293,9 +293,19 @@ export function SearchBox({ posts }: SearchBoxProps) {
             }
 
             searchContainer.addEventListener('keydown', function(e) {
+              // IME 変換中の Enter / 矢印は確定操作を優先する
+              if (e.isComposing || e.keyCode === 229) return;
               const options = getOptions();
               // パネルが閉じているときは不可視の候補を操作しない
               const panelHidden = searchResults.classList.contains('hidden');
+              // dialog（履歴・再試行）では候補ではなく先頭の操作要素へフォーカスを移す
+              if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && !panelHidden && searchResults.getAttribute('role') === 'dialog') {
+                const controls = searchResults.querySelectorAll('button, a[href]');
+                if (controls.length === 0) return;
+                e.preventDefault();
+                controls[0].focus();
+                return;
+              }
               if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
                 if (panelHidden || options.length === 0) return;
                 e.preventDefault();

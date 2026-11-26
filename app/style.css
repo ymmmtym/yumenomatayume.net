@@ -138,6 +138,15 @@ details[open] summary::before {
   background-color: rgba(243, 244, 246, 0.8) !important;
 }
 
+/* キーボードで選択中の検索結果（フォーカスは入力欄に残るため aria-selected で示す） */
+.search-results [role='option'][aria-selected='true'] {
+  background-color: rgba(243, 244, 246, 0.9);
+}
+
+.dark .search-results [role='option'][aria-selected='true'] {
+  background-color: rgba(55, 65, 81, 0.9);
+}
+
 .dark .search-result-item:hover {
   background-color: rgba(55, 65, 81, 0.8) !important;
 }

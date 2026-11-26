@@ -12,6 +12,7 @@ for (const outcome of ['success', 'failure']) {
     const listeners = new Map<string, (event: any) => void>()
     const hidden = new Set(['hidden'])
     let activated = 0
+    let dialogFocused = 0
     const options = Array.from({ length: 3 }, (_, index) => ({
       id: `search-option-${index}`,
       setAttribute() {},
@@ -47,7 +48,11 @@ for (const outcome of ['success', 'failure']) {
       },
       addEventListener() {}, replaceChildren() {},
       // 閉じたパネルにも候補が残っている状況を再現する
-      querySelectorAll: (selector: string) => selector.includes('[role="option"]') ? options : [],
+      querySelectorAll: (selector: string) => {
+        if (selector.includes('[role="option"]')) return options
+        if (selector.includes('a[href]')) return [{ focus: () => { dialogFocused += 1 } }]
+        return []
+      },
     }
     let resolve!: (value: any) => void
     let reject!: (reason: Error) => void
@@ -65,6 +70,8 @@ for (const outcome of ['success', 'failure']) {
     listeners.get('focus')!.call(input, {})
     assert.equal(results.getAttribute('role'), 'dialog', 'History uses the dialog popup role')
     assert.equal(input.getAttribute('aria-haspopup'), 'dialog', 'aria-haspopup must follow the popup role')
+    listeners.get('container:keydown')!({ key: 'ArrowDown', preventDefault() {} })
+    assert.equal(dialogFocused, 1, 'ArrowDown should move focus into the dialog popup')
     input.value = 'ansible'
     listeners.get('input')!({ target: input })
     if (dismissal === 'outside') listeners.get('document:click')!({ target: {} })
@@ -99,6 +106,10 @@ for (const outcome of ['success', 'failure']) {
       assert.equal(results.getAttribute('role'), 'listbox', 'Results use the listbox popup role')
       assert.equal(input.getAttribute('aria-haspopup'), 'listbox', 'aria-haspopup must follow the popup role')
       assert.equal(input.getAttribute('aria-activedescendant'), undefined, 'Rendering must clear the active descendant')
+      listeners.get('container:keydown')!({ key: 'ArrowDown', isComposing: true })
+      assert.equal(input.getAttribute('aria-activedescendant'), undefined, 'IME composition must not move the selection')
+      listeners.get('container:keydown')!({ key: 'ArrowDown', preventDefault() {} })
+      assert.equal(input.getAttribute('aria-activedescendant'), 'search-option-0', 'ArrowDown should select the first option')
     }
   }
 }
