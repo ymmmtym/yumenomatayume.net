@@ -50,7 +50,8 @@ for (const outcome of ['success', 'failure']) {
         remove: (s: string) => hidden.delete(s),
         contains: (s: string) => hidden.has(s),
       },
-      addEventListener() {}, replaceChildren() {},
+      children: [] as any[],
+      addEventListener() {}, replaceChildren(...nodes: any[]) { results.children = nodes },
       // 閉じたパネルにも候補が残っている状況を再現する
       querySelectorAll: (selector: string) => {
         if (selector.includes('[role="option"]')) return options
@@ -66,7 +67,14 @@ for (const outcome of ['success', 'failure']) {
       activeElement: input as object,
       getElementById: (id: string) => id === 'search-input' ? input : id === 'search-results' ? results : container,
       addEventListener: (name: string, fn: any) => listeners.set('document:' + name, fn),
-      createElement: () => ({ addEventListener() {} }),
+      createElement: () => {
+        const element = {
+          textContent: '', className: '', type: '',
+          listeners: {} as Record<string, (event: any) => void>,
+          addEventListener(name: string, fn: any) { element.listeners[name] = fn },
+        }
+        return element
+      },
     }
     runInNewContext(script.replace(/import\('[^']+'\)/, 'loadFuseForTest()'), {
       document, URLSearchParams,
@@ -122,6 +130,14 @@ for (const outcome of ['success', 'failure']) {
       assert.equal(input.getAttribute('aria-activedescendant'), undefined, 'IME composition must not move the selection')
       listeners.get('container:keydown')!({ key: 'ArrowDown', preventDefault() {} })
       assert.equal(input.getAttribute('aria-activedescendant'), 'search-option-0', 'ArrowDown should select the first option')
+    }
+    if (outcome === 'failure' && dismissal === 'none') {
+      // 再試行で表示が置き換わっても、フォーカスは入力欄に残る
+      const retry = results.children.find((node: any) => node.textContent === '再試行')
+      assert.ok(retry, 'Retry button should be rendered after a load failure')
+      document.activeElement = retry as object
+      retry.listeners.click.call(retry, { stopPropagation() {} })
+      assert.equal(document.activeElement, input, 'Retrying should return focus to the input')
     }
   }
 }

@@ -149,6 +149,8 @@ export function SearchBox({ posts }: SearchBoxProps) {
                 retryButton.addEventListener('click', function(event) {
                   event.stopPropagation();
                   initializeFuse();
+                  // 再試行ボタンは読み込み中の表示に置き換わるため、フォーカスを入力欄に戻す
+                  searchInput.focus();
                 });
                 setPopupMode('dialog');
                 searchResults.replaceChildren(message, retryButton);
