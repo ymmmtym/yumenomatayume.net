@@ -166,7 +166,8 @@ export function SearchBox({ posts }: SearchBoxProps) {
             }
             
             function performSearch(query) {
-              if (!query || query.length < 2) {
+              // 1 文字でも検索する（/?q=猫 のように SearchAction から 1 文字が渡るため）
+              if (!query) {
                 if (searchInput === document.activeElement) showSearchHistory();
                 else searchResults.classList.add('hidden');
                 return;
