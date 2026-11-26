@@ -84,4 +84,4 @@ Vagrant 環境で vmdk ファイルが肥大化した場合は、この方法で
 ## 参考文献
 
 - [Vagrantのvmdkファイルが肥大化してたので圧縮したら容量が10分の1になった！ - Qiita](https://qiita.com/RyujiAMANO/items/a904399b7c45d1f0b658)
-- [Bureimono stdio.h: Vagrant とストレージ容量](http://satorumpen.blogspot.com/2014/03/vagrant.html)
+- [Bureimono stdio.h: Vagrant とストレージ容量](http://web.archive.org/web/20150101025558/http://satorumpen.blogspot.com:80/2014/03/vagrant.html)

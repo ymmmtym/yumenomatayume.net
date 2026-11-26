@@ -39,7 +39,6 @@ https://github.com/calpa/gatsby-starter-calpa-blog
 
 https://log.yumenomatayume.net/
 
-https://beta.yumenomatayume.net/
 
 使い始める少し前からブログの下書きを Notion で書くようになっていました。Notion のページをそのままブログ記事にできるという魅力的な仕組みで、長らく愛用していました。外出先でも Notion を操作できるので、気づいた時にいつでもメモとして残せるのが、記事執筆を身近にしてくれたと思っています。
 

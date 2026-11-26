@@ -16,7 +16,7 @@ KubernetesでSecretを安全に管理したくて、SealedSecretsを使う機会
 ```yaml
 repositories:
   - name: sealed-secrets
-    url: https://bitnami-labs.github.io/sealed-secrets
+    url: https://bitnami.github.io/sealed-secrets
 
 templates:
   default: &default

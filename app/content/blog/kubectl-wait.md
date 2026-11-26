@@ -29,7 +29,7 @@ kubectl wait -A --for=condition=available deployment --all --timeout=300s
 
 ## 実際の使用例
 
-[manifests/jupyter-notebook](https://github.com/ymmmtym/manifests/tree/main/jupyter-notebook) を使って実際に試してみます 📝
+[manifests](https://github.com/ymmmtym/manifests) リポジトリのマニフェストを使って実際に試してみます 📝
 
 `deployment/jupyter-notebook` が available になるまで300秒待つコマンド：
 

@@ -18,8 +18,7 @@ tags: ['GitHub Actions', 'OpenHands', 'AI', 'LLM']
 
 OpenHands の公式ドキュメントは以下で確認できます。
 
-- [OpenHands GitHub Action - OpenHands Docs](https://docs.openhands.dev/openhands/usage/run-openhands/github-action)
-- [OpenHands/openhands/resolver/README.md](https://github.com/OpenHands/OpenHands/blob/main/openhands/resolver/README.md)
+- [OpenHands の GitHub 連携 - OpenHands Docs](https://docs.openhands.dev/openhands/usage/cloud/github-installation)
 
 ## 設定手順
 
