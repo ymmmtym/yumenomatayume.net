@@ -98,6 +98,7 @@ for (const outcome of ['success', 'failure']) {
     assert.equal(input.value, 'ansible', 'Accepting a history query should fill the input')
     input.value = 'ansible'
     listeners.get('input')!({ target: input })
+    assert.ok(results.innerHTML.includes('読み込んでいます'), 'First search should announce the index loading state')
     if (dismissal === 'outside') listeners.get('document:click')!({ target: {} })
     if (dismissal === 'history-Escape') {
       // A history button's keydown bubbles to the search container.

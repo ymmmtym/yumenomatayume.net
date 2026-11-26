@@ -230,6 +230,11 @@ export function SearchBox() {
               }
               
               if (!fuse) {
+                // 初回はインデックスの取得を待つため、読み込み中であることを示す
+                setPopupMode('dialog');
+                searchResults.innerHTML = '<div class="m-1 px-4 py-3 text-gray-500 dark:text-gray-400 text-sm">検索インデックスを読み込んでいます…</div>';
+                openPanel();
+                announce('検索インデックスを読み込んでいます');
                 initializeFuse();
                 return;
               }
