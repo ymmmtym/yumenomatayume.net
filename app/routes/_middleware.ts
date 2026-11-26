@@ -1,14 +1,16 @@
 import { createRoute } from 'honox/factory'
 import { isBlockedBot } from '../utils/botFilter'
-import { CSP_REPORT_ONLY, SECURITY_HEADERS } from '../utils/securityHeaders'
+import { applySecurityHeaders } from '../utils/securityHeaders'
 
 export default createRoute(async (c, next) => {
+  const setHeader = (name: string, value: string) => c.header(name, value)
+
+  // ブロックした 403 も含め、すべてのレスポンスに同じヘッダーを付ける
   if (isBlockedBot(c.req.header('user-agent'))) {
+    applySecurityHeaders(setHeader)
     return c.text('Forbidden', 403)
   }
+
   await next()
-  for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
-    c.header(name, value)
-  }
-  c.header('Content-Security-Policy-Report-Only', CSP_REPORT_ONLY)
+  applySecurityHeaders(setHeader)
 })

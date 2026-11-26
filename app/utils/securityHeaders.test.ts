@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { CSP_REPORT_ONLY, SECURITY_HEADERS } from './securityHeaders'
+import { CSP_REPORT_ONLY, SECURITY_HEADERS, applySecurityHeaders } from './securityHeaders'
 
 test('sets the baseline security headers', () => {
   expect(SECURITY_HEADERS).toMatchObject({
@@ -29,4 +29,11 @@ test('CSP report-only policy keeps the third-party origins in use', () => {
   }
   expect(CSP_REPORT_ONLY).toContain("frame-ancestors 'none'")
   expect(CSP_REPORT_ONLY).toContain("object-src 'none'")
+})
+
+test('applySecurityHeaders sets every header including the report-only policy', () => {
+  const applied = new Map<string, string>()
+  applySecurityHeaders((name, value) => applied.set(name, value))
+  for (const [name, value] of Object.entries(SECURITY_HEADERS)) expect(applied.get(name)).toBe(value)
+  expect(applied.get('Content-Security-Policy-Report-Only')).toBe(CSP_REPORT_ONLY)
 })

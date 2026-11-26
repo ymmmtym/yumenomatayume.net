@@ -11,8 +11,19 @@ for (const outcome of ['success', 'failure']) {
   for (const dismissal of ['outside', 'Escape', 'history-Escape', 'none']) {
     const listeners = new Map<string, (event: any) => void>()
     const hidden = new Set(['hidden'])
+    let activated = 0
+    const options = Array.from({ length: 3 }, (_, index) => ({
+      id: `search-option-${index}`,
+      setAttribute() {},
+      scrollIntoView() {},
+      click: () => { activated += 1 },
+    }))
     const input = {
       value: '',
+      attributes: new Map<string, string>(),
+      setAttribute(name: string, value: string) { this.attributes.set(name, value) },
+      getAttribute(name: string) { return this.attributes.get(name) },
+      removeAttribute(name: string) { this.attributes.delete(name) },
       focus() {
         if (document.activeElement === input) return
         document.activeElement = input
@@ -25,8 +36,18 @@ for (const outcome of ['success', 'failure']) {
       addEventListener: (name: string, fn: any) => listeners.set('container:' + name, fn),
     }
     const results = {
-      innerHTML: '', classList: { add: (s: string) => hidden.add(s), remove: (s: string) => hidden.delete(s) },
-      addEventListener() {}, replaceChildren() {}, querySelectorAll: () => [],
+      innerHTML: '',
+      attributes: new Map<string, string>(),
+      setAttribute(name: string, value: string) { this.attributes.set(name, value) },
+      getAttribute(name: string) { return this.attributes.get(name) },
+      classList: {
+        add: (s: string) => hidden.add(s),
+        remove: (s: string) => hidden.delete(s),
+        contains: (s: string) => hidden.has(s),
+      },
+      addEventListener() {}, replaceChildren() {},
+      // 閉じたパネルにも候補が残っている状況を再現する
+      querySelectorAll: (selector: string) => selector.includes('[role="option"]') ? options : [],
     }
     let resolve!: (value: any) => void
     let reject!: (reason: Error) => void
@@ -42,6 +63,8 @@ for (const outcome of ['success', 'failure']) {
       performance, console: { error() {}, warn() {} }, loadFuseForTest: () => pending,
     })
     listeners.get('focus')!.call(input, {})
+    assert.equal(results.getAttribute('role'), 'dialog', 'History uses the dialog popup role')
+    assert.equal(input.getAttribute('aria-haspopup'), 'dialog', 'aria-haspopup must follow the popup role')
     input.value = 'ansible'
     listeners.get('input')!({ target: input })
     if (dismissal === 'outside') listeners.get('document:click')!({ target: {} })
@@ -55,6 +78,13 @@ for (const outcome of ['success', 'failure']) {
       assert.equal(document.activeElement, input, 'Escape should return focus to the input')
       assert.equal(input.value, '', 'Escape should clear the query')
       assert.equal(hidden.has('hidden'), true, 'Escape should hide the panel after focusing the input')
+      assert.equal(input.getAttribute('aria-activedescendant'), undefined, 'Escape should clear the active descendant')
+
+      // パネルが閉じている間は、残っている候補を操作しない
+      listeners.get('container:keydown')!({ key: 'ArrowDown' })
+      assert.equal(input.getAttribute('aria-activedescendant'), undefined, 'Hidden panel must not select an option')
+      listeners.get('container:keydown')!({ key: 'Enter' })
+      assert.equal(activated, 0, 'Hidden panel must not activate an option')
     }
     if (outcome === 'success') resolve({ default: Fuse })
     else reject(new Error('Simulated loading failure'))
@@ -66,6 +96,9 @@ for (const outcome of ['success', 'failure']) {
       listeners.get('focus')!.call(input, {})
       assert.equal(hidden.has('hidden'), false, 'Focus should reuse the initialized index')
       assert.ok(results.innerHTML.includes('/blog/'), 'Refocusing should display search results')
+      assert.equal(results.getAttribute('role'), 'listbox', 'Results use the listbox popup role')
+      assert.equal(input.getAttribute('aria-haspopup'), 'listbox', 'aria-haspopup must follow the popup role')
+      assert.equal(input.getAttribute('aria-activedescendant'), undefined, 'Rendering must clear the active descendant')
     }
   }
 }

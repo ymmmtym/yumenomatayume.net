@@ -26,6 +26,7 @@ export function SearchBox({ posts }: SearchBoxProps) {
           aria-expanded="false"
           aria-controls="search-results"
           aria-autocomplete="list"
+          aria-haspopup="listbox"
           aria-label="記事を検索"
           placeholder="記事を検索... (⌘K / Ctrl+K)"
           class="w-full rounded-lg border border-gray-300 bg-white py-2 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder:text-gray-400"
@@ -88,8 +89,18 @@ export function SearchBox({ posts }: SearchBoxProps) {
 
             function openPanel() {
               activeIndex = -1;
+              searchInput.removeAttribute('aria-activedescendant');
               searchResults.classList.remove('hidden');
               searchInput.setAttribute('aria-expanded', 'true');
+            }
+
+            // combobox のポップアップは listbox / tree / grid / dialog のいずれか。
+            // 履歴やメッセージだけを出すときは dialog にして、listbox と混在させない。
+            function setPopupMode(mode) {
+              const isListbox = mode === 'listbox';
+              searchResults.setAttribute('role', isListbox ? 'listbox' : 'dialog');
+              searchResults.setAttribute('aria-label', isListbox ? '検索結果' : '検索候補');
+              searchInput.setAttribute('aria-haspopup', isListbox ? 'listbox' : 'dialog');
             }
 
             function closePanel() {
@@ -139,6 +150,7 @@ export function SearchBox({ posts }: SearchBoxProps) {
                   event.stopPropagation();
                   initializeFuse();
                 });
+                setPopupMode('dialog');
                 searchResults.replaceChildren(message, retryButton);
                 openPanel();
               });
@@ -176,15 +188,17 @@ export function SearchBox({ posts }: SearchBoxProps) {
                 closePanel();
                 return;
               }
-              searchResults.setAttribute('role', 'list');
+              setPopupMode('dialog');
               searchResults.innerHTML = '<div class="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">最近の検索</div>' +
+                '<ul class="m-0 list-none p-0">' +
                 searchHistory.map(query => {
                   const escapedQuery = escapeHtml(query);
-                  return '<button type="button" class="search-history-item block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm text-gray-700 dark:text-gray-300" data-query="' + escapedQuery + '">' +
+                  return '<li><button type="button" class="search-history-item block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm text-gray-700 dark:text-gray-300" data-query="' + escapedQuery + '">' +
                     '<svg class="w-3 h-3 inline-block mr-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>' +
                     escapedQuery +
-                  '</button>'
-                }).join('');
+                  '</button></li>'
+                }).join('') +
+                '</ul>';
               openPanel();
               
               // Add click handlers for history items
@@ -218,6 +232,7 @@ export function SearchBox({ posts }: SearchBoxProps) {
               saveSearchHistory(query);
               
               if (allResults.length === 0) {
+                setPopupMode('dialog');
                 searchResults.innerHTML = '<div class="m-1 px-4 py-3 text-gray-500 dark:text-gray-400 text-sm">「' + escapeHtml(query) + '」に一致する記事が見つかりませんでした</div>';
                 openPanel();
                 announce('一致する記事が見つかりませんでした');
@@ -226,7 +241,7 @@ export function SearchBox({ posts }: SearchBoxProps) {
               
               const countHtml = '<div class="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">' + allResults.length + '件見つかりました (' + Math.round(endTime - startTime) + 'ms)</div>';
               
-              searchResults.setAttribute('role', 'listbox');
+              setPopupMode('listbox');
               searchResults.innerHTML = countHtml + results.map(({ item, matches }, index) => {
                 let titleHtml = escapeHtml(item.title);
                 let descHtml = escapeHtml(item.description);
@@ -279,8 +294,10 @@ export function SearchBox({ posts }: SearchBoxProps) {
 
             searchContainer.addEventListener('keydown', function(e) {
               const options = getOptions();
+              // パネルが閉じているときは不可視の候補を操作しない
+              const panelHidden = searchResults.classList.contains('hidden');
               if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-                if (options.length === 0) return;
+                if (panelHidden || options.length === 0) return;
                 e.preventDefault();
                 activeIndex = e.key === 'ArrowDown'
                   ? (activeIndex + 1) % options.length
@@ -292,7 +309,7 @@ export function SearchBox({ posts }: SearchBoxProps) {
                 options[activeIndex].scrollIntoView({ block: 'nearest' });
                 return;
               }
-              if (e.key === 'Enter' && activeIndex >= 0 && options[activeIndex]) {
+              if (e.key === 'Enter' && !panelHidden && activeIndex >= 0 && options[activeIndex]) {
                 e.preventDefault();
                 options[activeIndex].click();
                 return;

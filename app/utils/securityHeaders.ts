@@ -23,3 +23,9 @@ export const CSP_REPORT_ONLY = [
   "connect-src 'self' https://*.google.com https://*.googlesyndication.com https://*.doubleclick.net",
   "frame-src 'self' https://*.doubleclick.net https://*.googlesyndication.com https://www.youtube.com https://www.youtube-nocookie.com",
 ].join('; ')
+
+/** レスポンスに共通ヘッダーを付与する。ヘッダーを設定できる任意のコンテキストで使う。 */
+export function applySecurityHeaders(setHeader: (name: string, value: string) => void) {
+  for (const [name, value] of Object.entries(SECURITY_HEADERS)) setHeader(name, value)
+  setHeader('Content-Security-Policy-Report-Only', CSP_REPORT_ONLY)
+}
