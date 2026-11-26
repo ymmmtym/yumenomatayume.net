@@ -13,6 +13,10 @@ for (const outcome of ['success', 'failure']) {
     const hidden = new Set(['hidden'])
     let activated = 0
     let dialogFocused = 0
+    const historyButton = {
+      dataset: { query: 'ansible' },
+      addEventListener: (name: string, fn: any) => listeners.set('history:' + name, fn),
+    }
     const options = Array.from({ length: 3 }, (_, index) => ({
       id: `search-option-${index}`,
       setAttribute() {},
@@ -51,6 +55,7 @@ for (const outcome of ['success', 'failure']) {
       querySelectorAll: (selector: string) => {
         if (selector.includes('[role="option"]')) return options
         if (selector.includes('a[href]')) return [{ focus: () => { dialogFocused += 1 } }]
+        if (selector.includes('search-history-item')) return [historyButton]
         return []
       },
     }
@@ -72,6 +77,12 @@ for (const outcome of ['success', 'failure']) {
     assert.equal(input.getAttribute('aria-haspopup'), 'dialog', 'aria-haspopup must follow the popup role')
     listeners.get('container:keydown')!({ key: 'ArrowDown', preventDefault() {} })
     assert.equal(dialogFocused, 1, 'ArrowDown should move focus into the dialog popup')
+
+    // 履歴を確定したら入力欄にフォーカスが戻り、続けてキーボード操作できる
+    document.activeElement = historyButton as object
+    listeners.get('history:click')!.call(historyButton, { stopPropagation() {} })
+    assert.equal(document.activeElement, input, 'Accepting a history query should return focus to the input')
+    assert.equal(input.value, 'ansible', 'Accepting a history query should fill the input')
     input.value = 'ansible'
     listeners.get('input')!({ target: input })
     if (dismissal === 'outside') listeners.get('document:click')!({ target: {} })

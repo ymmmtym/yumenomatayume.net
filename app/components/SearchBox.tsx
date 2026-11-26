@@ -207,6 +207,8 @@ export function SearchBox({ posts }: SearchBoxProps) {
                   event.stopPropagation();
                   searchInput.value = this.dataset.query;
                   performSearch(this.dataset.query);
+                  // 履歴ボタンは結果の描画で消えるため、フォーカスを入力欄に戻す
+                  searchInput.focus();
                 });
               });
             }
