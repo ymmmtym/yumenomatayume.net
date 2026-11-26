@@ -3,7 +3,7 @@ import type { NotFoundHandler } from 'hono'
 const handler: NotFoundHandler = (c) => {
   c.status(404)
   return c.render(
-    <main class="max-w-3xl mx-auto py-16 px-4 text-center">
+    <main id="main" class="max-w-3xl mx-auto py-16 px-4 text-center">
       <p class="mb-3 text-sm font-semibold text-brand-600 dark:text-brand-300">404 Not Found</p>
       <h1 class="mb-4 text-4xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50">ページが見つかりませんでした</h1>
       <p class="mb-8 text-lg text-gray-700 dark:text-gray-300">

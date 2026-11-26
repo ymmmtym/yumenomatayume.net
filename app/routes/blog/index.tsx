@@ -13,7 +13,7 @@ export default createRoute(async (c) => {
   const allTags = [...new Set(posts.flatMap(post => post.tags || []))].sort()
 
   return c.render(
-    <main class="mx-auto max-w-6xl px-4 py-10">
+    <main id="main" class="mx-auto max-w-6xl px-4 py-10">
       <div class="mb-8">
         <h1 class="text-4xl font-extrabold tracking-tight">Blog</h1>
         <p class="mt-2 text-lg text-gray-500 dark:text-gray-400">{posts.length}件の記事</p>

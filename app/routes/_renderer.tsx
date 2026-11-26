@@ -243,6 +243,12 @@ export default jsxRenderer(({ children, title, description, heroImage, noindex, 
         <Script src="/app/client.ts" async />
       </head>
       <body class="min-h-screen flex flex-col bg-white text-gray-900 antialiased dark:bg-gray-950 dark:text-gray-100">
+        <a
+          href="#main"
+          class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-brand-700 focus:shadow-lg dark:focus:bg-gray-900 dark:focus:text-brand-300"
+        >
+          本文へスキップ
+        </a>
         <Header pathname={c.req.path} posts={posts} />
         <div class="flex-1">{children}</div>
         <footer class="border-t border-gray-200 py-8 px-4 text-center text-sm text-gray-500 dark:border-gray-800 dark:text-gray-400">

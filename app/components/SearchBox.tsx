@@ -16,11 +16,17 @@ interface SearchBoxProps {
 
 export function SearchBox({ posts }: SearchBoxProps) {
   return (
-    <div class="relative" id="search-container">
+    <div class="relative" id="search-container" role="search">
+      <label for="search-input" class="sr-only">記事を検索</label>
       <div class="relative">
         <input
           type="text"
           id="search-input"
+          role="combobox"
+          aria-expanded="false"
+          aria-controls="search-results"
+          aria-autocomplete="list"
+          aria-label="記事を検索"
           placeholder="記事を検索... (⌘K / Ctrl+K)"
           class="w-full rounded-lg border border-gray-300 bg-white py-2 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder:text-gray-400"
           autocomplete="off"
@@ -32,7 +38,8 @@ export function SearchBox({ posts }: SearchBoxProps) {
         </div>
       </div>
 
-      <div id="search-results" class="search-results absolute left-0 right-0 top-full z-50 mt-1 hidden max-h-96 overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-900"></div>
+      <div id="search-results" role="listbox" aria-label="検索結果" class="search-results absolute left-0 right-0 top-full z-50 mt-1 hidden max-h-96 overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-900"></div>
+      <div id="search-status" role="status" aria-live="polite" class="sr-only"></div>
       
       <script dangerouslySetInnerHTML={{
         __html: `
@@ -76,6 +83,30 @@ export function SearchBox({ posts }: SearchBoxProps) {
               console.warn('Could not read search history from localStorage', error);
             }
 
+            let activeIndex = -1;
+            const searchStatus = document.getElementById('search-status');
+
+            function openPanel() {
+              activeIndex = -1;
+              searchResults.classList.remove('hidden');
+              searchInput.setAttribute('aria-expanded', 'true');
+            }
+
+            function closePanel() {
+              searchResults.classList.add('hidden');
+              searchInput.setAttribute('aria-expanded', 'false');
+              searchInput.removeAttribute('aria-activedescendant');
+              activeIndex = -1;
+            }
+
+            function announce(message) {
+              if (searchStatus) searchStatus.textContent = message;
+            }
+
+            function getOptions() {
+              return Array.prototype.slice.call(searchResults.querySelectorAll('[role="option"]'));
+            }
+
             function initializeFuse() {
               if (fuse || loadingFuse) return;
               loadingFuse = true;
@@ -109,7 +140,7 @@ export function SearchBox({ posts }: SearchBoxProps) {
                   initializeFuse();
                 });
                 searchResults.replaceChildren(message, retryButton);
-                searchResults.classList.remove('hidden');
+                openPanel();
               });
             }
 
@@ -142,9 +173,10 @@ export function SearchBox({ posts }: SearchBoxProps) {
             
             function showSearchHistory() {
               if (searchHistory.length === 0) {
-                searchResults.classList.add('hidden');
+                closePanel();
                 return;
               }
+              searchResults.setAttribute('role', 'list');
               searchResults.innerHTML = '<div class="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">最近の検索</div>' +
                 searchHistory.map(query => {
                   const escapedQuery = escapeHtml(query);
@@ -153,7 +185,7 @@ export function SearchBox({ posts }: SearchBoxProps) {
                     escapedQuery +
                   '</button>'
                 }).join('');
-              searchResults.classList.remove('hidden');
+              openPanel();
               
               // Add click handlers for history items
               searchResults.querySelectorAll('button.search-history-item').forEach(item => {
@@ -169,7 +201,7 @@ export function SearchBox({ posts }: SearchBoxProps) {
               // 1 文字でも検索する（/?q=猫 のように SearchAction から 1 文字が渡るため）
               if (!query) {
                 if (searchInput === document.activeElement) showSearchHistory();
-                else searchResults.classList.add('hidden');
+                else closePanel();
                 return;
               }
               
@@ -187,13 +219,15 @@ export function SearchBox({ posts }: SearchBoxProps) {
               
               if (allResults.length === 0) {
                 searchResults.innerHTML = '<div class="m-1 px-4 py-3 text-gray-500 dark:text-gray-400 text-sm">「' + escapeHtml(query) + '」に一致する記事が見つかりませんでした</div>';
-                searchResults.classList.remove('hidden');
+                openPanel();
+                announce('一致する記事が見つかりませんでした');
                 return;
               }
               
               const countHtml = '<div class="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">' + allResults.length + '件見つかりました (' + Math.round(endTime - startTime) + 'ms)</div>';
               
-              searchResults.innerHTML = countHtml + results.map(({ item, matches }) => {
+              searchResults.setAttribute('role', 'listbox');
+              searchResults.innerHTML = countHtml + results.map(({ item, matches }, index) => {
                 let titleHtml = escapeHtml(item.title);
                 let descHtml = escapeHtml(item.description);
                 
@@ -208,7 +242,7 @@ export function SearchBox({ posts }: SearchBoxProps) {
                   });
                 }
                 
-                return '<a href="/blog/' + encodeURIComponent(item.slug || '') + '" class="block m-1 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700 last:border-b-0 focus-visible:outline-2 focus-visible:outline-brand-500 dark:focus-visible:outline-brand-400 focus-visible:outline-offset-2">' +
+                return '<a href="/blog/' + encodeURIComponent(item.slug || '') + '" role="option" aria-selected="false" tabindex="-1" id="search-option-' + index + '" class="block m-1 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700 last:border-b-0 focus-visible:outline-2 focus-visible:outline-brand-500 dark:focus-visible:outline-brand-400 focus-visible:outline-offset-2">' +
                     '<div class="font-medium text-gray-800 dark:text-gray-100 mb-1">' + titleHtml + '</div>' +
                     '<div class="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">' + descHtml + '</div>' +
                     '<div class="flex items-center gap-2">' +
@@ -220,9 +254,10 @@ export function SearchBox({ posts }: SearchBoxProps) {
                   '</a>'
               }).join('');
               
-              searchResults.classList.remove('hidden');
+              openPanel();
+              announce(allResults.length + '件見つかりました');
             }
-            
+
             searchInput.addEventListener('input', function(e) {
               panelOpen = true;
               performSearch(e.target.value);
@@ -243,10 +278,29 @@ export function SearchBox({ posts }: SearchBoxProps) {
             }
 
             searchContainer.addEventListener('keydown', function(e) {
+              const options = getOptions();
+              if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                if (options.length === 0) return;
+                e.preventDefault();
+                activeIndex = e.key === 'ArrowDown'
+                  ? (activeIndex + 1) % options.length
+                  : (activeIndex <= 0 ? options.length - 1 : activeIndex - 1);
+                options.forEach(function(option, index) {
+                  option.setAttribute('aria-selected', index === activeIndex ? 'true' : 'false');
+                });
+                searchInput.setAttribute('aria-activedescendant', options[activeIndex].id);
+                options[activeIndex].scrollIntoView({ block: 'nearest' });
+                return;
+              }
+              if (e.key === 'Enter' && activeIndex >= 0 && options[activeIndex]) {
+                e.preventDefault();
+                options[activeIndex].click();
+                return;
+              }
               if (e.key === 'Escape') {
                 searchInput.focus();
                 panelOpen = false;
-                searchResults.classList.add('hidden');
+                closePanel();
                 searchInput.value = '';
               }
             });
@@ -255,7 +309,7 @@ export function SearchBox({ posts }: SearchBoxProps) {
             document.addEventListener('click', function(e) {
               if (!searchContainer.contains(e.target)) {
                 panelOpen = false;
-                searchResults.classList.add('hidden');
+                closePanel();
               }
             });
             
@@ -263,7 +317,7 @@ export function SearchBox({ posts }: SearchBoxProps) {
             searchResults.addEventListener('click', function(e) {
               if (!e.target.closest('.search-history-item')) {
                 panelOpen = false;
-                searchResults.classList.add('hidden');
+                closePanel();
                 searchInput.value = '';
               }
             });

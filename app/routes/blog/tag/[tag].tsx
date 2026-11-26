@@ -19,7 +19,7 @@ export default createRoute(async (c) => {
   if (posts.length === 0) return c.notFound()
 
   return c.render(
-    <main class="mx-auto max-w-6xl px-4 py-10">
+    <main id="main" class="mx-auto max-w-6xl px-4 py-10">
       <div class="mb-8">
         <a href="/blog" class="text-sm font-medium text-brand-600 no-underline transition-colors hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200">← Blog</a>
         <h1 class="mt-4 text-4xl font-extrabold tracking-tight">Tag: {tag}</h1>

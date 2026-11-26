@@ -10,7 +10,7 @@ export default createRoute(async (c) => {
   const { posts: externalPosts, isFallback } = await fetchExternalPosts(10)
 
   return c.render(
-    <main class="mx-auto max-w-3xl px-4 py-10">
+    <main id="main" class="mx-auto max-w-3xl px-4 py-10">
       <section class="hero-glow relative -mx-4 mb-16 rounded-3xl px-6 py-16 text-center">
         <p class="mb-4 text-xs font-semibold uppercase tracking-[0.3em] text-brand-600 dark:text-brand-300">
           Portfolio
