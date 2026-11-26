@@ -37,6 +37,7 @@ export default createRoute(async (c) => {
 </rss>`
 
   return c.text(rss, 200, {
-    'Content-Type': 'application/rss+xml; charset=utf-8'
+    'Content-Type': 'application/rss+xml; charset=utf-8',
+    'Cache-Control': 'public, max-age=600'
   })
 })

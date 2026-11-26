@@ -10,19 +10,27 @@ export default createRoute(async (c) => {
   })
 
   const baseUrl = 'https://yumenomatayume.net'
-  const now = new Date().toISOString().split('T')[0]
+  // リクエスト時刻を使うと毎日更新に見えるため、最新記事の日付に固定する
+  const latest = posts.reduce<Date | null>((acc, post) => {
+    const updated = new Date(post.updatedDate ?? '')
+    const pub = new Date(post.pubDate ?? '')
+    const candidate = !Number.isNaN(updated.getTime()) && (Number.isNaN(pub.getTime()) || updated > pub) ? updated : pub
+    if (Number.isNaN(candidate.getTime())) return acc
+    return !acc || candidate > acc ? candidate : acc
+  }, null)
+  const latestLastmod = (latest ?? new Date(PRIVACY_LAST_UPDATED)).toISOString()
   
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>${baseUrl}</loc>
-    <lastmod>${now}</lastmod>
+    <lastmod>${latestLastmod}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>${baseUrl}/blog</loc>
-    <lastmod>${now}</lastmod>
+    <lastmod>${latestLastmod}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -42,6 +50,7 @@ export default createRoute(async (c) => {
 </urlset>`
 
   return c.text(sitemap, 200, {
-    'Content-Type': 'application/xml; charset=utf-8'
+    'Content-Type': 'application/xml; charset=utf-8',
+    'Cache-Control': 'public, max-age=3600'
   })
 })

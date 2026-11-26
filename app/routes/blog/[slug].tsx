@@ -258,6 +258,15 @@ export default createRoute(async (c) => {
     </main>
     </div>
     </>,
-    { title: frontmatter.title, description: frontmatter.description, heroImage: frontmatter.heroImage }
+    {
+      title: frontmatter.title,
+      description: frontmatter.description,
+      heroImage: frontmatter.heroImage,
+      article: {
+        pubDate: frontmatter.pubDate,
+        updatedDate: frontmatter.updatedDate,
+        tags: frontmatter.tags,
+      },
+    }
   )
 })
