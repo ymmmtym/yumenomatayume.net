@@ -69,7 +69,8 @@ for (const outcome of ['success', 'failure']) {
       createElement: () => ({ addEventListener() {} }),
     }
     runInNewContext(script.replace(/import\('[^']+'\)/, 'loadFuseForTest()'), {
-      document, window: { localStorage: { getItem: () => JSON.stringify(['ansible']), setItem() {} } },
+      document, URLSearchParams,
+      window: { localStorage: { getItem: () => JSON.stringify(['ansible']), setItem() {} }, location: { search: '' } },
       performance, console: { error() {}, warn() {} }, loadFuseForTest: () => pending,
     })
     listeners.get('focus')!.call(input, {})
