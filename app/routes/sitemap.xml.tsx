@@ -12,11 +12,8 @@ export default createRoute(async (c) => {
   const baseUrl = 'https://yumenomatayume.net'
   // リクエスト時刻を使うと毎日更新に見えるため、最新記事の日付に固定する
   const latest = posts.reduce<Date | null>((acc, post) => {
-    const updated = new Date(post.updatedDate ?? '')
-    const pub = new Date(post.pubDate ?? '')
-    const candidate = !Number.isNaN(updated.getTime()) && (Number.isNaN(pub.getTime()) || updated > pub) ? updated : pub
-    if (Number.isNaN(candidate.getTime())) return acc
-    return !acc || candidate > acc ? candidate : acc
+    if (!post.lastmod) return acc
+    return !acc || post.lastmod > acc ? post.lastmod : acc
   }, null)
   const latestLastmod = (latest ?? new Date(PRIVACY_LAST_UPDATED)).toISOString()
   
