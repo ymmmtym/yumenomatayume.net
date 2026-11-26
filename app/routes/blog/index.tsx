@@ -60,9 +60,9 @@ export default createRoute(async (c) => {
                     </>
                   )
                 })()}
-                {post.readingTime && (
+                {post.readingTime != null && (
                   <span class="text-xs text-gray-500 dark:text-gray-500">
-                    📖 {post.readingTime >= 1 ? `约${post.readingTime}分で読めます` : '1分未満で読めます'}
+                    📖 {post.readingTime >= 1 ? `約${post.readingTime}分で読めます` : '1分未満で読めます'}
                   </span>
                 )}
               </div>

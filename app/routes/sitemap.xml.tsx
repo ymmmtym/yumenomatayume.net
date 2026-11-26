@@ -1,11 +1,12 @@
 import { createRoute } from 'honox/factory'
 import { getBlogPosts } from '../utils/blog'
 import { PRIVACY_LAST_UPDATED } from '../utils/privacy'
+import { resolvePostDate } from '../lib/dateUtils'
 
 export default createRoute(async (c) => {
   const posts = getBlogPosts().map(({ slug, module }) => {
     const { pubDate = '', updatedDate } = module.frontmatter ?? {}
-    return { slug, pubDate, updatedDate }
+    return { slug, lastmod: resolvePostDate(pubDate, updatedDate) }
   })
 
   const baseUrl = 'https://yumenomatayume.net'
@@ -31,18 +32,13 @@ export default createRoute(async (c) => {
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
-  ${posts.map(post => {
-    const pubDate = new Date(post.pubDate ?? '')
-    const updatedDate = new Date(post.updatedDate ?? '')
-    const lastmod = !Number.isNaN(updatedDate.getTime()) &&
-      (Number.isNaN(pubDate.getTime()) || updatedDate > pubDate) ? updatedDate : pubDate
-    return `
+  ${posts.map(post => `
   <url>
     <loc>${baseUrl}/blog/${post.slug}</loc>
-    ${Number.isNaN(lastmod.getTime()) ? '' : `<lastmod>${lastmod.toISOString()}</lastmod>`}
+    ${post.lastmod ? `<lastmod>${post.lastmod.toISOString()}</lastmod>` : ''}
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-  </url>`}).join('')}
+  </url>`).join('')}
 </urlset>`
 
   return c.text(sitemap, 200, {

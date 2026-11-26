@@ -86,7 +86,7 @@ Google AdSense の自動広告を利用しています。読み込みタグは `
 | --- | --- |
 | `/contact` | お問い合わせフォーム |
 | `/privacy` | プライバシーポリシー |
-| `/form` | `/contact` の旧 URL |
+| `/form` | `/contact` の旧 URL（`/contact` へ 301 リダイレクト） |
 | `/blog/tag/*` | タグ別の薄い一覧ページ |
 | 404 を含む `noindex` ページ | インデックス対象外のため |
 
@@ -135,6 +135,9 @@ bun run upload
 - `deploy` - Cloudflare Workers にデプロイ
 - `typecheck` - 型チェック (`tsc --noEmit`)
 - `lint` - Lint (oxlint)
+- `test` - ユニットテスト (`bun test`)
+- `test:smoke` - ビルド済みサイトのスモークテスト
+- `test:search` - 検索機能の E2E テスト（`build` が必要）
 - `upload` - 画像を Cloudinary にアップロード
 
 ## License

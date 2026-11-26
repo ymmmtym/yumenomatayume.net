@@ -8,6 +8,7 @@
     "deploy": "bun run build && wrangler deploy",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint app scripts",
+    "test": "bun test",
     "upload": "bun run scripts/upload-and-replace.ts",
     "test:smoke": "bun run scripts/smoke-test.ts",
     "test:search": "bun run build && bun run scripts/test-search-body.ts && bun run scripts/test-search-dismissal.ts"
