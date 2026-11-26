@@ -18,21 +18,41 @@ function readArticle(name: string): Article {
   return { frontmatter: (parse(match[1]) ?? {}) as Record<string, unknown>, body: match[2] }
 }
 
-/** 見出し行を返す。コードブロック（``` / ~~~）の中は対象外 */
-function headings(body: string): { line: number; level: number; text: string }[] {
-  const found: { line: number; level: number; text: string }[] = []
-  let fence: string | null = null
-  body.split(/\r?\n/).forEach((line, index) => {
-    const fenceMatch = /^\s{0,3}(`{3,}|~{3,})/.exec(line)
+export interface Heading {
+  line: number
+  level: number
+  text: string
+}
+
+/**
+ * 見出し行を返す。CommonMark に合わせて、コードブロック内の # は無視し、
+ * 閉じフェンスは開始フェンスと同じ文字・同じ長さ以上のみ有効とする。
+ * 見出しは最大 3 文字のインデントを許容し、末尾の閉じ # は取り除く。
+ */
+export function headings(body: string): Heading[] {
+  const found: Heading[] = []
+  let fence: { char: string; length: number } | null = null
+
+  for (const [index, line] of body.split(/\r?\n/).entries()) {
+    const fenceMatch = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(line)
     if (fenceMatch) {
-      if (!fence) fence = fenceMatch[1][0]
-      else if (fence === fenceMatch[1][0]) fence = null
-      return
+      const char = fenceMatch[1][0]
+      const length = fenceMatch[1].length
+      const rest = fenceMatch[2]
+      if (!fence) {
+        fence = { char, length }
+      } else if (char === fence.char && length >= fence.length && rest.trim() === '') {
+        fence = null
+      }
+      continue
     }
-    if (fence) return
-    const heading = /^(#{1,6})(?:[ \t]+(.*))?$/.exec(line)
-    if (heading) found.push({ line: index + 1, level: heading[1].length, text: (heading[2] ?? '').trim() })
-  })
+    if (fence) continue
+
+    const heading = /^ {0,3}(#{1,6})(?:[ \t]+(.*?))?[ \t]*$/.exec(line)
+    if (!heading) continue
+    const text = (heading[2] ?? '').replace(/(?:^|[ \t]+)#+[ \t]*$/, '').trim()
+    found.push({ line: index + 1, level: heading[1].length, text })
+  }
   return found
 }
 
@@ -64,4 +84,23 @@ test('article bodies have no empty headings and no h1', () => {
     }
   }
   expect(problems).toEqual([])
+})
+
+test('headings ignores fences longer than the closing fence', () => {
+  const body = ['````', '```', '# example', '````'].join('\n')
+  expect(headings(body)).toEqual([])
+})
+
+test('headings allows indented headings and strips closing hashes', () => {
+  const body = ['  # Extra title', '## ##', '## foo ##', '## C#', '#nope'].join('\n')
+  expect(headings(body)).toEqual([
+    { line: 1, level: 1, text: 'Extra title' },
+    { line: 2, level: 2, text: '' },
+    { line: 3, level: 2, text: 'foo' },
+    { line: 4, level: 2, text: 'C#' },
+  ])
+})
+
+test('headings accepts ordinary non-empty h2 headings', () => {
+  expect(headings('## まとめ')).toEqual([{ line: 1, level: 2, text: 'まとめ' }])
 })

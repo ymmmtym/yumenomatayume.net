@@ -1,6 +1,6 @@
 ---
 title: "[Qwiklabs] Introduction to AWS Lambda（ハンズオン）を実施してみました ⚡"
-description: "Qwiklabs のハンズオン「Introduction to AWS Lambda」を受講した感想と、Lambda 関数の作成から S3・CloudWatch 連携までの学習内容をまとめました。"
+description: "Qwiklabs のハンズオン「Introduction to AWS Lambda」を受講した感想と、S3 トリガーで Lambda を実行し、CloudWatch Logs で結果を確認する流れをまとめました。"
 pubDate: "2021-08-23"
 tags: ["qwiklabs","aws","google","lambda","s3","cloudwatch"]
 heroImage: "https://res.cloudinary.com/yumenomatayume/image/upload/f_auto,q_auto/v1/yumenomatayume.net/aws-lambda-qwiklabs-1?_a=BAMAMiFE0"

@@ -1,6 +1,6 @@
 ---
 title: "[Qwiklabs] Introduction to AWS Identity and Access Management（ハンズオン）を実施してみました 🔐"
-description: "Qwiklabs のハンズオン「Introduction to AWS Identity and Access Management」を受講した感想と、IAM ユーザー・グループ・ロールの学習内容をまとめました。"
+description: "Qwiklabs のハンズオン「Introduction to AWS Identity and Access Management」を受講した感想と、IAM ユーザー・グループ・ポリシーの学習内容をまとめました。"
 pubDate: "2021-08-24"
 tags: ["qwiklabs","aws","google","iam","s3","ec2"]
 heroImage: "https://res.cloudinary.com/yumenomatayume/image/upload/f_auto,q_auto/v1/yumenomatayume.net/aws-iam-qwiklabs-1?_a=BAMAMiFE0"
