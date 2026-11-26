@@ -70,12 +70,14 @@ export function TableOfContents() {
                 
                 document.querySelectorAll('#toc-list a').forEach(a => {
                   a.className = 'block text-sm py-1 px-2 rounded transition-colors text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100';
+                  a.removeAttribute('aria-current');
                 });
                 
                 if (activeHeading) {
                   const link = document.querySelector(\`a[data-heading-id="\${activeHeading.id}"]\`);
                   if (link) {
                     link.className = 'block text-sm py-1 px-2 rounded transition-colors bg-brand-100 dark:bg-brand-500/20 text-brand-700 dark:text-brand-200';
+                    link.setAttribute('aria-current', 'true');
                   }
                 }
               }

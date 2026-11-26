@@ -1,17 +1,14 @@
 import { createRoute } from 'honox/factory'
 import { getBlogPosts } from '../utils/blog'
+import { resolvePostDate } from '../lib/dateUtils'
 
 export default createRoute(async (c) => {
-  const posts = getBlogPosts().map(({ slug, module }) => {
+  const posts = getBlogPosts().flatMap(({ slug, module }) => {
     const { title = '', description = '', pubDate = '', updatedDate } = module.frontmatter ?? {}
     // An invalid date would make toISOString() throw and break the whole feed.
-    const validUpdatedDate = updatedDate && !Number.isNaN(new Date(updatedDate).getTime())
-      ? updatedDate
-      : undefined
-    return { slug, title, description, pubDate, updatedDate: validUpdatedDate }
-  }).sort((a, b) => 
-    new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
-  ).slice(0, 20)
+    const date = resolvePostDate(pubDate, updatedDate)
+    return date ? [{ slug, title, description, date }] : []
+  }).sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 20)
 
   const baseUrl = 'https://yumenomatayume.net'
   const lastBuildDate = new Date().toUTCString()
@@ -31,8 +28,8 @@ export default createRoute(async (c) => {
       <description><![CDATA[${post.description || ''}]]></description>
       <link>${baseUrl}/blog/${post.slug}</link>
       <guid>${baseUrl}/blog/${post.slug}</guid>
-      <pubDate>${new Date(post.pubDate).toUTCString()}</pubDate>
-      <atom:updated>${new Date(post.updatedDate || post.pubDate).toISOString()}</atom:updated>
+      <pubDate>${post.date.toUTCString()}</pubDate>
+      <atom:updated>${post.date.toISOString()}</atom:updated>
     </item>`).join('')}
   </channel>
 </rss>`
