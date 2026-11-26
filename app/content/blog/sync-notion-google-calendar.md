@@ -30,7 +30,7 @@ https://www.notion.com/ja/help
 
 調べていたら、まさに探していたツールを発見しました！
 
-https://www.notion.com/help/database-automations
+https://www.notion.com/connections/2sync
 
 <video src="https://www.youtube.com/watch?v=YvcfiMY5EqM"></video>
 
@@ -65,7 +65,7 @@ https://clickup.com/
 - **タスク管理機能がNotionより充実** ✅
 - **動作が軽快** ⚡
 
-http://web.archive.org/web/20240812223630/https://boxil.jp/mag/a7505/
+https://clickup.com/features/calendar
 
 ### 🔄 実際に移行してみた感想
 
@@ -109,8 +109,8 @@ NotionとGoogleカレンダーの連携を調べた結果：
 ## 🔗 参考リンク
 
 - [Notion ヘルプ](https://www.notion.com/ja/help)
-- [Notion データベースのオートメーション](https://www.notion.com/help/database-automations)
+- [2sync（旧 Notion Automations）](https://www.notion.com/connections/2sync)
 - [ClickUp公式サイト](https://clickup.com/)
-- [ClickUp機能解説記事](http://web.archive.org/web/20240812223630/https://boxil.jp/mag/a7505/)
+- [ClickUp のカレンダー機能](https://clickup.com/features/calendar)
 
 スケジュール管理、頑張りましょう！ 💪✨

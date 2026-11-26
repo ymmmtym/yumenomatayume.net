@@ -45,7 +45,6 @@ notion-blogを作成した時は（Vercelを使ったことがなかったのも
 ## 参考サイト
 
 - **GitHub Actionsでの変換方法**：Notionページをmarkdown形式に変換する方法もあります
-  https://m-tani.com/2022/01/01/notion-hexo-blog/
 
 - **本家リポジトリ**：easy-notion-blogのソースコード
   https://github.com/otoyo/easy-notion-blog
