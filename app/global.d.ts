@@ -17,6 +17,11 @@ declare module 'hono' {
         description?: string
         heroImage?: string
         noindex?: boolean
+        article?: {
+          pubDate?: string
+          updatedDate?: string
+          tags?: string[]
+        }
       }
     ): Response | Promise<Response>
   }

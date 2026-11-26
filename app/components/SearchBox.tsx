@@ -232,6 +232,15 @@ export function SearchBox({ posts }: SearchBoxProps) {
               performSearch(this.value);
             });
             
+            // /?q=... で検索結果を直接開けるようにする（JSON-LD の SearchAction の遷移先）
+            const initialQuery = new URLSearchParams(window.location.search).get('q');
+            if (initialQuery) {
+              searchInput.value = initialQuery;
+              panelOpen = true;
+              performSearch(initialQuery);
+              searchInput.focus();
+            }
+
             searchContainer.addEventListener('keydown', function(e) {
               if (e.key === 'Escape') {
                 searchInput.focus();

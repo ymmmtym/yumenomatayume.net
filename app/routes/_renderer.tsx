@@ -4,6 +4,7 @@ import Header from '../components/Header'
 import { getBlogPosts } from '../utils/blog'
 import { isAdExcludedPath } from '../utils/ads'
 import searchBodies from 'virtual:search-bodies'
+import { buildBlogPosting, buildWebSite, toIsoDate } from '../utils/structuredData'
 
 // Search bodies are stripped of frontmatter and HTML at build time (see
 // vite.config.ts / viteSearchBodies.ts), so this is a cheap lookup rather than
@@ -24,13 +25,41 @@ const getPosts = () => {
   }
 }
 
-export default jsxRenderer(({ children, title, description, heroImage, noindex }) => {
+interface ArticleMeta {
+  pubDate?: string
+  updatedDate?: string
+  tags?: string[]
+}
+
+export default jsxRenderer(({ children, title, description, heroImage, noindex, article }: {
+  children?: unknown
+  title?: string
+  description?: string
+  heroImage?: string
+  noindex?: boolean
+  article?: ArticleMeta
+}) => {
   const c = useRequestContext()
   const pageTitle = title ? `${title} | yumenomatayume` : 'yumenomatayume'
   const pageDescription = description || 'SRE / Infrastructure Engineer'
   const baseUrl = 'https://yumenomatayume.net'
   const currentUrl = `${baseUrl}${c.req.path}`
-  const ogImage = heroImage || 'https://img.yumenomatayume.net/og-image.png'
+  const ogImage = heroImage || `${baseUrl}/og-image.png`
+  const publishedTime = toIsoDate(article?.pubDate)
+  const modifiedTime = toIsoDate(article?.updatedDate)
+  const structuredData = article
+    ? buildBlogPosting({
+        url: currentUrl,
+        title: title ?? pageTitle,
+        description: pageDescription,
+        image: ogImage,
+        pubDate: article.pubDate,
+        updatedDate: article.updatedDate,
+        tags: article.tags,
+      })
+    : c.req.path === '/'
+      ? buildWebSite({ url: baseUrl, description: pageDescription })
+      : null
   // noindex のページ（404・フォーム・法務）と薄い一覧ページでは自動広告を読み込みません。
   const showAds = !noindex && !isAdExcludedPath(c.req.path)
   
@@ -47,8 +76,20 @@ export default jsxRenderer(({ children, title, description, heroImage, noindex }
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={pageDescription} />
         <meta property="og:url" content={currentUrl} />
-        <meta property="og:type" content="website" />
+        <meta property="og:type" content={article ? 'article' : 'website'} />
         <meta property="og:image" content={ogImage} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={pageTitle} />
+        {publishedTime && <meta property="article:published_time" content={publishedTime} />}
+        {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+        {article?.tags?.map((tag) => <meta property="article:tag" content={tag} />)}
+        {structuredData && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }}
+          />
+        )}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={pageTitle} />
         <meta name="twitter:description" content={pageDescription} />
