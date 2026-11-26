@@ -123,7 +123,7 @@ bun run upload
 ├── scripts/             # ユーティリティスクリプト
 │   ├── upload-and-replace.ts
 │   └── upload-single.ts
-├── .claude/skills/      # エージェント向けスキル定義
+├── .agents/skills/      # エージェント向けスキル定義
 └── dist/                # ビルド出力
 ```
 
