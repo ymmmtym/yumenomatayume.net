@@ -4,7 +4,7 @@ import Fuse from 'fuse.js'
 import app from '../dist/index.js'
 
 const html = await (await app.fetch(new Request('http://localhost/'))).text()
-const script = html.match(/<script[^>]*>\s*(\(function\(\) \{\s*const posts = [\s\S]*?)<\/script>/)?.[1]
+const script = html.match(/<script[^>]*>\s*(\(function\(\) \{\s*let posts = \[\];[\s\S]*?)<\/script>/)?.[1]
 assert.ok(script, 'SearchBox script should be rendered')
 
 for (const outcome of ['success', 'failure']) {
@@ -36,6 +36,7 @@ for (const outcome of ['success', 'failure']) {
       },
       addEventListener: (name: string, fn: any) => listeners.set(name, fn),
     }
+    const status = { textContent: '' }
     const container = {
       contains: () => false,
       addEventListener: (name: string, fn: any) => listeners.set('container:' + name, fn),
@@ -65,7 +66,7 @@ for (const outcome of ['success', 'failure']) {
     const pending = new Promise((yes, no) => { resolve = yes; reject = no })
     const document = {
       activeElement: input as object,
-      getElementById: (id: string) => id === 'search-input' ? input : id === 'search-results' ? results : container,
+      getElementById: (id: string) => id === 'search-input' ? input : id === 'search-results' ? results : id === 'search-status' ? status : container,
       addEventListener: (name: string, fn: any) => listeners.set('document:' + name, fn),
       createElement: () => {
         const element = {
@@ -80,6 +81,10 @@ for (const outcome of ['success', 'failure']) {
       document, URLSearchParams,
       window: { localStorage: { getItem: () => JSON.stringify(['ansible']), setItem() {} }, location: { search: '' } },
       performance, console: { error() {}, warn() {} }, loadFuseForTest: () => pending,
+      fetch: () => Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve([{ slug: 'ansible', title: 'ansible', description: '', tags: [], pubDate: '', body: 'ansible python module location' }])
+      }),
     })
     listeners.get('focus')!.call(input, {})
     assert.equal(results.getAttribute('role'), 'dialog', 'History uses the dialog popup role')
@@ -94,6 +99,8 @@ for (const outcome of ['success', 'failure']) {
     assert.equal(input.value, 'ansible', 'Accepting a history query should fill the input')
     input.value = 'ansible'
     listeners.get('input')!({ target: input })
+    assert.ok(results.innerHTML.includes('読み込んでいます'), 'First search should announce the index loading state')
+    assert.ok(status.textContent.includes('読み込んでいます'), 'The loading state should be announced')
     if (dismissal === 'outside') listeners.get('document:click')!({ target: {} })
     if (dismissal === 'history-Escape') {
       // A history button's keydown bubbles to the search container.
@@ -112,6 +119,9 @@ for (const outcome of ['success', 'failure']) {
       assert.equal(input.getAttribute('aria-activedescendant'), undefined, 'Hidden panel must not select an option')
       listeners.get('container:keydown')!({ key: 'Enter' })
       assert.equal(activated, 0, 'Hidden panel must not activate an option')
+    }
+    if (dismissal !== 'none') {
+      assert.equal(status.textContent, '', 'Dismissing should clear the loading announcement')
     }
     if (outcome === 'success') resolve({ default: Fuse })
     else reject(new Error('Simulated loading failure'))
@@ -132,6 +142,7 @@ for (const outcome of ['success', 'failure']) {
       assert.equal(input.getAttribute('aria-activedescendant'), 'search-option-0', 'ArrowDown should select the first option')
     }
     if (outcome === 'failure' && dismissal === 'none') {
+      assert.ok(status.textContent.includes('読み込めませんでした'), 'A load failure should be announced')
       // 再試行で表示が置き換わっても、フォーカスは入力欄に残る
       const retry = results.children.find((node: any) => node.textContent === '再試行')
       assert.ok(retry, 'Retry button should be rendered after a load failure')
@@ -141,4 +152,60 @@ for (const outcome of ['success', 'failure']) {
     }
   }
 }
+// 履歴が無い状態で読み込み中に入力をクリアしても、失敗時にパネルを開き直さない
+{
+  const listeners = new Map<string, (event: any) => void>()
+  const hidden = new Set<string>()
+  const status = { textContent: '' }
+  const input = {
+    value: '',
+    attributes: new Map<string, string>(),
+    setAttribute(name: string, value: string) { this.attributes.set(name, value) },
+    getAttribute(name: string) { return this.attributes.get(name) },
+    removeAttribute(name: string) { this.attributes.delete(name) },
+    focus() {
+      document.activeElement = input
+      listeners.get('focus')!.call(input, {})
+    },
+    addEventListener: (name: string, fn: any) => listeners.set(name, fn),
+  }
+  const results = {
+    innerHTML: '',
+    classList: {
+      add: (s: string) => hidden.add(s),
+      remove: (s: string) => hidden.delete(s),
+      contains: (s: string) => hidden.has(s),
+    },
+    setAttribute() {}, getAttribute() {}, addEventListener() {},
+    replaceChildren() {}, querySelectorAll: () => [],
+  }
+  const document = {
+    activeElement: input as object,
+    getElementById: (id: string) => id === 'search-input' ? input : id === 'search-results' ? results : id === 'search-status' ? status
+      : { contains: () => false, addEventListener: (name: string, fn: any) => listeners.set('container:' + name, fn) },
+    addEventListener: (name: string, fn: any) => listeners.set('document:' + name, fn),
+    createElement: () => ({ addEventListener() {} }),
+  }
+  let reject!: (reason: Error) => void
+  const pending = new Promise((_yes, no) => { reject = no })
+  runInNewContext(script.replace(/import\('[^']+'\)/, 'loadFuseForTest()'), {
+    document, URLSearchParams,
+    window: { localStorage: { getItem: () => null, setItem() {} }, location: { search: '' } },
+    performance, console: { error() {}, warn() {} }, loadFuseForTest: () => pending,
+    fetch: () => Promise.resolve({ ok: true, json: () => Promise.resolve([]) }),
+  })
+  input.focus()
+  assert.equal(hidden.has('hidden'), true, 'An empty query without history keeps the panel closed')
+  input.value = 'ansible'
+  listeners.get('input')!({ target: input })
+  assert.equal(hidden.has('hidden'), false, 'The loading message should open the panel')
+  input.value = ''
+  listeners.get('input')!({ target: input })
+  assert.equal(hidden.has('hidden'), true, 'Clearing the query closes the panel')
+  reject(new Error('Simulated loading failure'))
+  await new Promise(yes => setTimeout(yes, 0))
+  assert.equal(hidden.has('hidden'), true, 'A cleared search must stay closed after a load failure')
+  assert.equal(status.textContent, '', 'A cleared search must not announce a failure')
+}
+
 console.log('Verified delayed success and failure after outside click, Escape from input/history, and no dismissal')

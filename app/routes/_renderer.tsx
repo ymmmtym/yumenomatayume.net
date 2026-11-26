@@ -1,29 +1,8 @@
 import { jsxRenderer, useRequestContext } from 'hono/jsx-renderer'
 import { Link, Script } from 'honox/server'
 import Header from '../components/Header'
-import { getBlogPosts } from '../utils/blog'
 import { isAdExcludedPath } from '../utils/ads'
-import searchBodies from 'virtual:search-bodies'
 import { buildBlogPosting, buildWebSite, toIsoDate } from '../utils/structuredData'
-
-// Search bodies are stripped of frontmatter and HTML at build time (see
-// vite.config.ts / viteSearchBodies.ts), so this is a cheap lookup rather than
-// re-parsing every article's Markdown on each request.
-const getPosts = () => {
-  try {
-    return getBlogPosts().map(({ slug, module }) => ({
-      slug,
-      title: module.frontmatter?.title ?? '',
-      description: module.frontmatter?.description ?? '',
-      tags: module.frontmatter?.tags ?? [],
-      pubDate: module.frontmatter?.pubDate ?? '',
-      body: searchBodies[slug] ?? '',
-      updatedDate: module.frontmatter?.updatedDate || ''
-    }))
-  } catch {
-    return []
-  }
-}
 
 interface ArticleMeta {
   pubDate?: string
@@ -63,8 +42,6 @@ export default jsxRenderer(({ children, title, description, heroImage, noindex, 
   // noindex のページ（404・フォーム・法務）と薄い一覧ページでは自動広告を読み込みません。
   const showAds = !noindex && !isAdExcludedPath(c.req.path)
   
-  // 全ページで記事データを取得（検索機能のため）
-  const posts = getPosts()
   
   return (
     <html lang="ja">
@@ -249,7 +226,7 @@ export default jsxRenderer(({ children, title, description, heroImage, noindex, 
         >
           本文へスキップ
         </a>
-        <Header pathname={c.req.path} posts={posts} />
+        <Header pathname={c.req.path} />
         <div class="flex-1">{children}</div>
         <footer class="border-t border-gray-200 py-8 px-4 text-center text-sm text-gray-500 dark:border-gray-800 dark:text-gray-400">
           <p>&copy; {new Date().getFullYear()} yumenomatayume</p>

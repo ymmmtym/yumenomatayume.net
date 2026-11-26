@@ -2,18 +2,9 @@ import { SearchBox } from './SearchBox'
 
 interface HeaderProps {
   pathname: string
-  posts?: Array<{
-    slug: string
-    title: string
-    description: string
-    tags: string[]
-    pubDate: string
-    body: string
-    updatedDate?: string
-  }>
 }
 
-export default function Header({ pathname, posts = [] }: HeaderProps) {
+export default function Header({ pathname }: HeaderProps) {
   const isHome = pathname === '/'
   const isBlog = pathname.startsWith('/blog')
 
@@ -68,12 +59,9 @@ export default function Header({ pathname, posts = [] }: HeaderProps) {
           </label>
         </div>
 
-        {/* Search is available site-wide. */}
-        {posts.length > 0 && (
-          <div class="mx-auto max-w-md pb-3">
-            <SearchBox posts={posts} />
-          </div>
-        )}
+        <div class="mx-auto max-w-md pb-3">
+          <SearchBox />
+        </div>
       </div>
     </header>
   )
