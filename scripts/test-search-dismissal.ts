@@ -152,4 +152,60 @@ for (const outcome of ['success', 'failure']) {
     }
   }
 }
+// 履歴が無い状態で読み込み中に入力をクリアしても、失敗時にパネルを開き直さない
+{
+  const listeners = new Map<string, (event: any) => void>()
+  const hidden = new Set<string>()
+  const status = { textContent: '' }
+  const input = {
+    value: '',
+    attributes: new Map<string, string>(),
+    setAttribute(name: string, value: string) { this.attributes.set(name, value) },
+    getAttribute(name: string) { return this.attributes.get(name) },
+    removeAttribute(name: string) { this.attributes.delete(name) },
+    focus() {
+      document.activeElement = input
+      listeners.get('focus')!.call(input, {})
+    },
+    addEventListener: (name: string, fn: any) => listeners.set(name, fn),
+  }
+  const results = {
+    innerHTML: '',
+    classList: {
+      add: (s: string) => hidden.add(s),
+      remove: (s: string) => hidden.delete(s),
+      contains: (s: string) => hidden.has(s),
+    },
+    setAttribute() {}, getAttribute() {}, addEventListener() {},
+    replaceChildren() {}, querySelectorAll: () => [],
+  }
+  const document = {
+    activeElement: input as object,
+    getElementById: (id: string) => id === 'search-input' ? input : id === 'search-results' ? results : id === 'search-status' ? status
+      : { contains: () => false, addEventListener: (name: string, fn: any) => listeners.set('container:' + name, fn) },
+    addEventListener: (name: string, fn: any) => listeners.set('document:' + name, fn),
+    createElement: () => ({ addEventListener() {} }),
+  }
+  let reject!: (reason: Error) => void
+  const pending = new Promise((_yes, no) => { reject = no })
+  runInNewContext(script.replace(/import\('[^']+'\)/, 'loadFuseForTest()'), {
+    document, URLSearchParams,
+    window: { localStorage: { getItem: () => null, setItem() {} }, location: { search: '' } },
+    performance, console: { error() {}, warn() {} }, loadFuseForTest: () => pending,
+    fetch: () => Promise.resolve({ ok: true, json: () => Promise.resolve([]) }),
+  })
+  input.focus()
+  assert.equal(hidden.has('hidden'), true, 'An empty query without history keeps the panel closed')
+  input.value = 'ansible'
+  listeners.get('input')!({ target: input })
+  assert.equal(hidden.has('hidden'), false, 'The loading message should open the panel')
+  input.value = ''
+  listeners.get('input')!({ target: input })
+  assert.equal(hidden.has('hidden'), true, 'Clearing the query closes the panel')
+  reject(new Error('Simulated loading failure'))
+  await new Promise(yes => setTimeout(yes, 0))
+  assert.equal(hidden.has('hidden'), true, 'A cleared search must stay closed after a load failure')
+  assert.equal(status.textContent, '', 'A cleared search must not announce a failure')
+}
+
 console.log('Verified delayed success and failure after outside click, Escape from input/history, and no dismissal')
