@@ -11,7 +11,7 @@ const listClass = 'mb-4 list-disc space-y-2 pl-6 leading-relaxed text-gray-700 d
 
 export default createRoute((c) =>
   c.render(
-    <main class="mx-auto max-w-3xl px-4 py-10">
+    <main id="main" class="mx-auto max-w-3xl px-4 py-10">
       <p class="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-brand-600 dark:text-brand-300">
         Legal
       </p>

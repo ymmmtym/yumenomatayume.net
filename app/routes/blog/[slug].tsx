@@ -174,7 +174,7 @@ export default createRoute(async (c) => {
         <aside class="hidden w-64 flex-shrink-0" aria-label="目次">
           <TableOfContents />
         </aside>
-        <main class="flex-1 min-w-0 max-w-3xl mx-auto">
+        <main id="main" class="flex-1 min-w-0 max-w-3xl mx-auto">
       <article>
         {frontmatter.heroImage && (
           <div class="mb-8">

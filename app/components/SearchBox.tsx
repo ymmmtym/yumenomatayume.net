@@ -16,11 +16,18 @@ interface SearchBoxProps {
 
 export function SearchBox({ posts }: SearchBoxProps) {
   return (
-    <div class="relative" id="search-container">
+    <div class="relative" id="search-container" role="search">
+      <label for="search-input" class="sr-only">記事を検索</label>
       <div class="relative">
         <input
           type="text"
           id="search-input"
+          role="combobox"
+          aria-expanded="false"
+          aria-controls="search-results"
+          aria-autocomplete="list"
+          aria-haspopup="listbox"
+          aria-label="記事を検索"
           placeholder="記事を検索... (⌘K / Ctrl+K)"
           class="w-full rounded-lg border border-gray-300 bg-white py-2 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder:text-gray-400"
           autocomplete="off"
@@ -32,7 +39,8 @@ export function SearchBox({ posts }: SearchBoxProps) {
         </div>
       </div>
 
-      <div id="search-results" class="search-results absolute left-0 right-0 top-full z-50 mt-1 hidden max-h-96 overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-900"></div>
+      <div id="search-results" role="listbox" aria-label="検索結果" class="search-results absolute left-0 right-0 top-full z-50 mt-1 hidden max-h-96 overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-900"></div>
+      <div id="search-status" role="status" aria-live="polite" class="sr-only"></div>
       
       <script dangerouslySetInnerHTML={{
         __html: `
@@ -76,6 +84,40 @@ export function SearchBox({ posts }: SearchBoxProps) {
               console.warn('Could not read search history from localStorage', error);
             }
 
+            let activeIndex = -1;
+            const searchStatus = document.getElementById('search-status');
+
+            function openPanel() {
+              activeIndex = -1;
+              searchInput.removeAttribute('aria-activedescendant');
+              searchResults.classList.remove('hidden');
+              searchInput.setAttribute('aria-expanded', 'true');
+            }
+
+            // combobox のポップアップは listbox / tree / grid / dialog のいずれか。
+            // 履歴やメッセージだけを出すときは dialog にして、listbox と混在させない。
+            function setPopupMode(mode) {
+              const isListbox = mode === 'listbox';
+              searchResults.setAttribute('role', isListbox ? 'listbox' : 'dialog');
+              searchResults.setAttribute('aria-label', isListbox ? '検索結果' : '検索候補');
+              searchInput.setAttribute('aria-haspopup', isListbox ? 'listbox' : 'dialog');
+            }
+
+            function closePanel() {
+              searchResults.classList.add('hidden');
+              searchInput.setAttribute('aria-expanded', 'false');
+              searchInput.removeAttribute('aria-activedescendant');
+              activeIndex = -1;
+            }
+
+            function announce(message) {
+              if (searchStatus) searchStatus.textContent = message;
+            }
+
+            function getOptions() {
+              return Array.prototype.slice.call(searchResults.querySelectorAll('[role="option"]'));
+            }
+
             function initializeFuse() {
               if (fuse || loadingFuse) return;
               loadingFuse = true;
@@ -107,9 +149,12 @@ export function SearchBox({ posts }: SearchBoxProps) {
                 retryButton.addEventListener('click', function(event) {
                   event.stopPropagation();
                   initializeFuse();
+                  // 再試行ボタンは読み込み中の表示に置き換わるため、フォーカスを入力欄に戻す
+                  searchInput.focus();
                 });
+                setPopupMode('dialog');
                 searchResults.replaceChildren(message, retryButton);
-                searchResults.classList.remove('hidden');
+                openPanel();
               });
             }
 
@@ -142,18 +187,21 @@ export function SearchBox({ posts }: SearchBoxProps) {
             
             function showSearchHistory() {
               if (searchHistory.length === 0) {
-                searchResults.classList.add('hidden');
+                closePanel();
                 return;
               }
+              setPopupMode('dialog');
               searchResults.innerHTML = '<div class="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">最近の検索</div>' +
+                '<ul class="m-0 list-none p-0">' +
                 searchHistory.map(query => {
                   const escapedQuery = escapeHtml(query);
-                  return '<button type="button" class="search-history-item block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm text-gray-700 dark:text-gray-300" data-query="' + escapedQuery + '">' +
+                  return '<li><button type="button" class="search-history-item block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm text-gray-700 dark:text-gray-300" data-query="' + escapedQuery + '">' +
                     '<svg class="w-3 h-3 inline-block mr-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>' +
                     escapedQuery +
-                  '</button>'
-                }).join('');
-              searchResults.classList.remove('hidden');
+                  '</button></li>'
+                }).join('') +
+                '</ul>';
+              openPanel();
               
               // Add click handlers for history items
               searchResults.querySelectorAll('button.search-history-item').forEach(item => {
@@ -161,6 +209,8 @@ export function SearchBox({ posts }: SearchBoxProps) {
                   event.stopPropagation();
                   searchInput.value = this.dataset.query;
                   performSearch(this.dataset.query);
+                  // 履歴ボタンは結果の描画で消えるため、フォーカスを入力欄に戻す
+                  searchInput.focus();
                 });
               });
             }
@@ -169,7 +219,7 @@ export function SearchBox({ posts }: SearchBoxProps) {
               // 1 文字でも検索する（/?q=猫 のように SearchAction から 1 文字が渡るため）
               if (!query) {
                 if (searchInput === document.activeElement) showSearchHistory();
-                else searchResults.classList.add('hidden');
+                else closePanel();
                 return;
               }
               
@@ -186,14 +236,17 @@ export function SearchBox({ posts }: SearchBoxProps) {
               saveSearchHistory(query);
               
               if (allResults.length === 0) {
+                setPopupMode('dialog');
                 searchResults.innerHTML = '<div class="m-1 px-4 py-3 text-gray-500 dark:text-gray-400 text-sm">「' + escapeHtml(query) + '」に一致する記事が見つかりませんでした</div>';
-                searchResults.classList.remove('hidden');
+                openPanel();
+                announce('一致する記事が見つかりませんでした');
                 return;
               }
               
               const countHtml = '<div class="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">' + allResults.length + '件見つかりました (' + Math.round(endTime - startTime) + 'ms)</div>';
               
-              searchResults.innerHTML = countHtml + results.map(({ item, matches }) => {
+              setPopupMode('listbox');
+              searchResults.innerHTML = countHtml + results.map(({ item, matches }, index) => {
                 let titleHtml = escapeHtml(item.title);
                 let descHtml = escapeHtml(item.description);
                 
@@ -208,7 +261,7 @@ export function SearchBox({ posts }: SearchBoxProps) {
                   });
                 }
                 
-                return '<a href="/blog/' + encodeURIComponent(item.slug || '') + '" class="block m-1 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700 last:border-b-0 focus-visible:outline-2 focus-visible:outline-brand-500 dark:focus-visible:outline-brand-400 focus-visible:outline-offset-2">' +
+                return '<a href="/blog/' + encodeURIComponent(item.slug || '') + '" role="option" aria-selected="false" tabindex="-1" id="search-option-' + index + '" class="block m-1 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700 last:border-b-0 focus-visible:outline-2 focus-visible:outline-brand-500 dark:focus-visible:outline-brand-400 focus-visible:outline-offset-2">' +
                     '<div class="font-medium text-gray-800 dark:text-gray-100 mb-1">' + titleHtml + '</div>' +
                     '<div class="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">' + descHtml + '</div>' +
                     '<div class="flex items-center gap-2">' +
@@ -220,9 +273,10 @@ export function SearchBox({ posts }: SearchBoxProps) {
                   '</a>'
               }).join('');
               
-              searchResults.classList.remove('hidden');
+              openPanel();
+              announce(allResults.length + '件見つかりました');
             }
-            
+
             searchInput.addEventListener('input', function(e) {
               panelOpen = true;
               performSearch(e.target.value);
@@ -243,10 +297,41 @@ export function SearchBox({ posts }: SearchBoxProps) {
             }
 
             searchContainer.addEventListener('keydown', function(e) {
+              // IME 変換中の Enter / 矢印は確定操作を優先する
+              if (e.isComposing || e.keyCode === 229) return;
+              const options = getOptions();
+              // パネルが閉じているときは不可視の候補を操作しない
+              const panelHidden = searchResults.classList.contains('hidden');
+              // dialog（履歴・再試行）では候補ではなく先頭の操作要素へフォーカスを移す
+              if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && !panelHidden && searchResults.getAttribute('role') === 'dialog') {
+                const controls = searchResults.querySelectorAll('button, a[href]');
+                if (controls.length === 0) return;
+                e.preventDefault();
+                controls[0].focus();
+                return;
+              }
+              if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                if (panelHidden || options.length === 0) return;
+                e.preventDefault();
+                activeIndex = e.key === 'ArrowDown'
+                  ? (activeIndex + 1) % options.length
+                  : (activeIndex <= 0 ? options.length - 1 : activeIndex - 1);
+                options.forEach(function(option, index) {
+                  option.setAttribute('aria-selected', index === activeIndex ? 'true' : 'false');
+                });
+                searchInput.setAttribute('aria-activedescendant', options[activeIndex].id);
+                options[activeIndex].scrollIntoView({ block: 'nearest' });
+                return;
+              }
+              if (e.key === 'Enter' && !panelHidden && activeIndex >= 0 && options[activeIndex]) {
+                e.preventDefault();
+                options[activeIndex].click();
+                return;
+              }
               if (e.key === 'Escape') {
                 searchInput.focus();
                 panelOpen = false;
-                searchResults.classList.add('hidden');
+                closePanel();
                 searchInput.value = '';
               }
             });
@@ -255,7 +340,7 @@ export function SearchBox({ posts }: SearchBoxProps) {
             document.addEventListener('click', function(e) {
               if (!searchContainer.contains(e.target)) {
                 panelOpen = false;
-                searchResults.classList.add('hidden');
+                closePanel();
               }
             });
             
@@ -263,7 +348,7 @@ export function SearchBox({ posts }: SearchBoxProps) {
             searchResults.addEventListener('click', function(e) {
               if (!e.target.closest('.search-history-item')) {
                 panelOpen = false;
-                searchResults.classList.add('hidden');
+                closePanel();
                 searchInput.value = '';
               }
             });

@@ -209,7 +209,7 @@ export const POST = createRoute(async (c) => {
   if (await isRateLimited(c.env.CONTACT_RATE_LIMITER, rateLimitKey(c.req.path, clientIp))) {
     c.status(429)
     return c.render(
-      <main class="mx-auto max-w-3xl px-4 py-10">
+      <main id="main" class="mx-auto max-w-3xl px-4 py-10">
         <h1 class="mb-6 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50">お問い合わせ</h1>
         <ContactForm alert="短時間に送信が集中しています。しばらく時間をおいてから、再度お試しください。" />
       </main>,
@@ -250,7 +250,7 @@ export const POST = createRoute(async (c) => {
   // Silently accept honeypot hits so bots do not learn they were blocked.
   if (isHoneypotTripped(raw)) {
     return c.render(
-      <main class="mx-auto max-w-3xl px-4 py-10">
+      <main id="main" class="mx-auto max-w-3xl px-4 py-10">
         <ContactForm sent />
       </main>,
       { title: '送信完了', description: 'お問い合わせを送信しました。', noindex: true }
@@ -260,7 +260,7 @@ export const POST = createRoute(async (c) => {
   const result = validateContactForm(raw)
   if (!result.ok) {
     return c.render(
-      <main class="mx-auto max-w-3xl px-4 py-10">
+      <main id="main" class="mx-auto max-w-3xl px-4 py-10">
         <h1 class="mb-6 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50">お問い合わせ</h1>
         <ContactForm values={boundContactInput(raw)} errors={result.errors} />
       </main>,
@@ -282,7 +282,7 @@ export const POST = createRoute(async (c) => {
   } catch (error) {
     console.error('Failed to send contact form email:', error)
     return c.render(
-      <main class="mx-auto max-w-3xl px-4 py-10">
+      <main id="main" class="mx-auto max-w-3xl px-4 py-10">
         <h1 class="mb-6 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50">お問い合わせ</h1>
         <ContactForm
           values={result.value}
@@ -294,7 +294,7 @@ export const POST = createRoute(async (c) => {
   }
 
   return c.render(
-    <main class="mx-auto max-w-3xl px-4 py-10">
+    <main id="main" class="mx-auto max-w-3xl px-4 py-10">
       <ContactForm sent />
     </main>,
     { title: '送信完了', description: 'お問い合わせを送信しました。', noindex: true }
@@ -303,7 +303,7 @@ export const POST = createRoute(async (c) => {
 
 export default createRoute((c) =>
   c.render(
-    <main class="mx-auto max-w-3xl px-4 py-10">
+    <main id="main" class="mx-auto max-w-3xl px-4 py-10">
       <p class="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-brand-600 dark:text-brand-300">
         Contact
       </p>

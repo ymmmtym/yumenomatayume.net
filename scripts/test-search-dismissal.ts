@@ -11,8 +11,24 @@ for (const outcome of ['success', 'failure']) {
   for (const dismissal of ['outside', 'Escape', 'history-Escape', 'none']) {
     const listeners = new Map<string, (event: any) => void>()
     const hidden = new Set(['hidden'])
+    let activated = 0
+    let dialogFocused = 0
+    const historyButton = {
+      dataset: { query: 'ansible' },
+      addEventListener: (name: string, fn: any) => listeners.set('history:' + name, fn),
+    }
+    const options = Array.from({ length: 3 }, (_, index) => ({
+      id: `search-option-${index}`,
+      setAttribute() {},
+      scrollIntoView() {},
+      click: () => { activated += 1 },
+    }))
     const input = {
       value: '',
+      attributes: new Map<string, string>(),
+      setAttribute(name: string, value: string) { this.attributes.set(name, value) },
+      getAttribute(name: string) { return this.attributes.get(name) },
+      removeAttribute(name: string) { this.attributes.delete(name) },
       focus() {
         if (document.activeElement === input) return
         document.activeElement = input
@@ -25,8 +41,24 @@ for (const outcome of ['success', 'failure']) {
       addEventListener: (name: string, fn: any) => listeners.set('container:' + name, fn),
     }
     const results = {
-      innerHTML: '', classList: { add: (s: string) => hidden.add(s), remove: (s: string) => hidden.delete(s) },
-      addEventListener() {}, replaceChildren() {}, querySelectorAll: () => [],
+      innerHTML: '',
+      attributes: new Map<string, string>(),
+      setAttribute(name: string, value: string) { this.attributes.set(name, value) },
+      getAttribute(name: string) { return this.attributes.get(name) },
+      classList: {
+        add: (s: string) => hidden.add(s),
+        remove: (s: string) => hidden.delete(s),
+        contains: (s: string) => hidden.has(s),
+      },
+      children: [] as any[],
+      addEventListener() {}, replaceChildren(...nodes: any[]) { results.children = nodes },
+      // 閉じたパネルにも候補が残っている状況を再現する
+      querySelectorAll: (selector: string) => {
+        if (selector.includes('[role="option"]')) return options
+        if (selector.includes('a[href]')) return [{ focus: () => { dialogFocused += 1 } }]
+        if (selector.includes('search-history-item')) return [historyButton]
+        return []
+      },
     }
     let resolve!: (value: any) => void
     let reject!: (reason: Error) => void
@@ -35,13 +67,31 @@ for (const outcome of ['success', 'failure']) {
       activeElement: input as object,
       getElementById: (id: string) => id === 'search-input' ? input : id === 'search-results' ? results : container,
       addEventListener: (name: string, fn: any) => listeners.set('document:' + name, fn),
-      createElement: () => ({ addEventListener() {} }),
+      createElement: () => {
+        const element = {
+          textContent: '', className: '', type: '',
+          listeners: {} as Record<string, (event: any) => void>,
+          addEventListener(name: string, fn: any) { element.listeners[name] = fn },
+        }
+        return element
+      },
     }
     runInNewContext(script.replace(/import\('[^']+'\)/, 'loadFuseForTest()'), {
-      document, window: { localStorage: { getItem: () => JSON.stringify(['ansible']), setItem() {} } },
+      document, URLSearchParams,
+      window: { localStorage: { getItem: () => JSON.stringify(['ansible']), setItem() {} }, location: { search: '' } },
       performance, console: { error() {}, warn() {} }, loadFuseForTest: () => pending,
     })
     listeners.get('focus')!.call(input, {})
+    assert.equal(results.getAttribute('role'), 'dialog', 'History uses the dialog popup role')
+    assert.equal(input.getAttribute('aria-haspopup'), 'dialog', 'aria-haspopup must follow the popup role')
+    listeners.get('container:keydown')!({ key: 'ArrowDown', preventDefault() {} })
+    assert.equal(dialogFocused, 1, 'ArrowDown should move focus into the dialog popup')
+
+    // 履歴を確定したら入力欄にフォーカスが戻り、続けてキーボード操作できる
+    document.activeElement = historyButton as object
+    listeners.get('history:click')!.call(historyButton, { stopPropagation() {} })
+    assert.equal(document.activeElement, input, 'Accepting a history query should return focus to the input')
+    assert.equal(input.value, 'ansible', 'Accepting a history query should fill the input')
     input.value = 'ansible'
     listeners.get('input')!({ target: input })
     if (dismissal === 'outside') listeners.get('document:click')!({ target: {} })
@@ -55,6 +105,13 @@ for (const outcome of ['success', 'failure']) {
       assert.equal(document.activeElement, input, 'Escape should return focus to the input')
       assert.equal(input.value, '', 'Escape should clear the query')
       assert.equal(hidden.has('hidden'), true, 'Escape should hide the panel after focusing the input')
+      assert.equal(input.getAttribute('aria-activedescendant'), undefined, 'Escape should clear the active descendant')
+
+      // パネルが閉じている間は、残っている候補を操作しない
+      listeners.get('container:keydown')!({ key: 'ArrowDown' })
+      assert.equal(input.getAttribute('aria-activedescendant'), undefined, 'Hidden panel must not select an option')
+      listeners.get('container:keydown')!({ key: 'Enter' })
+      assert.equal(activated, 0, 'Hidden panel must not activate an option')
     }
     if (outcome === 'success') resolve({ default: Fuse })
     else reject(new Error('Simulated loading failure'))
@@ -66,6 +123,21 @@ for (const outcome of ['success', 'failure']) {
       listeners.get('focus')!.call(input, {})
       assert.equal(hidden.has('hidden'), false, 'Focus should reuse the initialized index')
       assert.ok(results.innerHTML.includes('/blog/'), 'Refocusing should display search results')
+      assert.equal(results.getAttribute('role'), 'listbox', 'Results use the listbox popup role')
+      assert.equal(input.getAttribute('aria-haspopup'), 'listbox', 'aria-haspopup must follow the popup role')
+      assert.equal(input.getAttribute('aria-activedescendant'), undefined, 'Rendering must clear the active descendant')
+      listeners.get('container:keydown')!({ key: 'ArrowDown', isComposing: true })
+      assert.equal(input.getAttribute('aria-activedescendant'), undefined, 'IME composition must not move the selection')
+      listeners.get('container:keydown')!({ key: 'ArrowDown', preventDefault() {} })
+      assert.equal(input.getAttribute('aria-activedescendant'), 'search-option-0', 'ArrowDown should select the first option')
+    }
+    if (outcome === 'failure' && dismissal === 'none') {
+      // 再試行で表示が置き換わっても、フォーカスは入力欄に残る
+      const retry = results.children.find((node: any) => node.textContent === '再試行')
+      assert.ok(retry, 'Retry button should be rendered after a load failure')
+      document.activeElement = retry as object
+      retry.listeners.click.call(retry, { stopPropagation() {} })
+      assert.equal(document.activeElement, input, 'Retrying should return focus to the input')
     }
   }
 }
