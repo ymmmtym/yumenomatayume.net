@@ -11,7 +11,7 @@ import { remarkLinkCard } from './app/utils/remarkLinkCard.ts'
 import { remarkReadingTime } from './app/utils/remarkReadingTime.ts'
 import { searchBodiesPlugin } from './app/utils/viteSearchBodies.ts'
 import { fileURLToPath } from 'node:url'
-import { defineConfig } from 'vite'
+import { defineConfig, type TransformResult } from 'vite'
 
 const mdxPlugin = mdx({
   jsxImportSource: 'hono/jsx',
@@ -38,10 +38,11 @@ export default defineConfig({
     searchBodiesPlugin(fileURLToPath(new URL('./app/content/blog', import.meta.url))),
     {
       ...mdxPlugin,
-      transform(code, id) {
+      async transform(code, id) {
         // Let Vite's raw imports return article text instead of compiling it as MDX.
         if (new URLSearchParams(id.split('?')[1]).has('raw')) return
-        return mdxPlugin.transform(code, id)
+        // @mdx-js/rollup is typed against rollup, whose sourcemap types differ from Vite 8's rolldown types.
+        return (await mdxPlugin.transform!(code, id)) as TransformResult
       }
     },
     build()
