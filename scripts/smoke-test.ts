@@ -26,6 +26,7 @@ const SECURITY_HEADERS = [
   "Strict-Transport-Security",
   "Content-Security-Policy-Report-Only",
 ];
+const ASSET_CACHE_DIRECTIVES = ["public", "max-age=31536000", "immutable"];
 const BOT_USER_AGENT = "GPTBot/1.0";
 const READY_TIMEOUT_MS = 60_000;
 const REQUEST_TIMEOUT_MS = 10_000;
@@ -142,10 +143,15 @@ async function main() {
         const res = await fetchWithTimeout(`${BASE_URL}${assetPath}`);
         const cacheControl = res.headers.get("Cache-Control") ?? "";
         const nosniff = res.headers.get("X-Content-Type-Options");
+        const missingDirectives = ASSET_CACHE_DIRECTIVES.filter(
+          (directive) => !cacheControl.includes(directive),
+        );
         if (res.status !== 200) {
           failures.push({ path: assetPath, status: res.status });
-        } else if (!cacheControl.includes("immutable")) {
-          failures.push({ path: `${assetPath}: Cache-Control is "${cacheControl}"` });
+        } else if (missingDirectives.length > 0) {
+          failures.push({
+            path: `${assetPath}: Cache-Control "${cacheControl}" is missing ${missingDirectives.join(", ")}`,
+          });
         } else if (nosniff !== "nosniff") {
           failures.push({ path: `${assetPath}: X-Content-Type-Options is "${nosniff}"` });
         } else {
