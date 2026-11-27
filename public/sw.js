@@ -2,7 +2,10 @@ const VERSION = 'v1'
 const STATIC_CACHE = `static-${VERSION}`
 const PAGE_CACHE = `pages-${VERSION}`
 const OFFLINE_URL = '/offline'
-const PRECACHE_URLS = ['/', OFFLINE_URL, '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png']
+// オフライン表示に必須のものと、失敗しても致命的でないもの
+const PRECACHE_REQUIRED = [OFFLINE_URL]
+const PRECACHE_OPTIONAL = ['/', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png']
+const KEEP_STATIC = [...PRECACHE_REQUIRED, ...PRECACHE_OPTIONAL]
 const MAX_PAGES = 50
 const MAX_STATIC = 120
 
@@ -10,8 +13,9 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     (async () => {
       const cache = await caches.open(STATIC_CACHE)
-      // 1 件でも失敗すると SW が有効化されなくなるため、個別に追加して失敗は無視する
-      await Promise.all(PRECACHE_URLS.map((url) => cache.add(url).catch(() => {})))
+      // フォールバックを欠いたまま有効化しないよう、/offline だけは必須にする
+      await cache.add(OFFLINE_URL)
+      await Promise.all(PRECACHE_OPTIONAL.map((url) => cache.add(url).catch(() => {})))
       await self.skipWaiting()
     })()
   )
@@ -22,7 +26,9 @@ self.addEventListener('activate', (event) => {
     (async () => {
       const keys = await caches.keys()
       await Promise.all(
-        keys.filter((key) => key !== STATIC_CACHE && key !== PAGE_CACHE).map((key) => caches.delete(key))
+        keys
+          .filter((key) => key !== STATIC_CACHE && key !== PAGE_CACHE)
+          .map((key) => caches.delete(key).catch(() => {}))
       )
       await self.clients.claim()
     })()
@@ -59,44 +65,58 @@ function isStaticAsset(pathname) {
 
 // 記事は常に最新を取りに行き、オフライン時だけキャッシュにフォールバックする
 async function handleNavigation(request) {
-  const cache = await caches.open(PAGE_CACHE)
+  let response
   try {
-    const response = await fetch(request)
-    if (response.ok) {
-      await cache.put(request, response.clone())
-      await trimCache(cache, MAX_PAGES, ['/', OFFLINE_URL])
-    }
-    return response
+    response = await fetch(request)
   } catch (error) {
-    const cached = await cache.match(request)
-    if (cached) return cached
-    const offline = await caches.match(OFFLINE_URL)
-    if (offline) return offline
+    const fallback = await findFallback(request)
+    if (fallback) return fallback
     throw error
+  }
+
+  if (response.ok) await saveToCache(PAGE_CACHE, request, response, MAX_PAGES, ['/', OFFLINE_URL])
+  return response
+}
+
+// install 時に precache した / なども拾えるよう、全キャッシュを対象に探す
+async function findFallback(request) {
+  try {
+    return (await caches.match(request)) || (await caches.match(OFFLINE_URL)) || null
+  } catch {
+    return null
   }
 }
 
 async function staleWhileRevalidate(request, event) {
-  const cache = await caches.open(STATIC_CACHE)
-  const cached = await cache.match(request)
-  const network = fetch(request)
-    .then(async (response) => {
-      if (response.ok) {
-        await cache.put(request, response.clone())
-        await trimCache(cache, MAX_STATIC, PRECACHE_URLS)
-      }
-      return response
-    })
-    .catch((error) => {
-      if (cached) return cached
-      throw error
-    })
-
+  const cached = await caches.match(request).catch(() => undefined)
   if (cached) {
-    event.waitUntil(network.catch(() => {}))
+    event.waitUntil(refresh(request))
     return cached
   }
-  return network
+
+  const response = await fetch(request)
+  if (response.ok) await saveToCache(STATIC_CACHE, request, response, MAX_STATIC, KEEP_STATIC)
+  return response
+}
+
+async function refresh(request) {
+  try {
+    const response = await fetch(request)
+    if (response.ok) await saveToCache(STATIC_CACHE, request, response, MAX_STATIC, KEEP_STATIC)
+  } catch {
+    // オフライン時はキャッシュをそのまま使い続ける
+  }
+}
+
+// キャッシュ更新の失敗で、取得できたレスポンスを落とさない
+async function saveToCache(cacheName, request, response, max, keep) {
+  try {
+    const cache = await caches.open(cacheName)
+    await cache.put(request, response.clone())
+    await trimCache(cache, max, keep)
+  } catch {
+    // ストレージ不足などは無視する
+  }
 }
 
 // 古いハッシュ付きアセットなどが溜まり続けないよう、挿入順で古いものから捨てる
