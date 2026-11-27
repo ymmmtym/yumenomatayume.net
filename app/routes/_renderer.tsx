@@ -83,6 +83,12 @@ export default jsxRenderer(({ children, title, description, heroImage, noindex, 
         <link rel="canonical" href={currentUrl} />
         <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed" />
         <link rel="icon" href="https://res.cloudinary.com/yumenomatayume/image/upload/v1675155499/yumenomatayume/icon.png" />
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" sizes="180x180" />
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-title" content="yumenomatayume" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
         <link
@@ -94,6 +100,18 @@ export default jsxRenderer(({ children, title, description, heroImage, noindex, 
           __html: `
             if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
               document.documentElement.classList.add('dark')
+            }
+            function syncThemeColor() {
+              const meta = document.querySelector('meta[name="theme-color"]');
+              if (meta) meta.setAttribute('content', document.documentElement.classList.contains('dark') ? '#030712' : '#ffffff');
+            }
+            syncThemeColor();
+
+            // islands を使わないページでも Service Worker を登録できるよう、ここで行う
+            if ('serviceWorker' in navigator) {
+              window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').catch(function() {});
+              }, { once: true });
             }
             window.addEventListener('DOMContentLoaded', function() {
               const isDark = document.documentElement.classList.contains('dark');

@@ -2,7 +2,21 @@ import { spawn } from "node:child_process";
 
 const PORT = Number(process.env.PORT ?? 8787);
 const BASE_URL = `http://127.0.0.1:${PORT}`;
-const PATHS = ["/", "/blog", "/feed", "/sitemap.xml", "/robots.txt", "/privacy", "/contact", "/form", "/ads.txt"];
+const PATHS = [
+  "/",
+  "/blog",
+  "/feed",
+  "/sitemap.xml",
+  "/robots.txt",
+  "/privacy",
+  "/contact",
+  "/form",
+  "/ads.txt",
+  "/offline",
+  "/manifest.webmanifest",
+  "/sw.js",
+  "/icons/icon-192.png",
+];
 const SECURITY_HEADERS = [
   "X-Content-Type-Options",
   "Referrer-Policy",

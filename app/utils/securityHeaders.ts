@@ -14,6 +14,7 @@ export const CSP_REPORT_ONLY = [
   "default-src 'self'",
   "base-uri 'self'",
   "object-src 'none'",
+  "worker-src 'self'",
   "frame-ancestors 'none'",
   "form-action 'self'",
   "script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.google.com https://*.doubleclick.net",
