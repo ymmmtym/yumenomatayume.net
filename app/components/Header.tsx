@@ -43,7 +43,7 @@ export default function Header({ pathname }: HeaderProps) {
               type="checkbox"
               id="theme-toggle"
               class="peer sr-only"
-              onclick="document.documentElement.classList.toggle('dark');localStorage.setItem('theme',document.documentElement.classList.contains('dark')?'dark':'light');"
+              onclick="document.documentElement.classList.toggle('dark');localStorage.setItem('theme',document.documentElement.classList.contains('dark')?'dark':'light');if(typeof syncThemeColor==='function')syncThemeColor();"
             />
             <span class="sr-only">ダークモードを切り替え</span>
             <span class="inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition-colors peer-checked:bg-brand-600 peer-checked:[&>svg]:translate-x-5 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand-500 dark:bg-gray-700 dark:peer-checked:bg-brand-500">

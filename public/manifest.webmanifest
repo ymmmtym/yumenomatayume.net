@@ -1,0 +1,48 @@
+{
+  "id": "/",
+  "name": "yumenomatayume.net",
+  "short_name": "yumenomatayume",
+  "description": "SRE / Infrastructure Engineer の技術ブログ",
+  "lang": "ja",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#7c3aed",
+  "categories": ["technology", "blog"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "ブログ一覧",
+      "short_name": "ブログ",
+      "url": "/blog",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "RSS フィード",
+      "short_name": "RSS",
+      "url": "/feed"
+    }
+  ]
+}
