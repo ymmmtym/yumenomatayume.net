@@ -1,0 +1,13 @@
+# ハッシュ付きのビルド成果物は内容が変わらないため、長期間キャッシュさせる
+/static/*
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+# アイコンと記事画像はファイル名が固定なので、更新が反映される範囲にとどめる
+/icons/*
+  Cache-Control: public, max-age=86400
+  X-Content-Type-Options: nosniff
+
+/images/*
+  Cache-Control: public, max-age=86400
+  X-Content-Type-Options: nosniff

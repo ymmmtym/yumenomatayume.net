@@ -86,6 +86,7 @@ async function main() {
     await waitForServer();
 
     const failures: { path: string; status?: number; error?: string }[] = [];
+    let assetCacheChecks = 0;
     for (const path of PATHS) {
       const url = `${BASE_URL}${path}`;
       try {
@@ -131,6 +132,34 @@ async function main() {
       }
     }
 
+    // ハッシュ付きアセットが public/_headers で長期キャッシュされること
+    try {
+      const html = await (await fetchWithTimeout(`${BASE_URL}/`)).text();
+      const assetPath = html.match(/\/static\/[A-Za-z0-9._-]+\.(?:css|js)/)?.[0];
+      if (!assetPath) {
+        failures.push({ path: "static asset: not referenced from /" });
+      } else {
+        const res = await fetchWithTimeout(`${BASE_URL}${assetPath}`);
+        const cacheControl = res.headers.get("Cache-Control") ?? "";
+        const nosniff = res.headers.get("X-Content-Type-Options");
+        if (res.status !== 200) {
+          failures.push({ path: assetPath, status: res.status });
+        } else if (!cacheControl.includes("immutable")) {
+          failures.push({ path: `${assetPath}: Cache-Control is "${cacheControl}"` });
+        } else if (nosniff !== "nosniff") {
+          failures.push({ path: `${assetPath}: X-Content-Type-Options is "${nosniff}"` });
+        } else {
+          console.log(`OK ${res.status} ${assetPath} (${cacheControl})`);
+          assetCacheChecks++;
+        }
+      }
+    } catch (error) {
+      failures.push({
+        path: "static asset cache",
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+
     if (failures.length > 0) {
       console.error("Smoke test failed:");
       for (const failure of failures) {
@@ -142,7 +171,9 @@ async function main() {
       }
       process.exitCode = 1;
     } else {
-      console.log(`Smoke test passed (${PATHS.length} paths + ${headerChecks.length} header checks).`);
+      console.log(
+        `Smoke test passed (${PATHS.length} paths + ${headerChecks.length} header checks + ${assetCacheChecks} asset cache checks).`,
+      );
     }
   } finally {
     shutdown();
