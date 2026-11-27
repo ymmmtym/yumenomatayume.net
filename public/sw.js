@@ -5,7 +5,9 @@ const OFFLINE_URL = '/offline'
 // オフライン表示に必須のものと、失敗しても致命的でないもの
 const PRECACHE_REQUIRED = [OFFLINE_URL]
 const PRECACHE_OPTIONAL = ['/', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png']
-const KEEP_STATIC = [...PRECACHE_REQUIRED, ...PRECACHE_OPTIONAL]
+const toUrl = (path) => new URL(path, self.location.origin).href
+const KEEP_STATIC = [...PRECACHE_REQUIRED, ...PRECACHE_OPTIONAL].map(toUrl)
+const KEEP_PAGES = ['/', OFFLINE_URL].map(toUrl)
 const MAX_PAGES = 50
 const MAX_STATIC = 120
 
@@ -74,7 +76,7 @@ async function handleNavigation(request) {
     throw error
   }
 
-  if (response.ok) await saveToCache(PAGE_CACHE, request, response, MAX_PAGES, ['/', OFFLINE_URL])
+  if (response.ok) await saveToCache(PAGE_CACHE, request, response, MAX_PAGES, KEEP_PAGES)
   return response
 }
 
@@ -119,10 +121,11 @@ async function saveToCache(cacheName, request, response, max, keep) {
   }
 }
 
-// 古いハッシュ付きアセットなどが溜まり続けないよう、挿入順で古いものから捨てる
+// 古いハッシュ付きアセットなどが溜まり続けないよう、挿入順で古いものから捨てる。
+// クエリ違いは別エントリなので、保護対象は URL 全体で比較する
 async function trimCache(cache, max, keep) {
   const keys = await cache.keys()
   if (keys.length <= max) return
-  const removable = keys.filter((key) => !keep.includes(new URL(key.url).pathname))
+  const removable = keys.filter((key) => !keep.includes(key.url))
   await Promise.all(removable.slice(0, keys.length - max).map((key) => cache.delete(key)))
 }
